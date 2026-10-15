@@ -433,3 +433,6 @@ footer.site { background: var(--panel); border-top: 1px solid var(--line); paddi
 }
 /* stat numbers: solid colour (gradient text clips in Chrome inside animated boxes) */
 .stat .n { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--accent); line-height: 1.15 }
+/* first suspense line visible immediately on load (no blank top) */
+.cine .line:first-of-type { opacity: 1 }
+.cine .line:first-of-type .w { opacity: 1; filter: none }

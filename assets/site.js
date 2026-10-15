@@ -117,11 +117,12 @@
     function update() {
       var r = sec.getBoundingClientRect(), span = sec.offsetHeight - innerHeight;
       p = Math.min(1, Math.max(0, -r.top / span));
-      lines.forEach(function (l) {
-        var a = +l.dataset.a, b = +l.dataset.b, fadeIn = ss(a, a + .04, p), fadeOut = 1 - ss(b - .04, b, p), o = Math.min(fadeIn, fadeOut);
+      lines.forEach(function (l, idx) {
+        var a = +l.dataset.a, b = +l.dataset.b;
+        var fadeIn = idx === 0 ? 1 : ss(a, a + .05, p), fadeOut = 1 - ss(b - .05, b, p), o = Math.min(fadeIn, fadeOut);
         l.style.opacity = o;
         l.style.transform = "translateY(" + (1 - fadeIn) * 30 + "px) scale(" + (.96 + .04 * fadeIn + (1 - fadeOut) * .08) + ")";
-        var ws = l.querySelectorAll(".w"), k = Math.round(ss(a, b - .05, p) * ws.length * 1.15);
+        var ws = l.querySelectorAll(".w"), k = idx === 0 ? ws.length : Math.round(ss(a, b - .05, p) * ws.length * 1.15);
         for (var j = 0; j < ws.length; j++) ws[j].classList.toggle("on", j < k);
       });
       var z = ss(.44, .74, p), lift = ss(.8, .95, p), wide = innerWidth > 980;
