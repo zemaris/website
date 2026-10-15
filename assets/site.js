@@ -125,12 +125,14 @@
         var ws = l.querySelectorAll(".w"), k = idx === 0 ? ws.length : Math.round(ss(a, b - .05, p) * ws.length * 1.15);
         for (var j = 0; j < ws.length; j++) ws[j].classList.toggle("on", j < k);
       });
-      var z = ss(.44, .74, p), lift = ss(.8, .95, p), wide = innerWidth > 980;
-      app.style.opacity = ss(.43, .52, p) * (wide ? 1 : 1 - .82 * lift);
-      app.style.transform = "translate(" + (wide ? lift * 23 : 0) + "vw," + ((1 - z) * 18 + lift * (wide ? 2 : 10)) + "vh) rotateX(" + (1 - z) * 38 + "deg) rotateY(" + (wide ? -lift * 8 : 0) + "deg) scale(" + (.28 + .72 * z - lift * (wide ? .34 : .08)) + ")";
-      var sp = ss(.49, .55, p) * (1 - ss(.60, .66, p));   // gone before the window fills, so no overlap
-      speedo.style.opacity = sp; num.textContent = Math.round(114 * ss(.49, .64, p));
-      var f = ss(.82, .92, p);
+      var wide = innerWidth > 980;
+      var z = ss(.42, .66, p);                                // zoom finishes sooner, no long centred hold
+      var lift = wide ? ss(.62, .82, p) : ss(.72, .90, p);    // then slide to the right (wide) / up (narrow)
+      app.style.opacity = ss(.41, .50, p) * (wide ? 1 : 1 - .9 * ss(.82, .95, p));
+      app.style.transform = "translate(" + (wide ? lift * 25 : 0) + "vw," + ((1 - z) * 16 + (wide ? 0 : lift * 8)) + "vh) rotateX(" + (1 - z) * 34 + "deg) rotateY(" + (wide ? -lift * 10 : 0) + "deg) scale(" + (.3 + .7 * z - lift * (wide ? .32 : .06)) + ")";
+      var sp = ss(.47, .53, p) * (1 - ss(.58, .63, p));   // gone before the window fills, so no overlap
+      speedo.style.opacity = sp; num.textContent = Math.round(114 * ss(.47, .61, p));
+      var f = ss(.64, .80, p);                                // headline fades in as the app slides aside
       fin.style.opacity = f; fin.style.filter = "blur(" + (1 - f) * 10 + "px)"; fin.classList.toggle("on", f > .5);
       hint.style.opacity = 1 - ss(.0, .05, p);
       warp = .6 + 26 * ss(.25, .46, p) * (1 - .85 * ss(.5, .72, p));
