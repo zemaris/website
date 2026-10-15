@@ -37,7 +37,7 @@
       }); o.observe(el);
     });
 
-    appDemo(); raceDemo(); netBg();
+    appDemo(); raceDemo(); netBg(); cinema();
   });
 
   // live app window in the hero
@@ -97,6 +97,60 @@
     }
     if (reduce) { box.querySelectorAll(".seg i").forEach(function (s) { s.style.width = "100%" }); return }
     new IntersectionObserver(function (es) { if (es[0].isIntersecting) run() }, { threshold: .4 }).observe(box);
+  }
+
+
+  // ---------- cinematic opening: warp-speed starfield, word reveal, app zoom, speed counter
+  function cinema() {
+    var sec = document.getElementById("cine");
+    if (!sec) return;
+    if (reduce) { sec.classList.add("static"); return; }
+    var stage = sec.querySelector(".stage"), cv = sec.querySelector("canvas.warp"), ctx = cv.getContext("2d");
+    var lines = [].slice.call(sec.querySelectorAll(".line")), app = sec.querySelector(".zoom .app");
+    var fin = sec.querySelector(".finale"), speedo = sec.querySelector(".speedo"), num = document.getElementById("speedoNum");
+    var hint = sec.querySelector(".scrollhint");
+    var ss = function (a, b, x) { var t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+    var p = 0, warp = 0.6, W, H, stars = [];
+    function size() { var d = Math.min(2, window.devicePixelRatio || 1); W = cv.width = stage.clientWidth * d; H = cv.height = stage.clientHeight * d }
+    size(); addEventListener("resize", size);
+    for (var i = 0; i < 520; i++) stars.push({ x: (Math.random() - .5) * 2, y: (Math.random() - .5) * 2, z: Math.random() });
+    function update() {
+      var r = sec.getBoundingClientRect(), span = sec.offsetHeight - innerHeight;
+      p = Math.min(1, Math.max(0, -r.top / span));
+      lines.forEach(function (l) {
+        var a = +l.dataset.a, b = +l.dataset.b, fadeIn = ss(a, a + .04, p), fadeOut = 1 - ss(b - .04, b, p), o = Math.min(fadeIn, fadeOut);
+        l.style.opacity = o;
+        l.style.transform = "translateY(" + (1 - fadeIn) * 30 + "px) scale(" + (.96 + .04 * fadeIn + (1 - fadeOut) * .08) + ")";
+        var ws = l.querySelectorAll(".w"), k = Math.round(ss(a, b - .05, p) * ws.length * 1.15);
+        for (var j = 0; j < ws.length; j++) ws[j].classList.toggle("on", j < k);
+      });
+      var z = ss(.44, .74, p), lift = ss(.8, .95, p), wide = innerWidth > 980;
+      app.style.opacity = ss(.43, .52, p) * (wide ? 1 : 1 - .82 * lift);
+      app.style.transform = "translate(" + (wide ? lift * 23 : 0) + "vw," + ((1 - z) * 18 + lift * (wide ? 2 : 10)) + "vh) rotateX(" + (1 - z) * 38 + "deg) rotateY(" + (wide ? -lift * 8 : 0) + "deg) scale(" + (.28 + .72 * z - lift * (wide ? .34 : .08)) + ")";
+      var sp = ss(.52, .58, p) * (1 - ss(.76, .82, p));
+      speedo.style.opacity = sp; num.textContent = Math.round(114 * ss(.52, .78, p));
+      var f = ss(.82, .92, p);
+      fin.style.opacity = f; fin.style.filter = "blur(" + (1 - f) * 10 + "px)"; fin.classList.toggle("on", f > .5);
+      hint.style.opacity = 1 - ss(.0, .05, p);
+      warp = .6 + 26 * ss(.25, .46, p) * (1 - .85 * ss(.5, .72, p));
+    }
+    addEventListener("scroll", update, { passive: true }); update();
+    (function frame() {
+      ctx.fillStyle = "rgba(4,6,12," + (warp > 4 ? .35 : .9) + ")"; ctx.fillRect(0, 0, W, H);
+      var cx = W / 2, cy = H / 2, f = Math.max(W, H) * .5;
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i], pz = s.z;
+        s.z -= .0016 * warp;
+        if (s.z <= .02) { s.x = (Math.random() - .5) * 2; s.y = (Math.random() - .5) * 2; s.z = 1; continue }
+        var x = cx + s.x / s.z * f, y = cy + s.y / s.z * f, px = cx + s.x / pz * f, py = cy + s.y / pz * f;
+        if (x < 0 || x > W || y < 0 || y > H) { s.z = 1; continue }
+        var b = Math.min(1, (1 - s.z) * 1.3), hue = 215 + (1 - s.z) * 50;
+        ctx.strokeStyle = "hsla(" + hue + ",90%," + (65 + b * 25) + "%," + b + ")";
+        ctx.lineWidth = Math.max(1, (1 - s.z) * 3);
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(x, y); ctx.stroke();
+      }
+      if (sec.getBoundingClientRect().bottom > 0) requestAnimationFrame(frame); else setTimeout(function () { requestAnimationFrame(frame) }, 300);
+    })();
   }
 
   // drifting network lines behind the hero
