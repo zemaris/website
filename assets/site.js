@@ -128,8 +128,8 @@
       var z = ss(.44, .74, p), lift = ss(.8, .95, p), wide = innerWidth > 980;
       app.style.opacity = ss(.43, .52, p) * (wide ? 1 : 1 - .82 * lift);
       app.style.transform = "translate(" + (wide ? lift * 23 : 0) + "vw," + ((1 - z) * 18 + lift * (wide ? 2 : 10)) + "vh) rotateX(" + (1 - z) * 38 + "deg) rotateY(" + (wide ? -lift * 8 : 0) + "deg) scale(" + (.28 + .72 * z - lift * (wide ? .34 : .08)) + ")";
-      var sp = ss(.52, .58, p) * (1 - ss(.76, .82, p));
-      speedo.style.opacity = sp; num.textContent = Math.round(114 * ss(.52, .78, p));
+      var sp = ss(.49, .55, p) * (1 - ss(.60, .66, p));   // gone before the window fills, so no overlap
+      speedo.style.opacity = sp; num.textContent = Math.round(114 * ss(.49, .64, p));
       var f = ss(.82, .92, p);
       fin.style.opacity = f; fin.style.filter = "blur(" + (1 - f) * 10 + "px)"; fin.classList.toggle("on", f > .5);
       hint.style.opacity = 1 - ss(.0, .05, p);

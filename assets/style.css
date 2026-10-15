@@ -408,7 +408,7 @@ footer.site { background: var(--panel); border-top: 1px solid var(--line); paddi
 .cine .zoom { position: absolute; inset: 0; display: grid; place-items: center; perspective: 1400px; pointer-events: none }
 .cine .zoom .app { width: min(880px, 92vw); opacity: 0; transform-origin: 50% 40%; will-change: transform, opacity; pointer-events: auto }
 .cine .zoom .app:hover { transform: none }
-.cine .speedo { position: absolute; left: 0; right: 0; top: 13vh; text-align: center; font-weight: 800; font-size: clamp(40px, 7vw, 96px); letter-spacing: -2px; opacity: 0; font-variant-numeric: tabular-nums;
+.cine .speedo { position: absolute; left: 0; right: 0; top: 7vh; z-index: 3; text-shadow: 0 2px 30px #04060c; text-align: center; font-weight: 800; font-size: clamp(40px, 7vw, 96px); letter-spacing: -2px; opacity: 0; font-variant-numeric: tabular-nums;
   background: linear-gradient(90deg, #34c77b, #6ea2ff); -webkit-background-clip: text; background-clip: text; color: transparent }
 .cine .speedo small { font-size: .35em; letter-spacing: 0 }
 .cine .finale { position: absolute; left: 0; right: 0; top: 7vh; padding: 0 20px; text-align: center; opacity: 0; pointer-events: none }
