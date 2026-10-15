@@ -431,3 +431,5 @@ footer.site { background: var(--panel); border-top: 1px solid var(--line); paddi
   .cine .finale .lead { margin-left: 0 }
   .cine .finale .cta, .cine .finale .trust { justify-content: flex-start }
 }
+/* stat numbers: solid colour (gradient text clips in Chrome inside animated boxes) */
+.stat .n { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--accent); line-height: 1.15 }
