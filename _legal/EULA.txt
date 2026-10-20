@@ -1,0 +1,93 @@
+VELOCITY BY ZEMARIS - LICENCE AGREEMENT
+Download Manager for Windows. Last updated: 20 October 2026
+
+Please read this before you install Velocity. By choosing "I accept" and installing or
+using Velocity, you agree to this agreement. If you don't agree, cancel the installation.
+
+Velocity is made and sold by [SELLER LEGAL NAME], trading as Zemaris ("Zemaris", "we",
+"us"). Contact: admin@zemaris.com, website: https://zemaris.com.
+This agreement is between you and Zemaris. It says the same as the Terms of Use on
+https://zemaris.com/terms.html. If the two ever differ, the Terms of Use on the website apply.
+
+1. YOUR LICENCE
+- Velocity comes with a 30-day free trial with all features.
+- After the trial you need a paid plan (Monthly, Yearly, Lifetime or Business) to keep
+  downloading. Each plan lets you use Velocity on the number of PCs shown when you buy it.
+- We give you a personal, non-exclusive, non-transferable licence to install and use
+  Velocity on those PCs while your plan is active (for Lifetime, for as long as Velocity is
+  offered). Monthly, Yearly and Lifetime plans are for personal use. Business plans are for
+  use at work on the agreed number of PCs.
+- Velocity and the Zemaris name and logos stay the property of Zemaris. You get a licence
+  to use the software, not ownership of it.
+
+2. WHAT YOU MAY NOT DO
+- Sell, rent, lend, share or give away Velocity or your licence key, or put it on a
+  server for others to use.
+- Remove or change copyright notices, or get around the trial or the licence check.
+- Reverse engineer, decompile or take apart Velocity, except where the law allows this
+  even though an agreement says otherwise.
+These limits do not apply to the open-source parts listed in THIRD-PARTY-NOTICES.txt
+(installed with Velocity). Each of those parts keeps its own licence, and nothing in this
+agreement limits the rights that licence gives you.
+
+3. LICENCE KEYS AND YOUR PCS
+Your licence key is tied to the PCs you use it on. When you enter a key, Velocity checks
+it and may contact our activation server to record the PC, so we can keep to the number
+of PCs on your plan. To move Velocity to a new PC, email us and we'll free up a slot.
+
+4. BUYING, RENEWING AND REFUNDS
+- Orders are handled by our online reseller Paddle.com, which is the Merchant of Record
+  for all orders. Paddle takes the payment, handles taxes and customer service questions
+  about payment, and handles returns.
+- Monthly and Yearly plans renew automatically until you cancel. If you cancel, Velocity
+  keeps working until the end of the period you paid for. Lifetime plans are paid once.
+- Not happy? Email admin@zemaris.com within 14 days of your purchase for a full refund.
+  When a purchase is refunded or charged back, its licence key stops working.
+- Prices and any taxes are shown at checkout.
+
+5. YOUR RESPONSIBILITY
+Velocity is a general-purpose download tool. You alone are responsible for what you
+download and how you use it. Only download things you have the right to download, and
+follow the copyright laws of your country and the terms of each website you use. Don't
+use Velocity to break copyright or for anything unlawful.
+
+6. UPDATES AND INTERNET USE
+Velocity may download and install updates to itself and to its video engine, so that it
+keeps working well and safely. Velocity checks that each update is genuine before using it.
+What Velocity sends over the internet, and why, is explained in our privacy policy:
+https://zemaris.com/privacy.html.
+
+7. OPEN-SOURCE PARTS
+Velocity includes open-source software, such as Python, yt-dlp and aria2 (aria2 is a
+separate program under the GNU General Public License, version 2). If you choose it during
+setup, FFmpeg is installed as a separate program from its own publisher. Each part is
+covered by its own licence. Details, licence texts and where to get the source code are in
+THIRD-PARTY-NOTICES.txt and the "licenses" folder, both installed with Velocity.
+
+8. NO WARRANTY
+Velocity is provided "as is", without warranties of any kind, express or implied,
+including fitness for a particular purpose. We don't promise that it will work with every
+website, or that it will be free of errors.
+
+9. LIMIT OF LIABILITY
+As far as the law allows, Zemaris is not liable for any indirect, incidental or
+consequential damage, or for any loss of data, that comes from using Velocity. If we are
+found liable anyway, our total liability is limited to the amount you paid for Velocity
+in the 12 months before the claim.
+Nothing in this agreement takes away rights you have as a consumer under the law of your
+country that cannot be taken away by an agreement.
+
+10. ENDING THIS AGREEMENT
+This agreement ends when your plan ends, or if you break it. When it ends, stop using
+Velocity and uninstall it. Sections 5, 8, 9 and 12 still apply after it ends.
+
+11. CHANGES
+We may update this agreement. The date at the top shows the latest version. If you keep
+using Velocity after a change, you accept the new version.
+
+12. LAW
+This agreement is governed by the laws of [GOVERNING LAW], unless the law of your
+country says otherwise for consumers.
+
+13. CONTACT
+Questions about this agreement: admin@zemaris.com

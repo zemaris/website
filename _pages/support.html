@@ -3,8 +3,8 @@
   <div class="wrap">
     <div class="crumbs"><a href="/">Home</a> › Help centre</div>
     <h1>How can we <span class="g">help?</span></h1>
-    <p class="sub">Step-by-step guides and quick fixes. Still stuck? Email <a href="mailto:admin@zemaris.com">admin@zemaris.com</a> and a real person will reply.</p>
-    <div class="toc"><a href="#start">Getting started</a><a href="#troubleshoot">Troubleshooting</a><a href="#licence">Licence & activation</a><a href="#keys">Shortcuts</a><a href="#uninstall">Uninstall</a></div>
+    <p class="sub">Step-by-step guides and quick fixes. Still stuck? Email <a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a> and a real person will reply.</p>
+    <div class="toc"><a href="#start">Getting started</a><a href="#troubleshoot">Troubleshooting</a><a href="#licence">Licence & activation</a><a href="#buying">Buying & refunds</a><a href="#keys">Shortcuts</a><a href="#uninstall">Uninstall</a></div>
   </div>
 </div>
 
@@ -13,7 +13,7 @@
     <h2 class="rv">Getting started</h2>
     <div class="help">
       <div class="card rv"><div class="fi c1"><svg viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg></div><h3>1. Install</h3>
-        <ol><li>Run <b>Velocity-Setup.exe</b>.</li><li>If Windows asks, choose <b>Yes</b> or <b>Run</b>.</li><li>Keep "Start with Windows" ticked so Velocity is ready in the tray.</li></ol></div>
+        <ol><li>Run the setup file you downloaded. Its name starts with <b>Velocity-Setup</b>.</li><li>If Windows shows a blue SmartScreen box, see <a href="#smartscreen">this tip</a>.</li><li>Tick <b>FFmpeg</b> if you want MP3 and HD video, and keep "Start with Windows" ticked so Velocity is ready in the tray.</li></ol></div>
       <div class="card rv"><div class="fi c6"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h3>2. Connect your browser</h3>
         <ol><li>Open <b>Start → Connect Velocity to Chrome</b>.</li><li>Follow the two clicks shown.</li><li>A ⚡ Velocity icon appears in the browser toolbar.</li></ol></div>
       <div class="card rv"><div class="fi c5"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><h3>3. Download</h3>
@@ -29,8 +29,18 @@
     <details><summary>The Download button doesn't appear on videos</summary><ol><li>Check the ⚡ Velocity icon is in your browser's toolbar.</li><li>Open <code>chrome://extensions</code> and make sure Velocity is switched on. Click the reload icon on it.</li><li>Reload the video page.</li></ol></details>
     <details><summary>Downloads are slower than expected</summary><ol><li>Check no speed limit is set in <b>Settings</b>.</li><li>Raise <b>Connections</b> to 16 or 32 in Settings.</li><li>Some servers limit every user to a slow speed. Velocity can't go faster than the server allows.</li></ol></details>
     <details><summary>The browser downloads files itself instead of Velocity</summary><p>Make sure Velocity is running (look for its icon in the system tray). If it's closed, the extension starts it automatically the next time you download.</p></details>
-    <details><summary>Windows SmartScreen shows a warning</summary><p>New apps can show this until Windows recognises them. Check the publisher is <b>Zemaris</b>, then click <b>More info → Run anyway</b>.</p></details>
-    <details><summary>MP3 or HD video fails to save</summary><p>These need FFmpeg, which the installer adds automatically. If it was skipped, run the installer again, or email us for help.</p></details>
+    <details id="smartscreen"><summary>Windows SmartScreen shows a warning</summary>
+      <p>Windows shows "Windows protected your PC" for new apps it doesn't know well yet. It is a caution, not a sign of a virus. Click <b>More info</b> to see the publisher, then:</p>
+      <ul>
+        <li><!--IF signed-->Our installer is digitally signed. The publisher should say <b>{{WIN_PUBLISHER}}</b>. If it says anything else, or "Unknown publisher", don't run it: delete it and download Velocity again from zemaris.com.<!--ELSE-->Our current installer is not digitally signed yet, so the publisher shows as <b>Unknown publisher</b>. That is expected for now. Before you click <b>Run anyway</b>, make sure you downloaded it from zemaris.com, and if you like, <a href="#verify">check the file</a>.<!--ENDIF--></li>
+        <li>Once our installers are signed, the publisher will show our name, and the warning goes away as more people install Velocity.</li>
+      </ul></details>
+    <details id="verify"><summary>How do I check that my download is genuine?</summary><ol>
+      <li>Open PowerShell (right-click Start → Terminal) and type <code>Get-FileHash "$env:USERPROFILE\Downloads\Velocity-Setup-{{WIN_VERSION}}.exe"</code>, using your file's name and folder.</li>
+      <li>Compare the long code it shows with the <b>SHA-256</b> on our <a href="/download.html">Download page</a>. They must be the same (capital or small letters don't matter).</li>
+      <li>For a signed installer you can also right-click the file → <b>Properties</b> → <b>Digital Signatures</b> and check the name.</li>
+      <li>If anything doesn't match, delete the file and email us.</li></ol></details>
+    <details><summary>MP3 or HD video fails to save</summary><p>These need FFmpeg, a free program Velocity uses for audio and video. Setup offers it as a tick box; it is never installed without your choice. If you left it unticked, run setup again and tick <b>FFmpeg</b>, or email us for help.</p></details>
   </div>
 </section>
 
@@ -45,7 +55,7 @@
           <li>In Velocity, open <b>Help → Licence</b>.</li>
           <li>Paste the key and click <b>Activate</b>.</li>
         </ol>
-        <p>Your key is checked on your PC and works offline. Lost your key? Email us from the address you bought with.</p>
+        <p><!--IF activation-->Activate while you are online: Velocity registers the PC with our activation server, so your plan's PC limit can be kept. After that it confirms the key about once a week, and keeps working for up to 14 days without internet.<!--ELSE-->Your key is checked on your PC and works offline.<!--ENDIF--> Subscriptions renew by themselves: Velocity picks up the renewed key the next time it's online. Lost your key? Email us from the address you bought with.</p>
       </div>
       <div class="visual">
         <table class="mini">
@@ -60,7 +70,17 @@
   </div>
 </section>
 
-<section class="alt" id="keys">
+<section class="alt" id="buying">
+  <div class="wrap faq">
+    <h2 class="rv">Buying & refunds</h2>
+    <details><summary>Who takes my payment?</summary><p>Our orders are processed by Paddle.com, our reseller and Merchant of Record. Paddle takes the payment, adds the right tax for your country and sends your receipt. Your licence key comes from us, by email, straight away.</p></details>
+    <details><summary>How do I cancel or change my card?</summary><p>Use the link in your receipt email from Paddle, or look up your order at <a href="https://paddle.net" rel="noopener">paddle.net</a>. Velocity keeps working until the end of the period you paid for.</p></details>
+    <details><summary>How do I get a refund?</summary><p>Ask within 14 days of buying for a full refund. See our <a href="/refunds.html">refund policy</a>.</p></details>
+    <details><summary>I changed my PC. How do I move my key?</summary><p>Enter your key on the new PC. If you've reached your plan's PC limit, email us and we'll free up a slot.</p></details>
+  </div>
+</section>
+
+<section id="keys">
   <div class="wrap" style="max-width:760px">
     <h2 class="rv">Keyboard shortcuts</h2>
     <table class="keys rv">
@@ -79,7 +99,7 @@
   </div>
 </section>
 
-<section id="uninstall">
+<section class="alt" id="uninstall">
   <div class="wrap" style="max-width:760px">
     <h2 class="rv">Uninstall</h2>
     <p class="rv" style="color:var(--text2)">Open <b>Windows Settings → Apps → Installed apps</b>, find <b>Velocity by Zemaris</b>, and choose <b>Uninstall</b>. Your downloaded files are not removed.</p>

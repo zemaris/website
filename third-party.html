@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open-source notices – Zemaris</title>
+<meta name="description" content="The open-source software in the Zemaris apps, its licences, and where to get the source code.">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://zemaris.com/third-party.html">
+<meta property="og:site_name" content="Zemaris">
+<meta property="og:title" content="Open-source notices – Zemaris">
+<meta property="og:description" content="The open-source software in the Zemaris apps, its licences, and where to get the source code.">
+<meta property="og:url" content="https://zemaris.com/third-party.html">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="stylesheet" href="/assets/style.css">
+<script src="/assets/site.js" defer></script>
+</head>
+<body>
+<a class="sr" href="#main">Skip to content</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="32" height="32">Zemaris</a>
+    <nav class="links" aria-label="Main"><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/support.html">Support</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a></nav>
+    <div class="hd-actions">
+      <button class="iconbtn" id="themeBtn" title="Switch light / dark" aria-label="Switch light or dark theme">
+        <svg class="theme-light-ic" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg class="theme-dark-ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <a class="btn small primary" href="/download.html" title="Go to the download page">Get Velocity</a>
+      <button class="iconbtn" id="menuBtn" title="Show or hide the menu" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </div>
+</header>
+<main id="main">
+<div class="doc">
+<h1>Open-source notices</h1>
+<p class="updated">We build on open-source software and are grateful to the people who make it. Each part is covered only by its own licence, and nothing in our terms limits the rights those licences give you.</p>
+
+<h2>Velocity download manager</h2>
+<p>This is the notices file the installer puts next to Velocity (<code>THIRD-PARTY-NOTICES.txt</code>), word for word. The full licence texts are installed in Velocity's <code>licenses</code> folder.</p>
+<pre class="legaltext">VELOCITY BY ZEMARIS - THIRD-PARTY NOTICES
+Download Manager for Windows
+
+Velocity is built with open-source software. We are grateful to the people who make it.
+This file lists each part, its licence, and where to get its source code. The full licence
+texts are in the "licenses" folder next to this file (and aria2's in the "bin" folder).
+Each part is covered only by its own licence. The Velocity licence agreement (EULA.txt)
+does not limit any right these licences give you.
+
+------------------------------------------------------------------------------------------
+1. aria2 (torrent and multi-source engine)
+   File:     bin\aria2c.exe - a separate program that Velocity starts when needed.
+   Version:  1.37.0 (official Windows build from the aria2 project)
+   Licence:  GNU General Public License, version 2 or later (GPL-2.0-or-later), with an
+             extra permission to link with OpenSSL.
+   Texts:    bin\aria2-COPYING.txt (the GPL), bin\aria2-LICENSE.OpenSSL.txt,
+             bin\aria2-README.html (lists the libraries the build may contain).
+   Source:   https://github.com/aria2/aria2/releases/tag/release-1.37.0
+   Copyright (C) 2006, 2019 Tatsuhiro Tsujikawa and contributors.
+
+   Written offer for the source code: for at least three years from the date we last
+   ship this version of aria2, anyone who received it from us may ask for the complete
+   source code of the exact aria2 version we ship. Email admin@zemaris.com and we will send
+   it (as a download link, or on a physical medium for no more than the cost of making and
+   sending it). We have not changed aria2: the code we ship is the aria2 project's own
+   release.
+
+------------------------------------------------------------------------------------------
+2. Python (the language Velocity is written in)
+   Velocity includes the Python runtime and its standard library.
+   Licence:  Python Software Foundation License, version 2 (PSF-2.0).
+   Text:     licenses\Python-&lt;version&gt;-LICENSE.txt
+   Source:   https://www.python.org/downloads/source/
+   Copyright (c) 2001 Python Software Foundation. All rights reserved.
+
+   Python includes other libraries under their own licences. Among them: OpenSSL
+   (Apache License 2.0), Expat (MIT), libffi (MIT), zlib (zlib licence), libmpdec
+   (BSD-2-Clause), mimalloc (MIT), Zstandard (BSD-3-Clause), bzip2 (BSD-style), XZ Utils
+   (public domain / 0BSD), SQLite (public domain) and Tcl/Tk (BSD-style, used for the
+   "choose a folder" box). Their licence texts are in:
+             licenses\Python-&lt;version&gt;-LICENSE.txt
+             licenses\Python-included-software.txt
+             licenses\Tcl-Tk-license.terms.txt
+
+   It also contains Microsoft Visual C++ runtime files (Microsoft Distributable Code),
+   used under Microsoft's terms for redistribution. Microsoft is not involved with and
+   does not endorse Velocity.
+
+------------------------------------------------------------------------------------------
+3. yt-dlp (video engine)
+   Licence:  The Unlicense (public domain dedication).
+   Text:     licenses\yt-dlp-&lt;version&gt;\LICENSE
+   Source:   https://github.com/yt-dlp/yt-dlp
+   Velocity may update its video engine to a newer yt-dlp release by itself. Newer
+   releases come from the yt-dlp project under the same licence.
+
+------------------------------------------------------------------------------------------
+4. certifi (list of trusted website certificates, used by the video engine)
+   Licence:  Mozilla Public License 2.0 (MPL-2.0).
+   Text:     licenses\certifi-&lt;version&gt;\LICENSE
+   Source:   https://github.com/certifi/python-certifi (the files are unchanged)
+
+------------------------------------------------------------------------------------------
+5. PyInstaller (packs Velocity into Velocity.exe)
+   The small start-up program inside Velocity.exe (the "bootloader") comes from PyInstaller.
+   Licence:  GNU General Public License, version 2 or later, with the PyInstaller bootloader
+             exception, which allows it to be used in programs under any licence.
+   Text:     licenses\pyinstaller-&lt;version&gt;\COPYING.txt
+   Source:   https://github.com/pyinstaller/pyinstaller
+
+------------------------------------------------------------------------------------------
+6. FFmpeg (optional, for MP3 audio and HD video)
+   FFmpeg is NOT part of Velocity and is not shipped in this installer. If you tick the
+   FFmpeg box during setup, Setup asks the Windows package manager (winget) to install the
+   separate "FFmpeg Essentials" build, which comes from its own publisher. Velocity then
+   starts it as a separate program when it needs it.
+   Licence:  FFmpeg is licensed under the GNU LGPL 2.1 or later; the Essentials build
+             includes GPL parts, so that build is under the GNU GPL version 3.
+   Source:   https://ffmpeg.org/download.html and https://www.gyan.dev/ffmpeg/builds/
+   FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
+
+------------------------------------------------------------------------------------------
+7. Inno Setup (makes the Velocity installer and uninstaller)
+   Copyright (C) 1997-2026 Jordan Russell. Portions Copyright (C) 2000-2026 Martijn Laan.
+   Licence:  Inno Setup License (free to use, also for commercial programs).
+   Source:   https://jrsoftware.org/isinfo.php
+
+------------------------------------------------------------------------------------------
+Everything else in Velocity (the app, its windows, the browser extension and the
+icons) is Copyright (C) 2026 Zemaris. All rights reserved.
+
+Questions, or a request for source code: admin@zemaris.com</pre>
+
+<h2>Velocity PDF</h2>
+<p>Velocity PDF is not released yet. Its full notices file will be published here and installed with it. It is built with these open-source parts, among others:</p>
+<ul>
+  <li><b>PDF.js</b> (shows PDF pages), Apache License 2.0</li>
+  <li><b>pdf-lib</b> and <b>fontkit</b> (write PDF files and fonts), MIT License</li>
+  <li><b>Tesseract</b> and <b>Tesseract.js</b> (text recognition), Apache License 2.0</li>
+  <li><b>whisper.cpp</b> (voice typing, downloaded only if you use it), MIT License</li>
+  <li><b>Liberation fonts</b>, SIL Open Font License 1.1, and the standard PDF fonts that come with PDF.js, under their own permissive licence</li>
+</ul>
+<p>Velocity PDF also uses Microsoft Edge WebView2, which is part of Windows and covered by Microsoft's own terms.</p>
+<p>Questions, or a request for source code under a licence that offers it: <a href="mailto:admin@zemaris.com">admin@zemaris.com</a>.</p>
+</div>
+</main>
+<footer class="site">
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="30" height="30">Zemaris</a>
+        <p>Fast, honest software. Velocity is our download manager for Windows, and Velocity PDF is coming soon.</p>
+      </div>
+      <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/velocity-pdf.html">Velocity PDF</a><a href="/languages.html">Languages</a></div>
+      <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:admin@zemaris.com">Contact us</a></div>
+      <div><h5>Company</h5><a href="/about.html">About Zemaris</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/eula.html">Licence agreement</a><a href="/legal.html">Legal notice</a><a href="/third-party.html">Open-source notices</a><a href="mailto:admin@zemaris.com">admin@zemaris.com</a></div>
+    </div>
+    <div class="fbottom"><span>© 2026 Zemaris. All rights reserved.</span><span>No ads · No tracking · Nothing installed without asking</span></div>
+  </div>
+</footer>
+</body>
+</html>

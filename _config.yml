@@ -1,0 +1,5 @@
+# GitHub Pages (Jekyll) settings. Files and folders starting with "_" are never published.
+# These notes are for the owner only, so they are kept off the live site too.
+exclude:
+  - README.md
+  - LAUNCH-PREP.md

@@ -1,0 +1,92 @@
+VELOCITY BY ZEMARIS - THIRD-PARTY NOTICES
+Download Manager for Windows
+
+Velocity is built with open-source software. We are grateful to the people who make it.
+This file lists each part, its licence, and where to get its source code. The full licence
+texts are in the "licenses" folder next to this file (and aria2's in the "bin" folder).
+Each part is covered only by its own licence. The Velocity licence agreement (EULA.txt)
+does not limit any right these licences give you.
+
+------------------------------------------------------------------------------------------
+1. aria2 (torrent and multi-source engine)
+   File:     bin\aria2c.exe - a separate program that Velocity starts when needed.
+   Version:  1.37.0 (official Windows build from the aria2 project)
+   Licence:  GNU General Public License, version 2 or later (GPL-2.0-or-later), with an
+             extra permission to link with OpenSSL.
+   Texts:    bin\aria2-COPYING.txt (the GPL), bin\aria2-LICENSE.OpenSSL.txt,
+             bin\aria2-README.html (lists the libraries the build may contain).
+   Source:   https://github.com/aria2/aria2/releases/tag/release-1.37.0
+   Copyright (C) 2006, 2019 Tatsuhiro Tsujikawa and contributors.
+
+   Written offer for the source code: for at least three years from the date we last
+   ship this version of aria2, anyone who received it from us may ask for the complete
+   source code of the exact aria2 version we ship. Email admin@zemaris.com and we will send
+   it (as a download link, or on a physical medium for no more than the cost of making and
+   sending it). We have not changed aria2: the code we ship is the aria2 project's own
+   release.
+
+------------------------------------------------------------------------------------------
+2. Python (the language Velocity is written in)
+   Velocity includes the Python runtime and its standard library.
+   Licence:  Python Software Foundation License, version 2 (PSF-2.0).
+   Text:     licenses\Python-<version>-LICENSE.txt
+   Source:   https://www.python.org/downloads/source/
+   Copyright (c) 2001 Python Software Foundation. All rights reserved.
+
+   Python includes other libraries under their own licences. Among them: OpenSSL
+   (Apache License 2.0), Expat (MIT), libffi (MIT), zlib (zlib licence), libmpdec
+   (BSD-2-Clause), mimalloc (MIT), Zstandard (BSD-3-Clause), bzip2 (BSD-style), XZ Utils
+   (public domain / 0BSD), SQLite (public domain) and Tcl/Tk (BSD-style, used for the
+   "choose a folder" box). Their licence texts are in:
+             licenses\Python-<version>-LICENSE.txt
+             licenses\Python-included-software.txt
+             licenses\Tcl-Tk-license.terms.txt
+
+   It also contains Microsoft Visual C++ runtime files (Microsoft Distributable Code),
+   used under Microsoft's terms for redistribution. Microsoft is not involved with and
+   does not endorse Velocity.
+
+------------------------------------------------------------------------------------------
+3. yt-dlp (video engine)
+   Licence:  The Unlicense (public domain dedication).
+   Text:     licenses\yt-dlp-<version>\LICENSE
+   Source:   https://github.com/yt-dlp/yt-dlp
+   Velocity may update its video engine to a newer yt-dlp release by itself. Newer
+   releases come from the yt-dlp project under the same licence.
+
+------------------------------------------------------------------------------------------
+4. certifi (list of trusted website certificates, used by the video engine)
+   Licence:  Mozilla Public License 2.0 (MPL-2.0).
+   Text:     licenses\certifi-<version>\LICENSE
+   Source:   https://github.com/certifi/python-certifi (the files are unchanged)
+
+------------------------------------------------------------------------------------------
+5. PyInstaller (packs Velocity into Velocity.exe)
+   The small start-up program inside Velocity.exe (the "bootloader") comes from PyInstaller.
+   Licence:  GNU General Public License, version 2 or later, with the PyInstaller bootloader
+             exception, which allows it to be used in programs under any licence.
+   Text:     licenses\pyinstaller-<version>\COPYING.txt
+   Source:   https://github.com/pyinstaller/pyinstaller
+
+------------------------------------------------------------------------------------------
+6. FFmpeg (optional, for MP3 audio and HD video)
+   FFmpeg is NOT part of Velocity and is not shipped in this installer. If you tick the
+   FFmpeg box during setup, Setup asks the Windows package manager (winget) to install the
+   separate "FFmpeg Essentials" build, which comes from its own publisher. Velocity then
+   starts it as a separate program when it needs it.
+   Licence:  FFmpeg is licensed under the GNU LGPL 2.1 or later; the Essentials build
+             includes GPL parts, so that build is under the GNU GPL version 3.
+   Source:   https://ffmpeg.org/download.html and https://www.gyan.dev/ffmpeg/builds/
+   FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
+
+------------------------------------------------------------------------------------------
+7. Inno Setup (makes the Velocity installer and uninstaller)
+   Copyright (C) 1997-2026 Jordan Russell. Portions Copyright (C) 2000-2026 Martijn Laan.
+   Licence:  Inno Setup License (free to use, also for commercial programs).
+   Source:   https://jrsoftware.org/isinfo.php
+
+------------------------------------------------------------------------------------------
+Everything else in Velocity (the app, its windows, the browser extension and the
+icons) is Copyright (C) 2026 Zemaris. All rights reserved.
+
+Questions, or a request for source code: admin@zemaris.com

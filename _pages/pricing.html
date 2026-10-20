@@ -12,18 +12,19 @@
     <div class="plans">
       <div class="plan rv"><h3>Monthly</h3><p class="desc">Pay as you go</p><div class="price">$1.99<small> /month</small></div><div class="per">Cancel any time</div>
         <ul><li>Every feature</li><li>1 PC</li><li>All updates while subscribed</li><li>Email support</li></ul>
-        <a class="btn" href="#launch">Choose Monthly</a></div>
+        <!--IF checkout_live--><button class="btn" type="button" data-checkout="monthly" title="Buy Monthly in a secure checkout window. Your key is emailed to you straight away.">Buy Monthly</button><!--ELSE--><a class="btn soon" href="#launch" title="Checkout opens at launch. Click to join the launch list.">Coming soon</a><!--ENDIF--></div>
       <div class="plan best rv"><span class="ribbon">Most popular</span><h3>Yearly</h3><p class="desc">Best for most people</p><div class="price">$9.99<small> /year</small></div><div class="per">Just $0.83 a month · save 58%</div>
         <ul><li>Every feature</li><li>2 PCs</li><li>All updates while subscribed</li><li>Priority email support</li></ul>
-        <a class="btn primary" href="#launch">Choose Yearly</a></div>
+        <!--IF checkout_live--><button class="btn primary" type="button" data-checkout="yearly" title="Buy Yearly in a secure checkout window. Your key is emailed to you straight away.">Buy Yearly</button><!--ELSE--><a class="btn primary soon" href="#launch" title="Checkout opens at launch. Click to join the launch list.">Coming soon</a><!--ENDIF--></div>
       <div class="plan rv"><h3>Lifetime</h3><p class="desc">Pay once, keep forever</p><div class="price">$19.99<small> once</small></div><div class="per">$6.66 per PC</div>
         <ul><li>Every feature, forever</li><li>3 PCs</li><li>Free updates for life</li><li>Priority email support</li></ul>
-        <a class="btn" href="#launch">Choose Lifetime</a></div>
+        <!--IF checkout_live--><button class="btn" type="button" data-checkout="lifetime" title="Buy Lifetime in a secure checkout window. Your key is emailed to you straight away.">Buy Lifetime</button><!--ELSE--><a class="btn soon" href="#launch" title="Checkout opens at launch. Click to join the launch list.">Coming soon</a><!--ENDIF--></div>
       <div class="plan rv"><h3>Business</h3><p class="desc">Offices and teams</p><div class="price">$6<small> /PC/year</small></div><div class="per">From 5 PCs</div>
         <ul><li>Every feature</li><li>Licensed for commercial use</li><li>One invoice, one key for all PCs</li><li>Priority support</li></ul>
-        <a class="btn" href="mailto:admin@zemaris.com?subject=Velocity%20for%20business">Contact sales</a></div>
+        <a class="btn" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20for%20business" title="Email us how many PCs you need and we'll send a quote">Contact us</a></div>
     </div>
-    <p class="fine center">Prices in US dollars. Local taxes may be added at checkout.</p>
+    <p class="fine center">Prices in US dollars. Local taxes may be added at checkout. Orders are processed by our reseller Paddle.com, the Merchant of Record for all our orders.</p>
+    <p class="fine center" id="checkoutMsg" role="status" aria-live="polite"></p>
   </div>
 </section>
 
@@ -76,19 +77,30 @@
 <section class="alt">
   <div class="wrap faq">
     <div class="center rv"><div class="kicker">Billing</div><h2>Billing questions</h2></div>
-    <details><summary>How do I pay?</summary><p>By card or PayPal through our secure payment partner. We never see or store your card details. Your licence key is emailed to you straight away.</p></details>
-    <details><summary>Can I get a refund?</summary><p>Yes. If Velocity isn't right for you, email admin@zemaris.com within 14 days of buying for a full refund.</p></details>
-    <details><summary>What happens when a Monthly or Yearly plan ends?</summary><p>It renews automatically and you get a fresh key by email. If you cancel, Velocity keeps working until the end of the period you paid for.</p></details>
+    <details><summary>How do I pay?</summary><p>By card, PayPal or other local ways to pay, in a secure checkout run by Paddle.com, our online reseller and Merchant of Record. Paddle takes the payment and handles taxes. We never see or store your card details. Your licence key is emailed to you straight away.</p></details>
+    <details><summary>Can I get a refund?</summary><p>Yes. If Velocity isn't right for you, ask within 14 days of buying for a full refund. See our <a href="/refunds.html">refund policy</a>.</p></details>
+    <details><summary>What happens when a Monthly or Yearly plan renews?</summary><p>It renews automatically. Velocity picks up the renewed key by itself the next time it's online, so there's nothing to paste. If you cancel, Velocity keeps working until the end of the period you paid for.</p></details>
+    <details><summary>How do I cancel or change my card?</summary><p>Use the link in your payment receipt email from Paddle, or look up your order at <a href="https://paddle.net" rel="noopener">paddle.net</a>. You can also email us and we'll help.</p></details>
     <details><summary>How do I move Velocity to a new PC?</summary><p>Enter your key on the new PC. If you've reached your plan's PC limit, email us and we'll free up a slot.</p></details>
     <details><summary>Can I upgrade from Yearly to Lifetime?</summary><p>Yes. Email us and we'll take what's left of your Yearly plan off the Lifetime price.</p></details>
-    <details><summary>Do you offer student or bulk discounts?</summary><p>Business pricing starts at 5 PCs. For schools and students, <a href="mailto:admin@zemaris.com?subject=Education%20pricing">get in touch</a>.</p></details>
+    <details><summary>Do you offer student or bulk discounts?</summary><p>Business pricing starts at 5 PCs. For schools and students, <a href="mailto:{{SUPPORT_EMAIL}}?subject=Education%20pricing">get in touch</a>.</p></details>
   </div>
 </section>
 
-<section class="final" id="launch">
+<!--IF checkout_live--><section class="final" id="launch">
+  <div class="wrap">
+    <h2>Try it first, buy when you're ready</h2>
+    <p class="sub">Every plan starts with the 30-day free trial. When you buy, paste the key from your email into <b>Help → Licence</b>.</p>
+    <a class="btn primary" href="/download.html" title="Go to the download page">Get Velocity</a>
+  </div>
+</section>
+<script type="application/json" id="checkout-config">{{CHECKOUT_JSON}}</script>
+<script src="/assets/checkout.js" defer></script>
+<!--ELSE--><section class="final" id="launch">
   <div class="wrap">
     <h2>Checkout opens at launch</h2>
     <p class="sub">Join the launch list and we'll email you when Velocity is ready, with a launch discount on Lifetime.</p>
-    <a class="btn primary" href="mailto:admin@zemaris.com?subject=Velocity%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20launches.">Join the launch list</a>
+    <a class="btn primary" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20launches." title="Write us a short email to join the launch list">Join the launch list</a>
   </div>
 </section>
+<!--ENDIF-->
