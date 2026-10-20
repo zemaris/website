@@ -51,6 +51,27 @@ def read_manifest(path):
     return {"version": ver, "base_url": base + "/", "file": file, "sha256": digest, "size": size}
 
 
+def update_json_signed(path, app=APP):
+    """True when update.json carries a valid signature by an update key built into the Velocity code at `app`
+    (its updater.py UPDATE_PUBLIC_KEYS). Uses the app's own check, so the two can never disagree."""
+    import importlib.util
+    upd = os.path.join(app, "updater.py")
+    if not os.path.isfile(upd):
+        return False
+    sys.path.insert(0, app)
+    try:
+        spec = importlib.util.spec_from_file_location("_velocity_updater_for_release", upd)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        with open(path, encoding="utf-8-sig") as f:
+            m = json.load(f)
+        return isinstance(m, dict) and mod.manifest_signed(m)
+    except (OSError, ValueError, ImportError, AttributeError):
+        return False
+    finally:
+        sys.path.remove(app)
+
+
 def main(argv=None, root=HERE, app=APP, today=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--update-json", default=os.path.join(app, "dist", "update.json"))
@@ -104,6 +125,9 @@ def main(argv=None, root=HERE, app=APP, today=None):
     if a.stage:
         if not rel["base_url"].startswith(SITE):
             raise SystemExit(f"--stage only works for files served from {SITE} (update.json says {rel['base_url']})")
+        if not update_json_signed(a.update_json, app):
+            raise SystemExit(f"{a.update_json} is not signed with the update key built into Velocity, so installed "
+                             "copies would ignore it. Sign it: python tools\\sign_update.py --sign dist\\update.json")
         folder = os.path.join(root, *rel["base_url"][len(SITE):].strip("/").split("/"))
         os.makedirs(folder, exist_ok=True)
         shutil.copyfile(installer, os.path.join(folder, rel["file"]))

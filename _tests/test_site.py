@@ -305,11 +305,16 @@ class Downloads(unittest.TestCase):
         c["downloads"]["windows"].update(w)
         return c
 
-    def put_file(self, data=None):
+    def put_file(self, data=None, update=True, **uj):
         d = os.path.join(self.tmp, "velocity", "download")
         os.makedirs(d, exist_ok=True)
         with open(os.path.join(d, "Velocity-Setup-9.8.7.exe"), "wb") as f:
             f.write(self.data if data is None else data)
+        if update:
+            m = {"version": "9.8.7", "url": "https://zemaris.com/velocity/download/Velocity-Setup-9.8.7.exe",
+                 "sha256": self.digest, "size": len(self.data), "notes": "", "signature": "c2lnbmVk"} | uj
+            with open(os.path.join(self.tmp, "velocity", "update.json"), "w", encoding="utf-8") as f:
+                json.dump({k: v for k, v in m.items() if v is not None}, f)
 
     def test_open_with_matching_file(self):
         self.put_file()
@@ -350,8 +355,25 @@ class Downloads(unittest.TestCase):
             _build.build(self.out, self.cfg(base="http://zemaris.com/velocity/download/"), quiet=True, root=self.tmp)
 
     def test_other_https_host_needs_no_local_file(self):
-        pages = _build.build(self.out, self.cfg(base="https://downloads.example.com/v/"), quiet=True, root=self.tmp)
-        self.assertIn('href="https://downloads.example.com/v/Velocity-Setup-9.8.7.exe"', pages["download.html"])
+        pages = _build.build(self.out, self.cfg(base="https://downloads.zemaris.com/v/"), quiet=True, root=self.tmp)
+        self.assertIn('href="https://downloads.zemaris.com/v/Velocity-Setup-9.8.7.exe"', pages["download.html"])
+        pages = _build.build(self.out, self.cfg(base="https://github.com/zemaris/velocity/releases/download/v9.8.7/"),
+                             quiet=True, root=self.tmp)
+        self.assertIn("github.com/zemaris/velocity/releases/download/v9.8.7/Velocity-Setup-9.8.7.exe", pages["download.html"])
+
+    def test_refuses_hosts_the_app_would_refuse(self):
+        for base in ("https://downloads.example.com/v/", "https://evilzemaris.com/v/", "https://github.com/someone/v/"):
+            with self.assertRaises(_build.BuildError, msg=base):
+                _build.build(self.out, self.cfg(base=base), quiet=True, root=self.tmp)
+
+    def test_refuses_missing_unsigned_or_other_update_json(self):
+        self.put_file(update=False)
+        with self.assertRaises(_build.BuildError):
+            _build.build(self.out, self.cfg(), quiet=True, root=self.tmp)
+        for bad in (dict(signature=None), dict(signature=""), dict(version="9.8.6"), dict(sha256="0" * 64)):
+            self.put_file(**bad)
+            with self.assertRaises(_build.BuildError, msg=str(bad)):
+                _build.build(self.out, self.cfg(), quiet=True, root=self.tmp)
 
 
 class Template(unittest.TestCase):
@@ -389,11 +411,26 @@ class Release(unittest.TestCase):
         self.data = b"MZ release " * 500
         with open(os.path.join(self.app, "dist", "Velocity-Setup-2.0.1.exe"), "wb") as f:
             f.write(self.data)
+        # the app's real update check, with a throwaway update key built into a temp copy (never the real one)
+        sys.path.insert(0, APP)
+        import licence
+        self.licence = licence
+        self.priv, pub = licence.new_keypair()
+        shutil.copyfile(os.path.join(APP, "licence.py"), os.path.join(self.app, "licence.py"))
+        src = open(os.path.join(APP, "updater.py"), encoding="utf-8").read()
+        src = re.sub(r"^UPDATE_PUBLIC_KEYS = .*$", f"UPDATE_PUBLIC_KEYS = (({pub[0]}, {pub[1]}),)", src, count=1, flags=re.M)
+        with open(os.path.join(self.app, "updater.py"), "w", encoding="utf-8") as f:
+            f.write(src)
         self.manifest(hashlib.sha256(self.data).hexdigest(), len(self.data))
 
-    def manifest(self, digest, size, url="https://zemaris.com/velocity/download/Velocity-Setup-2.0.1.exe"):
+    def manifest(self, digest, size, url="https://zemaris.com/velocity/download/Velocity-Setup-2.0.1.exe", signed=True):
+        m = {"version": "2.0.1", "url": url, "sha256": digest, "size": size, "notes": ""}
+        if signed:
+            import base64
+            msg = json.dumps(m, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("ascii")
+            m["signature"] = base64.b64encode(self.licence.sign(msg, self.priv, domain=b"VELOCITY-UPDATE-JSON\x00")).decode()
         with open(os.path.join(self.app, "dist", "update.json"), "w", encoding="utf-8") as f:
-            json.dump({"version": "2.0.1", "url": url, "sha256": digest, "size": size, "notes": ""}, f)
+            json.dump(m, f)
 
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
@@ -436,6 +473,21 @@ class Release(unittest.TestCase):
         staged = os.path.join(self.root, "velocity", "download", "Velocity-Setup-2.0.1.exe")
         self.assertEqual(open(staged, "rb").read(), self.data)
         self.assertEqual(json.load(open(os.path.join(self.root, "velocity", "update.json")))["version"], "2.0.1")
+
+    def test_stage_refuses_an_unsigned_or_changed_update_json(self):
+        self.manifest(hashlib.sha256(self.data).hexdigest(), len(self.data), signed=False)
+        with self.assertRaises(SystemExit):
+            self.run_release("--stage")
+        self.assertFalse(os.path.exists(os.path.join(self.root, "velocity")))
+        self.manifest(hashlib.sha256(self.data).hexdigest(), len(self.data))
+        p = os.path.join(self.app, "dist", "update.json")
+        m = json.load(open(p, encoding="utf-8"))
+        m["notes"] = "changed after signing"
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(m, f)
+        with self.assertRaises(SystemExit):
+            self.run_release("--stage")
+        self.run_release()          # filling in the details without staging still works
 
     def test_stage_refuses_other_hosts(self):
         self.manifest(hashlib.sha256(self.data).hexdigest(), len(self.data), url="https://cdn.example.com/Velocity-Setup-2.0.1.exe")

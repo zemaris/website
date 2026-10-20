@@ -141,6 +141,9 @@ def check_downloads(cfg, root=HERE):
     base = d.get("base_url") or ""
     if not (base.startswith("https://") and base.endswith("/")):
         fail("downloads.base_url must start with https:// and end with /")
+    if not re.match(r"^https://(zemaris\.com|[a-z0-9-]+(\.[a-z0-9-]+)*\.zemaris\.com|github\.com/zemaris)/", base.lower()):
+        fail("downloads.base_url must be on zemaris.com (or a subdomain) or github.com/zemaris/...: the app refuses "
+             "installers from other hosts (updater.py INSTALLER_HOSTS)")
     if not re.match(r"^\d+\.\d+\.\d+$", w.get("version") or ""):
         fail("downloads.windows.version must look like 1.7.2")
     if not re.match(r"^[A-Za-z0-9._-]+\.exe$", w.get("file") or ""):
@@ -163,6 +166,17 @@ def check_downloads(cfg, root=HERE):
                 h.update(chunk)
         if h.hexdigest() != w["sha256"] or os.path.getsize(local) != w["size"]:
             fail(f"{os.path.relpath(local, root)} does not match the SHA-256 or size in _launch.json")
+        # the in-app update file goes out with the same installer, and signed (the app ignores it otherwise)
+        uj = os.path.join(root, "velocity", "update.json")
+        try:
+            with open(uj, encoding="utf-8-sig") as f:
+                m = json.load(f)
+        except (OSError, ValueError):
+            fail("velocity/update.json is missing or not valid JSON (python _release.py --stage)")
+        if (m.get("version"), (m.get("sha256") or "").lower()) != (w["version"], w["sha256"]):
+            fail("velocity/update.json names another version or file than _launch.json (python _release.py --stage)")
+        if not isinstance(m.get("signature"), str) or not m["signature"]:
+            fail("velocity/update.json is not signed (tools\\sign_update.py --sign, then _release.py --stage)")
     return True
 
 

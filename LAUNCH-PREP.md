@@ -21,7 +21,7 @@ This file and `README.md` are kept off the live site by `_config.yml`.
 | Download page | Windows card ready behind `downloads.open`: version, date, file, size, SHA-256 with a Copy button, signed / not signed, system requirements, Download button. Filled from the release files by `_release.py`. While closed it shows "Coming soon" and no file details. | `_pages/download.html`, `_release.py` |
 | Velocity PDF page | "Coming soon" product page with features checked against the code, privacy summary, Microsoft Store, price "announced at launch". Linked from the footer, the download page and About. | `_pages/velocity-pdf.html` |
 | Tooltips | Every button and button-style link has a tooltip; the build stops if one is missing. | `_build.py` |
-| Tests | `python _tests\test_site.py` (24 checks) and `node --test _tests\checkout.test.mjs` (7 checks). | `_tests/` |
+| Tests | `python _tests\test_site.py` (27 checks) and `node --test _tests\checkout.test.mjs` (7 checks). | `_tests/` |
 
 ## What the owner fills in (in `_launch.json`, then `python _build.py`)
 
@@ -67,6 +67,28 @@ installer missing from the repo or not matching its SHA-256).
    thank-you page and get the key email.
 7. Approve the push: `git push origin launch-prep:main` (or merge into `main` and push). That publishes the site.
    Do it when the packages are final, and only after `python _tests\test_site.py` passes.
+
+## Releasing a download manager update (from the first public build on)
+
+1. In the Velocity code: bump the version, `build.bat`. It signs `dist\update.json` with the owner's update key
+   (`private\velocity_update_key.json`, made once by the owner with `python tools\sign_update.py --new-key`). If the
+   build says "update.json is NOT signed" or "app updates are OFF", stop: that build must not go public.
+2. Here: `python _release.py --stage`. It refuses an update.json that is not signed with the key built into Velocity,
+   and puts the installer (`velocity/download/`) and `velocity/update.json` into the same commit.
+3. `python _build.py`: with downloads open it stops when the installer or a signed `velocity/update.json` for the same
+   version is missing, or when the download address is not on zemaris.com, a subdomain, or github.com/zemaris/...
+   (the only hosts the app accepts).
+4. Owner approves the push. If the installer is hosted elsewhere (a GitHub release), upload it and check it downloads
+   BEFORE update.json goes out: copies that see update.json first would fail to download the update.
+5. After the push: open https://zemaris.com/velocity/update.json and the installer address in a browser.
+
+Hosting limits: GitHub Pages allows about 1 GB per site and about 100 GB of traffic a month, and it is not meant as a
+file host. Every installer committed here (about 24 MB) stays in this public repo's history for good. When downloads
+grow, use GitHub releases under `zemaris` or `downloads.zemaris.com` for the installer and keep only update.json here.
+
+Protect this repo before launch (owner): two-step sign-in on the GitHub account and branch protection on `main`.
+A signed update.json means a changed file here can no longer make installed copies install anything, but the site
+itself (download page, checkout) still depends on this repo.
 
 ## Not done here
 - Nothing is published, no account was touched, no token or price id is real.
