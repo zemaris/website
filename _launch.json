@@ -1,9 +1,9 @@
 {
   "_read_me": "Launch settings for zemaris.com. Fill these in, then run: python _build.py. Empty text shows as [PLACEHOLDER] on the pages. Nothing here is secret: the Paddle client-side token is made to be public. Never put an API key, webhook secret or password in this file. See LAUNCH-PREP.md.",
   "seller": {
-    "legal_name": "",
-    "address": "",
-    "governing_law": "",
+    "legal_name": "Muhammad Asif, trading as Zemaris",
+    "address": "Sultanate of Oman",
+    "governing_law": "the laws of the Sultanate of Oman",
     "privacy_email": "admin@zemaris.com",
     "support_email": "admin@zemaris.com",
     "email_sender": "",
