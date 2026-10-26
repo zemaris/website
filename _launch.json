@@ -15,12 +15,13 @@
   },
   "checkout": {
     "open": false,
-    "environment": "sandbox",
-    "client_token": "",
+    "environment": "production",
+    "client_token": "live_9f8409f49d177fd2ee25bccf469",
     "prices": {
-      "monthly": "",
-      "yearly": "",
-      "lifetime": ""
+      "monthly": "pri_01m5was7vtz65wpd88mnh3kjn0",
+      "yearly": "pri_01m5wasxq5hp8pbnq8z0mkq8yy",
+      "lifetime": "pri_01m5watybxhx32sk1ejh3cpwy8",
+      "business": "pri_01m5wavfzx17jej3q47ewq8xvg"
     }
   },
   "downloads": {
