@@ -1,0 +1,40 @@
+{
+  "_read_me": "Launch settings for zemaris.com. Fill these in, then run: python _build.py. Empty text shows as [PLACEHOLDER] on the pages. Nothing here is secret: the Paddle client-side token is made to be public. Never put an API key, webhook secret or password in this file. See LAUNCH-PREP.md.",
+  "seller": {
+    "legal_name": "Muhammad Asif, trading as Zemaris",
+    "address": "Sultanate of Oman",
+    "governing_law": "the laws of the Sultanate of Oman",
+    "privacy_email": "admin@zemaris.com",
+    "support_email": "admin@zemaris.com",
+    "email_sender": "",
+    "data_kept_after_licence_ends": "2 years"
+  },
+  "licence": {
+    "activation_server": true,
+    "_note": "true when the public build has ACTIVATE_URL set (the activation server is deployed). Changes the licence text on the Support and Features pages."
+  },
+  "checkout": {
+    "open": false,
+    "environment": "production",
+    "client_token": "live_9f8409f49d177fd2ee25bccf469",
+    "prices": {
+      "monthly": "pri_01m5was7vtz65wpd88mnh3kjn0",
+      "yearly": "pri_01m5wasxq5hp8pbnq8z0mkq8yy",
+      "lifetime": "pri_01m5watybxhx32sk1ejh3cpwy8",
+      "business": "pri_01m5wavfzx17jej3q47ewq8xvg"
+    }
+  },
+  "downloads": {
+    "open": false,
+    "base_url": "https://zemaris.com/velocity/download/",
+    "windows": {
+      "version": "1.7.2",
+      "file": "Velocity-Setup-1.7.2.exe",
+      "size": 22137794,
+      "sha256": "ccfd41031a42272368bef42d9f7918fa62badf55bd2ff8a57260974d5409319e",
+      "signed": false,
+      "publisher": "",
+      "date": "October 2026"
+    }
+  }
+}

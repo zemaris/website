@@ -14,6 +14,13 @@
       root.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next) } catch (err) {}
     }
+    var c = e.target.closest("[data-copy]");
+    if (c) {
+      // copy a checksum (or other text) shown on the page
+      var src = document.getElementById(c.getAttribute("data-copy")), text = src ? src.textContent.trim() : "";
+      var done = function () { var old = c.textContent; c.textContent = "Copied"; setTimeout(function () { c.textContent = old }, 1600) };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () {});
+    }
     var m = e.target.closest("#menuBtn");
     if (m) { var n = document.querySelector("nav.links"); n.classList.toggle("open"); m.setAttribute("aria-expanded", n.classList.contains("open")) }
   });
