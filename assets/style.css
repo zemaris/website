@@ -474,3 +474,24 @@ button.btn { line-height: inherit }
 .adm-grid table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius) }
 .adm-grid td { padding: 7px 12px; border-top: 1px solid var(--line); overflow-wrap: anywhere }
 .adm-grid td.num { text-align: right; font-variant-numeric: tabular-nums; width: 4em }
+
+/* reviews on product pages (reviews.js) and in admin.html */
+.reviews { display: grid; gap: 14px; margin-top: 16px }
+.rv-head { font-size: 17px; font-weight: 600; margin: 0 }
+.rv-list { display: grid; gap: 12px }
+.rv-card, .adm-rv { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px }
+.rv-stars { color: #f5b301; letter-spacing: 2px }
+.rv-text { margin: 6px 0; white-space: pre-line; color: var(--text) }
+.rv-who { color: var(--mute); font-size: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.rv-badge { color: var(--ok); font-weight: 600 }
+.rv-form { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; max-width: 640px }
+.rv-form h3 { margin: 0 }
+.rv-form input, .rv-form textarea { font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text) }
+.rv-pick { display: flex; gap: 2px }
+.rv-star { font-size: 28px; line-height: 1; background: none; border: 0; color: #f5b301; cursor: pointer; padding: 2px }
+.rv-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0 }
+.rv-used { color: var(--text2) }
+.rv-msg { margin: 0; color: var(--text2) }
+.adm-reviews { display: grid; gap: 10px; margin-bottom: 18px }
+.adm-rv .adm-rv-act { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap }
+.adm-rv.pending { border-color: var(--warn) }

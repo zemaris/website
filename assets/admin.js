@@ -26,6 +26,37 @@
     });
     box.innerHTML = svg + "</svg><div class=\"adm-axis\"><span>" + list[0].day + "</span><span>most: " + max + "</span><span>" + list[list.length - 1].day + "</span></div>";
   }
+  // reviews waiting for approval first; buttons approve, hide or delete one
+  function reviews(key, action, id) {
+    var box = $("admReviews"), names = { velocity: "Velocity", "velocity-pdf": "Velocity PDF" };
+    fetch(END.replace(/\/stats$/, "/reviews-admin"), { method: "POST", headers: { "content-type": "text/plain" },
+      body: JSON.stringify({ token: key, action: action || "list", id: id }) })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        box.textContent = "";
+        if (!d.ok) { box.textContent = d.reason || "Reviews could not be loaded."; return; }
+        if (!d.reviews.length) { box.textContent = "No reviews yet."; return; }
+        d.reviews.forEach(function (r) {
+          var c = document.createElement("div"); c.className = "adm-rv " + r.status;
+          var h = document.createElement("b");
+          h.textContent = (r.status === "pending" ? "Waiting · " : r.status === "approved" ? "Shown · " : "Hidden · ") +
+            (names[r.product] || r.product) + " · " + "★★★★★".slice(0, r.stars) + " · " + r.name + (r.country ? " (" + r.country + ")" : "") +
+            (r.verified ? " · Verified buyer" : "") + " · " + String(r.created).slice(0, 10);
+          var t = document.createElement("p"); t.textContent = r.text;
+          var act = document.createElement("div"); act.className = "adm-rv-act";
+          [["approve", "Approve", "Show this review on the product page"], ["hide", "Hide", "Keep it but do not show it"], ["delete", "Delete", "Delete this review for good"]]
+            .forEach(function (a) {
+              if ((a[0] === "approve" && r.status === "approved") || (a[0] === "hide" && r.status === "hidden")) return;
+              var b = document.createElement("button"); b.className = "btn small" + (a[0] === "approve" ? " primary" : ""); b.type = "button";
+              b.textContent = a[1]; b.title = a[2];
+              b.addEventListener("click", function () { if (a[0] !== "delete" || confirm("Delete this review for good?")) reviews(key, a[0], r.id); });
+              act.append(b);
+            });
+          c.append(h, t, act); box.append(c);
+        });
+      })
+      .catch(function () { box.textContent = "Could not reach the server."; });
+  }
   function show(key, days) {
     $("admMsg").textContent = "Loading…";
     fetch(END, { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify({ token: key, days: days }) })
@@ -43,6 +74,7 @@
         rows("tSources", s.sources, nice); rows("tDevices", s.devices, nice);
         $("admMsg").textContent = "Since " + s.since + " (dates in UTC).";
         $("admOut").hidden = false;
+        reviews(key);
       })
       .catch(function () { $("admMsg").textContent = "Could not reach the server. Check the internet connection."; });
   }
