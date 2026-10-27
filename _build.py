@@ -49,6 +49,7 @@ HEAD = """<!doctype html>
 <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
 <link rel="stylesheet" href="/assets/style.css">
 <script src="/assets/site.js" defer></script>
+<script src="/assets/stats.js" defer></script>
 {extra}</head>
 <body>
 <a class="sr" href="#main">Skip to content</a>
@@ -81,7 +82,7 @@ FOOT = """</main>
       <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:{{SUPPORT_EMAIL}}">Contact us</a></div>
       <div><h5>Company</h5><a href="/about.html">About Zemaris</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/eula.html">Licence agreement</a><a href="/legal.html">Legal notice</a><a href="/third-party.html">Open-source notices</a><a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a></div>
     </div>
-    <div class="fbottom"><span>© 2026 Zemaris. All rights reserved.</span><span>No ads · No tracking · Nothing installed without asking</span></div>
+    <div class="fbottom"><span>© 2026 Zemaris. All rights reserved.</span><span>No ads · No cookies · Nothing installed without asking</span></div>
   </div>
 </footer>
 </body>
