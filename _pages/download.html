@@ -1,9 +1,9 @@
-<!-- Download Velocity – Windows | Get Velocity for Windows 11 and 10, with a 30-day free trial. macOS and Linux versions are in testing. | download -->
+<!-- Download Velocity Download Manager for Windows | Get Velocity Download Manager for Windows 11 and 10, with a 30-day free trial. macOS and Linux versions are in testing. | download -->
 <div class="phero">
   <div class="wrap">
     <div class="crumbs"><a href="/">Home</a> › Download</div>
-    <h1>Get <span class="g">Velocity</span></h1>
-    <p class="sub">Velocity for Windows comes with a 30-day free trial with every feature. The macOS and Linux versions are in testing.</p>
+    <h1>Get <span class="g">Velocity Download Manager</span></h1>
+    <p class="sub">Velocity Download Manager for Windows comes with a 30-day free trial with every feature. The macOS and Linux versions are in testing.</p>
   </div>
 </div>
 
@@ -19,10 +19,25 @@
           <tr><td>Version</td><td>{{WIN_VERSION}} · {{WIN_DATE}}</td></tr>
           <tr><td>File</td><td>{{WIN_FILE}} · {{WIN_SIZE}}</td></tr>
           <tr><td>SHA-256</td><td><span class="hash" id="winHash">{{WIN_SHA256}}</span> <button class="copybtn" type="button" data-copy="winHash" title="Copy the SHA-256 checksum, to compare with your downloaded file">Copy</button></td></tr>
-          <tr><td>Publisher</td><td><!--IF signed-->Signed by {{WIN_PUBLISHER}}<!--ELSE-->Not digitally signed yet (<a href="/support.html#smartscreen">what this means</a>)<!--ENDIF--></td></tr>
+          <tr><td>Publisher</td><td><!--IF signed-->Signed by {{WIN_PUBLISHER}}<!--ELSE-->Not digitally signed yet (<a href="#warning-help">what this means</a>)<!--ENDIF--></td></tr>
         </table>
-        <a class="btn primary" href="{{WIN_URL}}" title="Download the Velocity installer for Windows ({{WIN_SIZE}})">Download for Windows</a>
+        <a class="btn primary" href="{{WIN_URL}}" title="Download the Velocity Download Manager installer for Windows ({{WIN_SIZE}})">Download for Windows</a>
         <a class="btn" href="/support.html#verify" title="How to check that your download is genuine">Check your download</a>
+        <details class="reqs warnhelp" id="warning-help"><summary>Seeing a warning when you download?</summary>
+          <p>That's normal for a new app, and usually a few clicks get you past it.</p>
+          <h4>In Microsoft Edge</h4>
+          <p>If it says the file <b>"isn't commonly downloaded"</b>, click the three dots (<b>...</b>) next to the download, choose <b>Keep</b>, then <b>Show more</b>, then <b>Keep anyway</b>.</p>
+          <h4>In Chrome</h4>
+          <p>Open your downloads (<b>Ctrl+J</b>). If the file is marked <b>"isn't commonly downloaded"</b> or <b>suspicious</b>, choose <b>Keep</b> (or <b>Download suspicious file</b>).</p>
+          <h4>In Windows</h4>
+          <p>If a blue box says <b>"Windows protected your PC"</b>, click <b>More info</b>, then <b>Run anyway</b>.<!--IF !signed--> The publisher shows as "Unknown publisher" for now.<!--ENDIF--></p>
+<!--IF !signed-->          <p>If Windows says <b>Smart App Control</b> blocked it, there is no Run anyway button yet. Email <a href="mailto:{{SUPPORT_EMAIL}}?subject=Smart%20App%20Control%20blocked%20Velocity%20Setup">{{SUPPORT_EMAIL}}</a> and we'll help. This goes away once our installer is code-signed.</p>
+<!--ENDIF-->
+          <h4>Why it happens</h4>
+          <p><!--IF signed-->Our installer is signed by <b>{{WIN_PUBLISHER}}</b>, but Windows and browsers are careful with files they haven't seen many times yet, so a new version can be warned about for a while.<!--ELSE-->Velocity Download Manager is a new app, and our installer isn't code-signed yet, so Windows and your browser don't know it well. It's a caution, not a sign of a virus. Code signing is on the way.<!--ENDIF--></p>
+          <h4>Check the file</h4>
+          <p>Want to be sure it's ours? Its SHA-256 must match the one shown above. <a href="/support.html#verify">How to check your download</a>.</p>
+        </details>
 <!--ELSE-->        <span class="chip warn">Coming soon</span>
         <ul><li>Installer, no admin rights needed</li><li>Tray icon & clipboard monitor</li><li>Microsoft Defender scan option</li></ul>
         <a class="btn primary soon" href="#launch" title="Downloads open at launch. Click to join the launch list.">Coming soon</a>
@@ -79,7 +94,7 @@
 <section id="more" style="padding-top:8px">
   <div class="wrap">
     <div class="fgroup">
-      <div class="head"><div class="fi c2"><svg viewBox="0 0 24 24"><path d="M4 5h7v7H4zM13 5h7v7h-7zM4 14h7v5H4zM13 14h7v5h-7z"/></svg></div><h2>More from Zemaris</h2><p>Two new apps that work hand in hand with Velocity.</p></div>
+      <div class="head"><div class="fi c2"><svg viewBox="0 0 24 24"><path d="M4 5h7v7H4zM13 5h7v7h-7zM4 14h7v5H4zM13 14h7v5h-7z"/></svg></div><h2>More from Zemaris</h2><p>Two new apps that work hand in hand with Velocity Download Manager.</p></div>
     </div>
     <div class="plats" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
       <div class="plat rv" data-app="pdf">
@@ -116,10 +131,10 @@
 
 <section class="final" id="launch">
   <div class="wrap">
-<!--IF downloads_live-->    <h2>Try Velocity free for 30 days</h2>
+<!--IF downloads_live-->    <h2>Try Velocity Download Manager free for 30 days</h2>
     <p class="sub">Every feature, no card, no sign-up. Velocity updates itself.</p>
-    <a class="btn primary" href="{{WIN_URL}}" title="Download the Velocity installer for Windows ({{WIN_SIZE}})">Download free trial</a>
-<!--ELSE-->    <h2>Velocity is launching soon</h2>
+    <a class="btn primary" href="{{WIN_URL}}" title="Download the Velocity Download Manager installer for Windows ({{WIN_SIZE}})">Download free trial</a>
+<!--ELSE-->    <h2>Velocity Download Manager is launching soon</h2>
     <p class="sub">Join the launch list and we'll email you the moment your version is ready, with a launch discount on Lifetime.</p>
     <a class="btn primary" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20launches.%20My%20system%20is%3A%20" title="Write us a short email to join the launch list">Join the launch list</a>
 <!--ENDIF-->  </div>

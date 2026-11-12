@@ -1,8 +1,9 @@
-VELOCITY BY ZEMARIS - LICENCE AGREEMENT
-Download Manager for Windows. Last updated: 20 October 2026
+VELOCITY DOWNLOAD MANAGER BY ZEMARIS - LICENCE AGREEMENT
+For Windows. Last updated: 12 November 2026
 
-Please read this before you install Velocity. By choosing "I accept" and installing or
-using Velocity, you agree to this agreement. If you don't agree, cancel the installation.
+Please read this before you install Velocity Download Manager ("Velocity"). By choosing
+"I accept" and installing or using Velocity, you agree to this agreement. If you don't
+agree, cancel the installation.
 
 Velocity is made and sold by Muhammad Asif, trading as Zemaris ("Zemaris", "we",
 "us"). Contact: admin@zemaris.com, website: https://zemaris.com.

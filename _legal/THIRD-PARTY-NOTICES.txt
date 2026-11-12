@@ -1,7 +1,7 @@
-VELOCITY BY ZEMARIS - THIRD-PARTY NOTICES
-Download Manager for Windows
+VELOCITY DOWNLOAD MANAGER BY ZEMARIS - THIRD-PARTY NOTICES
+For Windows
 
-Velocity is built with open-source software. We are grateful to the people who make it.
+Velocity Download Manager ("Velocity") is built with open-source software. We are grateful to the people who make it.
 This file lists each part, its licence, and where to get its source code. The full licence
 texts are in the "licenses" folder next to this file (and aria2's in the "bin" folder).
 Each part is covered only by its own licence. The Velocity licence agreement (EULA.txt)

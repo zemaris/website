@@ -23,6 +23,10 @@
     }
     var m = e.target.closest("#menuBtn");
     if (m) { var n = document.querySelector("nav.links"); n.classList.toggle("open"); m.setAttribute("aria-expanded", n.classList.contains("open")) }
+    // a link to a collapsed answer on this page opens it, also when clicked again after it was closed: the address
+    // already ends in that #, so no hashchange comes
+    var h = e.target.closest('a[href^="#"]');
+    if (h) openDetails(h.getAttribute("href").slice(1));
   });
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -44,8 +48,18 @@
       }); o.observe(el);
     });
 
-    appDemo(); raceDemo(); netBg(); cinema();
+    appDemo(); raceDemo(); netBg(); cinema(); openTarget();
   });
+
+  // a link to a collapsed answer (support.html#smartscreen, #verify, download.html#warning-help) opens it: on load,
+  // when the address's # changes, and on a click of a link to it on the same page (see the click handler above)
+  function openDetails(id) {
+    try { id = decodeURIComponent(id) } catch (e) { return }
+    var el = id && document.getElementById(id);
+    if (el && el.tagName === "DETAILS") el.open = true;
+  }
+  function openTarget() { openDetails(location.hash.slice(1)) }
+  addEventListener("hashchange", openTarget);
 
   // live app window in the hero
   function appDemo() {

@@ -28,7 +28,7 @@
   }
   // reviews waiting for approval first; buttons approve, hide or delete one
   function reviews(key, action, id) {
-    var box = $("admReviews"), names = { velocity: "Velocity", "velocity-pdf": "Velocity PDF" };
+    var box = $("admReviews"), names = { velocity: "Velocity Download Manager", "velocity-pdf": "Velocity PDF" };
     fetch(END.replace(/\/stats$/, "/reviews-admin"), { method: "POST", headers: { "content-type": "text/plain" },
       body: JSON.stringify({ token: key, action: action || "list", id: id }) })
       .then(function (r) { return r.json(); })

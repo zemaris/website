@@ -31,6 +31,16 @@ VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "met
         "circle", "rect"}
 
 
+def isolate():
+    """The Release tests load Velocity's own code (licence.py, and updater.py through _release.py): first the app's
+    tests/isolation.py, as for every test that loads it (temp data folder; licence server, registry and the Windows
+    start-up entry off). Once per run."""
+    if "isolation" not in sys.modules:
+        sys.path.insert(0, os.path.join(APP, "tests"))
+        import isolation
+        isolation.setup("zsite-iso-")
+
+
 def base_cfg():
     return _build.load_config()
 
@@ -193,7 +203,9 @@ class Built(unittest.TestCase):
             self.assertIn(f'href="{d["base_url"]}{w["file"]}"', card)
             self.assertIn(w["sha256"], card)
             self.assertIn(f'Version {w["version"]}', card)
-            self.assertIn(f'Velocity {w["version"]} <span class="tag new">Current</span>', self.pages["whats-new.html"])
+            self.assertRegex(self.pages["whats-new.html"],
+                             r'Velocity (?:Download Manager )?' + re.escape(w["version"]) + r' <span class="tag new">Current</span>')
+            self.assertEqual(self.pages["whats-new.html"].count('<span class="tag new">Current</span>'), 1)
             if d["base_url"].startswith("https://zemaris.com/"):
                 local = os.path.join(SITE, *d["base_url"][len("https://zemaris.com/"):].strip("/").split("/"), w["file"])
                 self.assertEqual(os.path.getsize(local), w["size"])
@@ -316,6 +328,151 @@ class Built(unittest.TestCase):
         for n in ("terms.html", "eula.html"):
             self.assertEqual(plain(self.pages[n]).count("governed by the laws of " + law), 1, n)
 
+    def test_new_name_in_titles_meta_and_schema(self):
+        """1.7.5: the product is "Velocity Download Manager" (by Zemaris) in every product page's title, Open Graph
+        title, description and the schema; the old name "Velocity by Zemaris" is left only where a page says it was
+        renamed, and in the schema's alternateName."""
+        for n in ("index.html", "download.html", "features.html", "compare.html", "pricing.html", "support.html",
+                  "whats-new.html", "languages.html", "eula.html", "thank-you.html"):
+            text = self.pages[n]
+            title = html.unescape(re.search(r"<title>(.*?)</title>", text).group(1))
+            self.assertIn("Velocity Download Manager", title, n)
+            og = html.unescape(re.search(r'<meta property="og:title" content="([^"]*)">', text).group(1))
+            self.assertEqual(og, title, n)
+            desc = html.unescape(re.search(r'<meta name="description" content="([^"]*)">', text).group(1))
+            self.assertIn("Velocity Download Manager", desc, n)
+        for n, text in self.pages.items():
+            head = text[:text.index("<body>")]
+            for m in re.finditer(r'<title>(.*?)</title>|<meta (?:name|property)="[^"]+" content="([^"]*)">', head):
+                self.assertNotIn("Velocity by Zemaris", html.unescape(m.group(1) or m.group(2)), n)
+            outside_legal = re.sub(r'<pre class="legaltext">.*?</pre>', "", text, flags=re.S)
+            olds = outside_legal.count("Velocity by Zemaris")
+            if n == "support.html":   # "called Velocity by Zemaris before version 1.7.5" (Installed apps)
+                self.assertIn("called <b>Velocity by Zemaris</b> before version 1.7.5", text)
+                self.assertEqual(olds, 1, n)
+            elif n == "index.html":   # the schema's alternateName, so searches for the old name still find it
+                self.assertEqual(olds, 1, n)
+            else:
+                self.assertEqual(olds, 0, n)
+        schema = json.loads(parse(self.pages["index.html"]).json_scripts[0])
+        self.assertEqual(schema["name"], "Velocity Download Manager")
+        self.assertEqual(schema["publisher"]["name"], "Zemaris")
+        home = self.pages["index.html"]
+        self.assertIn("Velocity Download Manager", plain(home[home.index("<footer"):]))
+        wn = self.pages["whats-new.html"]
+        self.assertIn("Velocity Download Manager 1.7.5", wn)
+        self.assertIn("now called <b>Velocity Download Manager</b>", wn)
+
+    def test_download_warning_help(self):
+        """A short "Seeing a warning when you download?" help: in the download page's Windows card (collapsible) and
+        in support.html#smartscreen: the browser's and Windows' messages, the clicks, why, and how to check the file."""
+        cfg = base_cfg()
+        sp = self.pages["support.html"]
+        m = re.search(r'<details id="smartscreen"><summary>Seeing a warning when you download\?</summary>(.*?)</details>',
+                      sp, re.S)
+        self.assertIsNotNone(m, "support.html#smartscreen")
+        blocks = [("support.html", plain(m.group(1)))]
+        self.assertIn('<a href="#verify">check the file</a>', m.group(1))
+        self.assertIn('href="#smartscreen"', sp[:sp.index('id="start"')])   # in the page's table of contents
+        if cfg["downloads"]["open"]:
+            dl = self.pages["download.html"]
+            card = dl[dl.index('data-os="windows"'):dl.index('data-os="mac"')]
+            m = re.search(r'<details class="reqs warnhelp" id="warning-help"><summary>Seeing a warning when you download\?'
+                          r'</summary>(.*?)</details>', card, re.S)
+            self.assertIsNotNone(m, "download.html Windows card")
+            self.assertIn('href="/support.html#verify"', m.group(1))
+            self.assertIn('href="#warning-help"', card)  # the "Not digitally signed yet (what this means)" link
+            blocks.append(("download.html", plain(m.group(1))))
+        signed = cfg["downloads"]["windows"].get("signed")
+        for n, t in blocks:
+            for words in ("\"isn't commonly downloaded\"", "Keep", "\"Windows protected your PC\"", "More info",
+                          "Run anyway", "new app", "SHA-256", "not a sign of a virus", "usually a few clicks"):
+                self.assertIn(words, t, n)
+            # each browser its own steps (second 1.7.5 review). Edge (Microsoft's own steps): the three dots next to
+            # the download, Keep, then Show more, then Keep anyway: "Keep anyway" stays hidden until "Show more", and
+            # clicking the download itself opens none of these
+            self.assertNotIn("click the download, then", t, n)
+            edge = re.search(r"In Microsoft Edge:?(.*?)In Chrome", t, re.S)
+            self.assertIsNotNone(edge, f"{n}: Edge steps before Chrome's")
+            e = edge.group(1)
+            self.assertIn("three dots", e, n)
+            self.assertIn("Show more", e, n)
+            self.assertLess(e.index("Keep"), e.index("Show more"), n)
+            self.assertLess(e.index("Show more"), e.index("Keep anyway"), n)
+            chrome = re.search(r"In Chrome:?(.*?)In Windows", t, re.S)
+            self.assertIsNotNone(chrome, f"{n}: Chrome steps before Windows'")
+            for words in ("Ctrl+J", "\"isn't commonly downloaded\"", "suspicious", "Keep", "Download suspicious file"):
+                self.assertIn(words, chrome.group(1), n)
+            if not signed:
+                self.assertIn("code-signed yet", t, n)
+                self.assertIn("Code signing is on the way", t, n)
+                # Smart App Control blocks an unsigned installer with no Run anyway button: say so, and where to get
+                # help, without telling anyone to switch security off
+                self.assertIn("Smart App Control", t, n)
+                sac = t[t.index("Smart App Control"):]
+                self.assertIn("no Run anyway button", sac, n)
+                self.assertIn(cfg["seller"]["support_email"], sac, n)
+                self.assertNotRegex(sac[:300].lower(), r"turn (it )?off|switch (it )?off|disable", n)
+            else:
+                self.assertNotIn("Smart App Control", t, n)
+
+    def test_thank_you_email_subject_fits_old_and_new_server(self):
+        """The key email's subject changed with 1.7.5 ("Your Velocity licence key" -> "Your Velocity Download Manager
+        licence key", server/worker.js), and the site and the licence server go live at different times: the page
+        names only the start both share, never one full subject."""
+        ty = plain(self.pages["thank-you.html"])
+        self.assertIn('subject starts with "Your Velocity"', ty)
+        self.assertNotIn('"Your Velocity licence key"', ty)
+        self.assertNotIn('"Your Velocity Download Manager licence key"', ty)
+        worker = os.path.join(APP, "server", "worker.js")
+        if os.path.isfile(worker):
+            with open(worker, encoding="utf-8") as f:
+                m = re.search(r"const subject = (.*?);", f.read(), re.S)   # the key email (new key, or sent again)
+            self.assertIsNotNone(m, "server/worker.js: the key email's subject")
+            keys = [s for s in re.findall(r'"([^"]*)"', m.group(1)) if " " in s]     # the texts, not "resend"
+            self.assertTrue(keys and all("licence key" in s for s in keys), keys)
+            for s in keys:
+                self.assertTrue(s.startswith("Your Velocity"), s)
+
+    def test_titles_and_descriptions_fit_search_results(self):
+        """Search results show about 60 characters of a title and 160 of a description. The longer name pushed the
+        home title and four descriptions past that (second 1.7.5 review)."""
+        for n, text in self.pages.items():
+            m = re.search(r"<title>(.*?)</title>", text)
+            if m:
+                self.assertLessEqual(len(html.unescape(m.group(1))), 60, n)
+            d = re.search(r'<meta name="description" content="([^"]*)">', text)
+            if d and "Velocity Download Manager" in html.unescape(d.group(1)):
+                self.assertLessEqual(len(html.unescape(d.group(1))), 160, n)
+
+    def test_legal_pages_changed_by_the_rename_are_dated_after_it(self):
+        """A legal page whose text names "Velocity Download Manager" was changed by the 1.7.5 rename, so its "Last
+        updated" date is 12 November 2026 or later (legal.html kept 20 October 2026)."""
+        import datetime
+        checked = []
+        for n, text in self.pages.items():
+            m = re.search(r'<p class="updated">Last updated: (\d{1,2} \w+ \d{4})</p>', text)
+            if not m:
+                continue
+            body = text[text.index('<main id="main">'):text.index("</main>")]    # the page's own text, not the footer
+            body = re.sub(r'<pre class="legaltext">.*?</pre>', "", body, flags=re.S)
+            if "Velocity Download Manager" not in body:
+                continue
+            day = datetime.datetime.strptime(m.group(1), "%d %B %Y").date()
+            self.assertGreaterEqual(day, datetime.date(2026, 11, 12), n)
+            checked.append(n)
+        self.assertIn("legal.html", checked)
+
+    def test_narrow_screens_do_not_scroll_sideways(self):
+        """At 375 px thank-you.html's two-part row and support.html's PowerShell line (#verify, which download-page
+        links now open) ran 10 px past the screen. Measured in headless Edge; here only the rules that fix it."""
+        with open(os.path.join(SITE, "assets", "style.css"), encoding="utf-8") as f:
+            css = f.read()
+        self.assertIn(".dive > * { min-width: 0 }", css)
+        self.assertRegex(css, r"\.faq code[^{]*\{ overflow-wrap: anywhere \}")
+        self.assertIn("Get-FileHash", self.pages["support.html"])
+        self.assertIn('class="dive', self.pages["thank-you.html"])
+
     def test_site_files_are_built_from_sources(self):
         """The built pages in the repo are up to date with _pages and _launch.json."""
         for name, text in self.pages.items():
@@ -437,7 +594,10 @@ class Downloads(unittest.TestCase):
         self.assertIn("Version 9.8.7", dl)
         self.assertIn(_build._size_text(len(self.data)), dl)
         self.assertIn("Not digitally signed yet", dl)
-        self.assertNotIn("soon", dl[dl.index('data-os="windows"'):dl.index('data-os="mac"')])
+        card = dl[dl.index('data-os="windows"'):dl.index('data-os="mac"')]
+        self.assertNotIn("soon", card)
+        self.assertIn("Seeing a warning when you download?", card)
+        self.assertIn("isn't code-signed yet", plain(card))
         self.assertIn("Velocity-Setup-9.8.7.exe", pages["support.html"])
         self.assertIn("Current", pages["whats-new.html"])
         self.assertIn("Start 30-day free trial", pages["index.html"])
@@ -464,10 +624,31 @@ class Downloads(unittest.TestCase):
         self.put_file()
         pages = _build.build(self.out, self.cfg(signed=True, publisher="Jane Example"), quiet=True, root=self.tmp)
         self.assertIn("Signed by Jane Example", pages["download.html"])
+        self.assertIn("signed by <b>Jane Example</b>", pages["download.html"])   # the warning help
+        self.assertNotIn("code-signed yet", plain(pages["download.html"]) + plain(pages["support.html"]))
         self.assertIn("should say <b>Jane Example</b>", pages["support.html"])
         self.assertNotIn("Not digitally signed", pages["download.html"])
         with self.assertRaises(_build.BuildError):
             _build.build(self.out, self.cfg(signed=True, publisher=""), quiet=True, root=self.tmp)
+
+    def test_whats_new_current_follows_the_version_on_the_site(self):
+        """The 1.7.5 entry says "Next update" until the site serves 1.7.5, then "Current" (and 1.7.4 no longer is)."""
+        def entries(version):
+            self.put_file(version=version)
+            wn = _build.build(self.out, self.cfg(version=version), quiet=True, root=self.tmp)["whats-new.html"]
+            return {v: re.search(r"<h3>Velocity (?:Download Manager )?" + re.escape(v) + r" (.*?)</h3>\s*"
+                                 r'<div class="date">(.*?)</div>', wn).groups() for v in ("1.7.5", "1.7.4")}, wn
+        e, wn = entries("1.7.4")
+        self.assertEqual(e["1.7.5"], ('<span class="tag">Next update</span>', "Coming soon"))
+        self.assertEqual(e["1.7.4"], ('<span class="tag new">Current</span>', "November 2026"))
+        for v in ("1.7.5", "1.7.10", "2.0.0"):
+            e, wn = entries(v)
+            self.assertEqual(e["1.7.5"], ('<span class="tag new">Current</span>', "January 2027"), v)
+            self.assertEqual(e["1.7.4"], ('<span class="tag">First public release</span>', "November 2026"), v)
+            self.assertEqual(wn.count("Current</span>"), 1, v)
+        closed = _build.build(self.out, closed_cfg(), quiet=True)["whats-new.html"]   # downloads off: nothing current
+        self.assertNotIn("Current</span>", closed)
+        self.assertIn('<span class="tag">Next update</span>', closed)
 
     def test_refuses_missing_or_wrong_file(self):
         with self.assertRaises(_build.BuildError):  # not in the repo
@@ -518,6 +699,20 @@ class Template(unittest.TestCase):
         self.assertEqual(self.r("<!--IF !a-->off<!--ENDIF-->"), "off")
         self.assertEqual(self.r("{{X}}{{RAW}}"), "&lt;x&gt;<raw>")
 
+    def test_release_flags(self):
+        def flags(text, version, live=True):
+            return _build.release_flags(text, {"downloads": {"windows": {"version": version}}}, live)
+        t = "<!--IF released_1_7_5-->a<!--ENDIF--><!--IF !released_1_10_0-->b<!--ENDIF-->"
+        self.assertEqual(flags(t, "1.7.4"), {"released_1_7_5": False, "released_1_10_0": False})
+        self.assertEqual(flags(t, "1.7.5"), {"released_1_7_5": True, "released_1_10_0": False})
+        self.assertEqual(flags(t, "1.9.0"), {"released_1_7_5": True, "released_1_10_0": False})   # numbers, not text
+        self.assertEqual(flags(t, "1.10.0"), {"released_1_7_5": True, "released_1_10_0": True})
+        self.assertEqual(flags(t, "2.0.0", live=False), {"released_1_7_5": False, "released_1_10_0": False})
+        self.assertEqual(flags(t, ""), {"released_1_7_5": False, "released_1_10_0": False})
+        self.assertEqual(flags("no flags", "1.7.5"), {})
+        with self.assertRaises(_build.BuildError):   # any other unknown flag still stops the build
+            self.r("<!--IF released_1_7-->x<!--ENDIF-->")
+
     def test_mistakes_stop_the_build(self):
         for t in ("<!--IF zz-->x<!--ENDIF-->", "<!--IF a-->x", "{{NOPE}}", "x<!--ENDIF-->"):
             with self.assertRaises(_build.BuildError):
@@ -541,7 +736,7 @@ class Release(unittest.TestCase):
         with open(os.path.join(self.app, "dist", "Velocity-Setup-2.0.1.exe"), "wb") as f:
             f.write(self.data)
         # the app's real update check, with a throwaway update key built into a temp copy (never the real one)
-        sys.path.insert(0, APP)
+        isolate()
         import licence
         self.licence = licence
         self.priv, pub = licence.new_keypair()

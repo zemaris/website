@@ -163,6 +163,8 @@ h3 { letter-spacing: -.2px }
 /* deep-dive rows */
 .dive { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 110px }
 .dive:last-child { margin-bottom: 0 }
+.dive > * { min-width: 0 }  /* a column may shrink below its longest word or code (thank-you.html at 375 px) */
+.faq code, .help code, .dive code { overflow-wrap: anywhere }  /* a long command wraps instead of widening the page */
 .dive.flip > :first-child { order: 2 }
 .dive h3 { font-size: clamp(26px, 3vw, 34px); margin: 0 0 14px; letter-spacing: -.6px; line-height: 1.15 }
 .dive p { color: var(--text2); font-size: 18px }
@@ -456,6 +458,11 @@ button.btn { line-height: inherit }
 .copybtn:hover { border-color: var(--accent); color: var(--accent) }
 .req { font-size: 14px; color: var(--text2); margin: 0 0 18px; padding-left: 18px }
 .req li { margin: 3px 0 }
+/* "Seeing a warning when you download?" in the download page's Windows card */
+.warnhelp { font-size: 14.5px }
+.warnhelp h4 { font-size: 14.5px; margin: 0 0 2px; color: var(--text) }
+.warnhelp p { margin: 0 0 12px }
+.warnhelp p:last-child { margin-bottom: 18px }
 .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px }
 
 /* private visitor page (admin.html) */

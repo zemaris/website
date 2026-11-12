@@ -1,8 +1,8 @@
 {
-  "version": "1.7.4",
-  "url": "https://zemaris.com/velocity/download/Velocity-Setup-1.7.4.exe",
-  "sha256": "6aaa356a635a23bde8893e2d174a9ecc76f589d7a770cd61d67863b1ce28ebe4",
-  "size": 22346060,
+  "version": "1.7.5",
+  "url": "https://zemaris.com/velocity/download/Velocity-Setup-1.7.5.exe",
+  "sha256": "5f1dd0a64c79a09687fadf5baa37a2d426ad93b7c4cdff5290501fcb110f6d9e",
+  "size": 22355532,
   "notes": "",
-  "signature": "JkrAQOPxFYlZQwKezahXmKeQK8fjua0lk0BLPBJdxduhkCh1cila1S7Jr2DVJvNP1GmtWB4OpQDcoxjdkQ9hFg=="
+  "signature": "MUln53UN7IfgwGYSESaxIgWIT8X/PCVGl3vyJC/ZToljs/LXo+luIM3I0/QFoqf+/aZc1ODVrT7Ms45R2DUVpQ=="
 }

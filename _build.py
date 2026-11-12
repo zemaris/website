@@ -10,7 +10,9 @@ Both only turn on when the rest of their settings are filled in correctly; other
 
 Page sources may use:
   {{NAME}}                                  a value from _launch.json (HTML-escaped), see values() below
-  <!--IF flag-->...<!--ELSE-->...<!--ENDIF-->  flags: checkout_live, downloads_live, signed, activation (and !flag)
+  <!--IF flag-->...<!--ELSE-->...<!--ENDIF-->  flags: checkout_live, downloads_live, signed, activation (and !flag),
+                                            and released_1_7_5 (any version): true when downloads are open with
+                                            that Windows version or a later one (What's new "Current" tags)
 The licence agreement and open-source notices are copied from the app with:  python _release.py --legal ..\\legal
 """
 import html
@@ -76,7 +78,7 @@ FOOT = """</main>
     <div class="fcols">
       <div>
         <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="30" height="30">Zemaris</a>
-        <p>Fast, honest software. Velocity is our download manager for Windows, and Velocity PDF is coming soon.</p>
+        <p>Fast, honest software: Velocity Download Manager for Windows, and Velocity PDF, coming soon.</p>
       </div>
       <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/velocity-pdf.html">Velocity PDF</a><a href="/languages.html">Languages</a></div>
       <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:{{SUPPORT_EMAIL}}">Contact us</a></div>
@@ -217,6 +219,16 @@ def values(cfg):
 # innermost block first (its text holds no other IF), so blocks may be nested
 COND = re.compile(r"<!--IF (!?)(\w+)-->((?:(?!<!--IF ).)*?)(?:<!--ELSE-->((?:(?!<!--IF ).)*?))?<!--ENDIF-->", re.S)
 TOKEN = re.compile(r"\{\{(\w+)\}\}")
+RELEASED = re.compile(r"<!--IF !?(released_(\d+)_(\d+)_(\d+))-->")
+
+
+def release_flags(text, cfg, live):
+    """The released_X_Y_Z flags a page uses: true when downloads are open with Windows version X.Y.Z or a later one.
+    A What's new entry marked with one turns "Current" by itself once _release.py --stage puts that version on the site,
+    and says "Next update" until then."""
+    ver = (cfg.get("downloads", {}).get("windows", {}).get("version") or "")
+    have = tuple(int(x) for x in ver.split(".")) if live and re.match(r"^\d+\.\d+\.\d+$", ver) else None
+    return {m.group(1): bool(have and have >= tuple(int(x) for x in m.group(2, 3, 4))) for m in RELEASED.finditer(text)}
 
 
 def render(text, vals, raw, flags, name):
@@ -316,7 +328,7 @@ def build(out_dir=None, cfg=None, quiet=False, root=HERE):
         nav = "".join(f'<a href="{href}"{" class=\"on\"" if key == active else ""}>{label}</a>' for key, href, label in NAV)
         path = "/" if name == "index.html" else "/" + name
         page = HEAD.format(title=title, desc=desc, nav=nav, extra=extra, path=path) + body + FOOT
-        page = render(page, vals, raw, flags, name)
+        page = render(page, vals, raw, {**flags, **release_flags(page, cfg, flags["downloads_live"])}, name)
         check_page(name, page)
         placeholders.update(PLACEHOLDER.findall(page))
         with open(os.path.join(out_dir, name), "w", encoding="utf-8", newline="\n") as f:

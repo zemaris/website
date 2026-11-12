@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Help centre – Velocity by Zemaris</title>
-<meta name="description" content="Get started with Velocity, connect your browser, fix common problems and activate your licence.">
+<title>Help centre – Velocity Download Manager</title>
+<meta name="description" content="Get started with Velocity Download Manager, connect your browser, fix common problems and activate your licence.">
 <meta name="theme-color" content="#0b1020">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://zemaris.com/support.html">
 <meta property="og:site_name" content="Zemaris">
-<meta property="og:title" content="Help centre – Velocity by Zemaris">
-<meta property="og:description" content="Get started with Velocity, connect your browser, fix common problems and activate your licence.">
+<meta property="og:title" content="Help centre – Velocity Download Manager">
+<meta property="og:description" content="Get started with Velocity Download Manager, connect your browser, fix common problems and activate your licence.">
 <meta property="og:url" content="https://zemaris.com/support.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
@@ -41,7 +41,7 @@
     <div class="crumbs"><a href="/">Home</a> › Help centre</div>
     <h1>How can we <span class="g">help?</span></h1>
     <p class="sub">Step-by-step guides and quick fixes. Still stuck? Email <a href="mailto:admin@zemaris.com">admin@zemaris.com</a> and a real person will reply.</p>
-    <div class="toc"><a href="#start">Getting started</a><a href="#troubleshoot">Troubleshooting</a><a href="#licence">Licence & activation</a><a href="#buying">Buying & refunds</a><a href="#keys">Shortcuts</a><a href="#uninstall">Uninstall</a></div>
+    <div class="toc"><a href="#start">Getting started</a><a href="#smartscreen">Download warnings</a><a href="#troubleshoot">Troubleshooting</a><a href="#licence">Licence & activation</a><a href="#buying">Buying & refunds</a><a href="#keys">Shortcuts</a><a href="#uninstall">Uninstall</a></div>
   </div>
 </div>
 
@@ -50,7 +50,7 @@
     <h2 class="rv">Getting started</h2>
     <div class="help">
       <div class="card rv"><div class="fi c1"><svg viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg></div><h3>1. Install</h3>
-        <ol><li>Run the setup file you downloaded. Its name starts with <b>Velocity-Setup</b>.</li><li>If Windows shows a blue SmartScreen box, see <a href="#smartscreen">this tip</a>.</li><li>Tick <b>FFmpeg</b> if you want MP3 and HD video, and keep "Start with Windows" ticked so Velocity is ready in the tray.</li></ol></div>
+        <ol><li>Run the setup file you downloaded. Its name starts with <b>Velocity-Setup</b>.</li><li>If your browser or Windows shows a warning, see <a href="#smartscreen">this tip</a>.</li><li>Tick <b>FFmpeg</b> if you want MP3 and HD video, and keep "Start with Windows" ticked so Velocity is ready in the tray.</li></ol></div>
       <div class="card rv"><div class="fi c6"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><h3>2. Connect your browser</h3>
         <ol><li>Open <b>Start → Connect Velocity to Chrome</b>.</li><li>Follow the two clicks shown.</li><li>A ⚡ Velocity icon appears in the browser toolbar.</li></ol></div>
       <div class="card rv"><div class="fi c5"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div><h3>3. Download</h3>
@@ -62,18 +62,25 @@
 <section class="alt" id="troubleshoot">
   <div class="wrap faq">
     <h2 class="rv">Troubleshooting</h2>
+    <details id="smartscreen"><summary>Seeing a warning when you download?</summary>
+      <p>Your browser or Windows may warn you about our installer. That's normal for a new app, and usually a few clicks get you past it.</p>
+      <ul>
+        <li><b>In Microsoft Edge:</b> if the download says the file <b>"isn't commonly downloaded"</b>, click the three dots (<b>...</b>) next to it, choose <b>Keep</b>, then <b>Show more</b>, then <b>Keep anyway</b>.</li>
+        <li><b>In Chrome:</b> open your downloads (<b>Ctrl+J</b>). If the file is marked <b>"isn't commonly downloaded"</b> or <b>suspicious</b>, choose <b>Keep</b> (or <b>Download suspicious file</b>).</li>
+        <li><b>In Windows:</b> if a blue box says <b>"Windows protected your PC"</b>, click <b>More info</b>, check the file name starts with <b>Velocity-Setup</b>, then click <b>Run anyway</b>.</li>
+        <li><b>Smart App Control:</b> if Windows says Smart App Control blocked it, there is no Run anyway button yet. Email <a href="mailto:admin@zemaris.com?subject=Smart%20App%20Control%20blocked%20Velocity%20Setup">admin@zemaris.com</a> and we'll help. This goes away once our installer is code-signed.</li>
+      </ul>
+      <p><b>Why it happens:</b> Velocity Download Manager is a new app, and Windows and browsers are careful with programs they haven't seen many times yet. It's a caution, not a sign of a virus.</p>
+      <ul>
+        <li>Our installer isn't code-signed yet, so the publisher shows as <b>Unknown publisher</b>. That is expected for now. Code signing is on the way; then Windows will show the publisher's name instead.</li>
+        <li>Before you click <b>Run anyway</b>, make sure you downloaded the file from zemaris.com. To be completely sure, <a href="#verify">check the file</a>: its SHA-256 must match the one on our <a href="/download.html">Download page</a>.</li>
+      </ul></details>
     <details><summary>A video won't download</summary><ol><li>Wait a moment and try again. Velocity updates its video engine automatically, and a fix may already be on its way.</li><li>Open <b>Help → Check for updates</b> to update now.</li><li>For members-only videos, make sure you're signed in to the site in your browser.</li><li>Still failing? Email us the page address.</li></ol></details>
     <details><summary>The Download button doesn't appear on videos</summary><ol><li>Check the ⚡ Velocity icon is in your browser's toolbar.</li><li>Open <code>chrome://extensions</code> and make sure Velocity is switched on. Click the reload icon on it.</li><li>Reload the video page.</li></ol></details>
     <details><summary>Downloads are slower than expected</summary><ol><li>Check no speed limit is set in <b>Settings</b>.</li><li>Raise <b>Connections</b> to 16 or 32 in Settings.</li><li>Some servers limit every user to a slow speed. Velocity can't go faster than the server allows.</li></ol></details>
     <details><summary>The browser downloads files itself instead of Velocity</summary><p>Make sure Velocity is running (look for its icon in the system tray). If it's closed, the extension starts it automatically the next time you download.</p></details>
-    <details id="smartscreen"><summary>Windows SmartScreen shows a warning</summary>
-      <p>Windows shows "Windows protected your PC" for new apps it doesn't know well yet. It is a caution, not a sign of a virus. Click <b>More info</b> to see the publisher, then:</p>
-      <ul>
-        <li>Our current installer is not digitally signed yet, so the publisher shows as <b>Unknown publisher</b>. That is expected for now. Before you click <b>Run anyway</b>, make sure you downloaded it from zemaris.com, and if you like, <a href="#verify">check the file</a>.</li>
-        <li>Once our installers are signed, the publisher will show our name, and the warning goes away as more people install Velocity.</li>
-      </ul></details>
     <details id="verify"><summary>How do I check that my download is genuine?</summary><ol>
-      <li>Open PowerShell (right-click Start → Terminal) and type <code>Get-FileHash "$env:USERPROFILE\Downloads\Velocity-Setup-1.7.4.exe"</code>, using your file's name and folder.</li>
+      <li>Open PowerShell (right-click Start → Terminal) and type <code>Get-FileHash "$env:USERPROFILE\Downloads\Velocity-Setup-1.7.5.exe"</code>, using your file's name and folder.</li>
       <li>Compare the long code it shows with the <b>SHA-256</b> on our <a href="/download.html">Download page</a>. They must be the same (capital or small letters don't matter).</li>
       <li>For a signed installer you can also right-click the file → <b>Properties</b> → <b>Digital Signatures</b> and check the name.</li>
       <li>If anything doesn't match, delete the file and email us.</li></ol></details>
@@ -139,7 +146,7 @@
 <section class="alt" id="uninstall">
   <div class="wrap" style="max-width:760px">
     <h2 class="rv">Uninstall</h2>
-    <p class="rv" style="color:var(--text2)">Open <b>Windows Settings → Apps → Installed apps</b>, find <b>Velocity by Zemaris</b>, and choose <b>Uninstall</b>. Your downloaded files are not removed.</p>
+    <p class="rv" style="color:var(--text2)">Open <b>Windows Settings → Apps → Installed apps</b>, find <b>Velocity Download Manager</b> (called <b>Velocity by Zemaris</b> before version 1.7.5), and choose <b>Uninstall</b>. Your downloaded files are not removed.</p>
   </div>
 </section>
 </main>
@@ -148,7 +155,7 @@
     <div class="fcols">
       <div>
         <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="30" height="30">Zemaris</a>
-        <p>Fast, honest software. Velocity is our download manager for Windows, and Velocity PDF is coming soon.</p>
+        <p>Fast, honest software: Velocity Download Manager for Windows, and Velocity PDF, coming soon.</p>
       </div>
       <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/velocity-pdf.html">Velocity PDF</a><a href="/languages.html">Languages</a></div>
       <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:admin@zemaris.com">Contact us</a></div>
