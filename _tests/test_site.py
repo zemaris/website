@@ -35,6 +35,14 @@ def base_cfg():
     return _build.load_config()
 
 
+def closed_cfg():
+    """The real settings with both launch switches off, so these checks do not depend on how _launch.json is set."""
+    cfg = copy.deepcopy(base_cfg())
+    cfg["checkout"]["open"] = False
+    cfg["downloads"]["open"] = False
+    return cfg
+
+
 def live_checkout(cfg):
     cfg = copy.deepcopy(cfg)
     cfg["seller"].update(SELLER)
@@ -101,8 +109,58 @@ def parse(text):
     return p
 
 
+def final_section(page):
+    """The end section of a page (<section class="final" id="launch">)."""
+    m = re.search(r'<section class="final" id="launch">.*?</section>', page, re.S)
+    return m.group(0) if m else ""
+
+
+def plain(text):
+    """A page or legal text as words: tags removed, entities decoded, wrapped lines joined."""
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", text)))
+
+
+def doubled(text):
+    """Seller or law wording written twice ("trading as" twice in one sentence, "the laws of the laws of").
+    Written apart from _build.py's own check on purpose."""
+    t = plain(text).lower()
+    return re.findall(r"trading as [^.]{0,80}?trading as", t) + re.findall(r"laws of (?:the )?laws of", t)
+
+
+class Closed(unittest.TestCase):
+    """The site with both launch switches off."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.mkdtemp(prefix="zsite-")
+        cls.pages = _build.build(cls.tmp, closed_cfg(), quiet=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp, ignore_errors=True)
+
+    def test_switches_off_means_coming_soon_and_no_payment_script(self):
+        pr = self.pages["pricing.html"]
+        self.assertNotIn("data-checkout=", pr)
+        self.assertNotIn("checkout.js", pr)
+        self.assertNotIn("paddle.js", pr.lower())
+        self.assertNotIn("checkout-config", pr)
+        self.assertEqual(len(re.findall(r'class="btn[^"]*soon"[^>]*>Coming soon<', pr)), 3)
+        self.assertIn("Contact us", pr)
+        dl = self.pages["download.html"]
+        self.assertNotIn(".exe", dl)
+        self.assertNotIn("SHA-256", dl)
+        self.assertIn('>Coming soon</a>', dl)
+        self.assertIn("System requirements", dl)
+        for name, text in self.pages.items():
+            self.assertNotIn("cdn.paddle.com", text.replace('"paddleJs"', ""), name)
+        for n in ("index.html", "download.html"):  # before launch the end section is still the launch list
+            self.assertIn("Join the launch list", final_section(self.pages[n]), n)
+            self.assertNotIn("Download free trial", self.pages[n], n)
+
+
 class Built(unittest.TestCase):
-    """The site as it is configured now (everything switched off)."""
+    """The site as it is configured now in _launch.json."""
 
     @classmethod
     def setUpClass(cls):
@@ -112,6 +170,35 @@ class Built(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp, ignore_errors=True)
+
+    def test_launch_switches_as_configured(self):
+        cfg = base_cfg()
+        pr, dl = self.pages["pricing.html"], self.pages["download.html"]
+        for name, text in self.pages.items():  # Paddle's script is never a page script, only loaded by checkout.js
+            self.assertNotIn('src="https://cdn.paddle.com', text, name)
+        if cfg["checkout"]["open"]:
+            for plan in _build.PLANS:
+                self.assertIn(f'data-checkout="{plan}"', pr)
+            self.assertNotIn(">Coming soon<", pr)
+            self.assertIn('<script src="/assets/checkout.js" defer></script>', pr)
+            conf = json.loads(parse(pr).json_scripts[0])
+            self.assertEqual(conf["prices"], {p: cfg["checkout"]["prices"][p] for p in _build.PLANS})
+            self.assertEqual(conf["token"], cfg["checkout"]["client_token"])
+            self.assertEqual(conf["environment"], cfg["checkout"]["environment"])
+            self.assertIsNone(_build.PLACEHOLDER.search("\n".join(self.pages.values())))
+        if cfg["downloads"]["open"]:
+            d, w = cfg["downloads"], cfg["downloads"]["windows"]
+            card = dl[dl.index('data-os="windows"'):dl.index('data-os="mac"')]
+            self.assertNotIn("soon", card)
+            self.assertIn(f'href="{d["base_url"]}{w["file"]}"', card)
+            self.assertIn(w["sha256"], card)
+            self.assertIn(f'Version {w["version"]}', card)
+            self.assertIn(f'Velocity {w["version"]} <span class="tag new">Current</span>', self.pages["whats-new.html"])
+            if d["base_url"].startswith("https://zemaris.com/"):
+                local = os.path.join(SITE, *d["base_url"][len("https://zemaris.com/"):].strip("/").split("/"), w["file"])
+                self.assertEqual(os.path.getsize(local), w["size"])
+                with open(os.path.join(SITE, "velocity", "update.json"), encoding="utf-8-sig") as f:
+                    self.assertEqual(json.load(f)["url"], d["base_url"] + w["file"])
 
     def test_every_source_page_is_built(self):
         src = sorted(n for n in os.listdir(os.path.join(SITE, "_pages")) if n.endswith(".html"))
@@ -144,22 +231,6 @@ class Built(unittest.TestCase):
                     self.assertTrue(os.path.isfile(os.path.join(SITE, *target.split("/"))), f"{name}: missing file {url}")
             for s in p.scripts:
                 self.assertTrue(s.startswith("/assets/"), f"{name}: outside script {s}")
-
-    def test_switches_off_means_coming_soon_and_no_payment_script(self):
-        pr = self.pages["pricing.html"]
-        self.assertNotIn("data-checkout=", pr)
-        self.assertNotIn("checkout.js", pr)
-        self.assertNotIn("paddle.js", pr.lower())
-        self.assertNotIn("checkout-config", pr)
-        self.assertEqual(len(re.findall(r'class="btn[^"]*soon"[^>]*>Coming soon<', pr)), 3)
-        self.assertIn("Contact us", pr)
-        dl = self.pages["download.html"]
-        self.assertNotIn(".exe", dl)
-        self.assertNotIn("SHA-256", dl)
-        self.assertIn('>Coming soon</a>', dl)
-        self.assertIn("System requirements", dl)
-        for name, text in self.pages.items():
-            self.assertNotIn("cdn.paddle.com", text.replace('"paddleJs"', ""), name)
 
     def test_every_button_has_a_tooltip(self):
         for name, text in self.pages.items():
@@ -212,13 +283,38 @@ class Built(unittest.TestCase):
             self.assertIn("Velocity PDF", text)
             self.assertIn("Paddle", text)
         self.assertIn("Merchant of Record", t)
-        self.assertIn("[GOVERNING LAW]", t)
-        self.assertIn("[SELLER LEGAL NAME]", t)
+        s = base_cfg()["seller"]
+
+        def shown(key, placeholder):  # the value from _launch.json, or its placeholder while it is empty
+            v = (s.get(key) or "").strip()
+            return html.escape(v, quote=True) if v else placeholder
+
+        self.assertIn(shown("governing_law", "[GOVERNING LAW]"), t)
+        self.assertIn(shown("legal_name", "[SELLER LEGAL NAME]"), t)
         self.assertIn("customer portal", t)
-        for word in ("Cloudflare", "anonymous PC code", "[EMAIL SENDING SERVICE]", "Anthropic", "Microsoft Store"):
+        for word in ("Cloudflare", "anonymous PC code", shown("email_sender", "[EMAIL SENDING SERVICE]"), "Anthropic",
+                     "Microsoft Store"):
             self.assertIn(word, p)
         self.assertIn("14 days", self.pages["refunds.html"])
         self.assertIn('name="robots" content="noindex"', self.pages["thank-you.html"])
+
+    def test_seller_and_law_are_written_once(self):
+        """12 Nov 2026 the EULA, terms, privacy and legal notice said "Muhammad Asif, trading as Zemaris, trading as
+        Zemaris" and "the laws of the laws of the Sultanate of Oman": the values held words the sentences add."""
+        for name, text in self.pages.items():
+            self.assertEqual(doubled(text), [], name)
+        for path in (os.path.join(SITE, "_legal", "EULA.txt"), os.path.join(SITE, "_legal", "THIRD-PARTY-NOTICES.txt"),
+                     os.path.join(APP, "legal", "EULA.txt")):
+            if os.path.isfile(path):
+                with open(path, encoding="utf-8") as f:
+                    self.assertEqual(doubled(f.read()), [], path)
+        s = base_cfg()["seller"]
+        seller = (s.get("legal_name") or "").strip() or "[SELLER LEGAL NAME]"
+        law = (s.get("governing_law") or "").strip() or "[GOVERNING LAW]"
+        for n in ("terms.html", "privacy.html", "legal.html", "eula.html"):
+            self.assertIn(f"{seller}, trading as Zemaris", plain(self.pages[n]), n)
+        for n in ("terms.html", "eula.html"):
+            self.assertEqual(plain(self.pages[n]).count("governed by the laws of " + law), 1, n)
 
     def test_site_files_are_built_from_sources(self):
         """The built pages in the repo are up to date with _pages and _launch.json."""
@@ -238,7 +334,7 @@ class Checkout(unittest.TestCase):
         return _build.build(self.tmp, cfg, quiet=True)
 
     def test_live_checkout(self):
-        pages = self.build(live_checkout(base_cfg()))
+        pages = self.build(live_checkout(closed_cfg()))
         pr = pages["pricing.html"]
         for plan in ("monthly", "yearly", "lifetime"):
             self.assertIn(f'data-checkout="{plan}"', pr)
@@ -250,11 +346,16 @@ class Checkout(unittest.TestCase):
         self.assertEqual(conf["environment"], "sandbox")
         self.assertEqual(conf["successUrl"], "https://zemaris.com/thank-you.html")
         self.assertEqual(conf["paddleJs"], "https://cdn.paddle.com/paddle/v2/paddle.js")
-        # seller filled everywhere, escaped
+        # seller filled everywhere, escaped (the EULA only where the app's EULA.txt still has the placeholder:
+        # once the app fills it in, the page shows the installer's words as they are)
+        with open(os.path.join(SITE, "_legal", "EULA.txt"), encoding="utf-8") as f:
+            eula_src = f.read()
         for n in ("terms.html", "legal.html", "privacy.html", "eula.html"):
-            self.assertIn("Test Seller &lt;&amp;&gt;", pages[n], n)
+            if n != "eula.html" or "[SELLER LEGAL NAME]" in eula_src:
+                self.assertIn("Test Seller &lt;&amp;&gt;", pages[n], n)
             self.assertNotIn("[SELLER LEGAL NAME]", pages[n], n)
-        self.assertIn("Testland", pages["eula.html"])
+        if "[GOVERNING LAW]" in eula_src:
+            self.assertIn("Testland", pages["eula.html"])
         self.assertNotIn("[GOVERNING LAW]", pages["eula.html"])
         self.assertIn("privacy@zemaris.com", pages["privacy.html"])
         self.assertNotIn("Test Seller <&>", "".join(pages.values()))
@@ -262,7 +363,7 @@ class Checkout(unittest.TestCase):
         self.assertNotIn(".exe", pages["download.html"])
 
     def test_refuses_wrong_settings(self):
-        good = live_checkout(base_cfg())
+        good = live_checkout(closed_cfg())
         bad = []
         c = copy.deepcopy(good); c["checkout"]["client_token"] = ""; bad.append(c)
         c = copy.deepcopy(good); c["checkout"]["client_token"] = "pdl_sdbx_apikey_01abcdefghijklmnopqrstuvwxyz"; bad.append(c)
@@ -278,6 +379,17 @@ class Checkout(unittest.TestCase):
         prod = copy.deepcopy(good)
         prod["checkout"].update(environment="production", client_token="live_" + "a" * 27)
         self.assertIn('"environment": "production"', self.build(prod)["pricing.html"])
+
+    def test_seller_or_law_written_twice_stops_the_build(self):
+        # the values of 12 Nov 2026, which the sentences already wrapped in ", trading as Zemaris" and "the laws of"
+        for k, v in (("legal_name", "Muhammad Asif, trading as Zemaris"), ("governing_law", "the laws of the Sultanate of Oman")):
+            c = closed_cfg()
+            c["seller"][k] = v
+            with self.assertRaises(_build.BuildError, msg=k):
+                self.build(c)
+        self.assertTrue(doubled('<b>A, trading as Zemaris</b>, trading as\nZemaris ("Zemaris"'))
+        self.assertTrue(doubled("governed by the laws of the\nlaws of Oman"))
+        self.assertEqual(doubled("A, trading as Zemaris. B is governed by the laws of Oman."), [])
 
     def test_checkout_json_cannot_break_out_of_its_script(self):
         _, raw = _build.values({"checkout": {"client_token": "</script><b>", "prices": {}}})
@@ -297,7 +409,7 @@ class Downloads(unittest.TestCase):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def cfg(self, base="https://zemaris.com/velocity/download/", **w):
-        c = copy.deepcopy(base_cfg())
+        c = closed_cfg()
         c["downloads"]["open"] = True
         c["downloads"]["base_url"] = base
         c["downloads"]["windows"].update(version="9.8.7", file="Velocity-Setup-9.8.7.exe", size=len(self.data),
@@ -329,6 +441,22 @@ class Downloads(unittest.TestCase):
         self.assertIn("Velocity-Setup-9.8.7.exe", pages["support.html"])
         self.assertIn("Current", pages["whats-new.html"])
         self.assertIn("Start 30-day free trial", pages["index.html"])
+        # with downloads open the end section of home and download is a plain download button, no launch list
+        # the download page's own end button downloads the installer instead of linking to itself
+        for n, href in (("index.html", "/download.html"),
+                        ("download.html", re.escape("https://zemaris.com/velocity/download/Velocity-Setup-9.8.7.exe"))):
+            end = final_section(pages[n])
+            self.assertRegex(end, r'<a class="btn primary" href="' + href + r'" title="[^"]+">(?:\s*<svg.*?</svg>)?'
+                                  r'Download free trial</a>', n)
+            for gone in ("launch list", "mailto:", "launches", "Join our list"):
+                self.assertNotIn(gone, end, n)
+            self.assertNotIn("Please%20tell%20me%20when%20Velocity%20launches", pages[n], n)
+        # the macOS, Linux and phone cards ask for an email, never the launch list that no longer exists
+        # (Velocity PDF and Velocity Browser cards further down keep their own launch list: not released yet)
+        cards = dl[dl.index('data-os="mac"'):dl.index('data-os="ext"')]
+        self.assertNotIn('href="#launch"', dl)
+        self.assertNotIn("launch list", cards)
+        self.assertEqual(len(re.findall(r">Email me when ready<", cards)), 4)
         # checkout still closed
         self.assertEqual(len(re.findall(r">Coming soon<", pages["pricing.html"])), 3)
 
@@ -407,7 +535,8 @@ class Release(unittest.TestCase):
         for n in ("EULA.txt", "THIRD-PARTY-NOTICES.txt"):
             with open(os.path.join(self.app, "legal", n), "w", encoding="utf-8") as f:
                 f.write(n + " text\n")
-        shutil.copyfile(os.path.join(SITE, "_launch.json"), os.path.join(self.root, "_launch.json"))
+        with open(os.path.join(self.root, "_launch.json"), "w", encoding="utf-8") as f:
+            json.dump(closed_cfg(), f)  # both switches off: _release.py must never turn them on
         self.data = b"MZ release " * 500
         with open(os.path.join(self.app, "dist", "Velocity-Setup-2.0.1.exe"), "wb") as f:
             f.write(self.data)

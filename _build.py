@@ -259,6 +259,16 @@ def legal_text(name, vals):
 
 BTN = re.compile(r'<a\b[^>]*\bclass="[^"]*\bbtn\b[^"]*"[^>]*>|<button\b[^>]*>', re.I)
 PLACEHOLDER = re.compile(r"\[[A-Z][A-Z0-9 ,:/()-]{3,}\]")
+# The pages and the EULA already say "{{SELLER}}, trading as Zemaris" and "the laws of {{GOVERNING_LAW}}", so
+# seller.legal_name is the name only and seller.governing_law the country only (12 Nov 2026 the values held those words
+# too: "Muhammad Asif, trading as Zemaris, trading as Zemaris", "the laws of the laws of the Sultanate of Oman").
+DOUBLED = re.compile(r"\btrading as\b[^.]{0,80}?\btrading as\b|\blaws of (?:the )?laws of\b", re.I)
+
+
+def doubled_wording(text):
+    """Seller or law wording written twice in a page or legal text (tags removed, wrapped lines joined)."""
+    plain = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", text)))
+    return [m.group(0) for m in DOUBLED.finditer(plain)]
 
 
 def check_page(name, page):
@@ -267,6 +277,10 @@ def check_page(name, page):
         fail(f"{name}: every button needs a tooltip (title=...): " + "; ".join(missing))
     if TOKEN.search(page):
         fail(f"{name}: a {{{{value}}}} was left unfilled")
+    doubled = doubled_wording(page)
+    if doubled:
+        fail(f"{name}: written twice: {doubled[0]!r}. In _launch.json seller.legal_name is the name only (the pages add "
+             "\", trading as Zemaris\") and seller.governing_law the country only (they add \"the laws of\")")
 
 
 def build(out_dir=None, cfg=None, quiet=False, root=HERE):

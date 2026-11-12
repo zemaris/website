@@ -30,9 +30,9 @@ into the server with `wrangler secret put` (see `..\server\README.md`).
 
 | Setting | What to put | Needed before |
 |---|---|---|
-| `seller.legal_name` | The seller's exact legal name, e.g. "Muhammad Asif" (the EULA in the installer must say the same) | Checkout opens |
+| `seller.legal_name` | The seller's exact legal name only, e.g. "Muhammad Asif" (the pages add ", trading as Zemaris"; the EULA in the installer must say the same). The build stops if a page says "trading as" twice | Checkout opens |
 | `seller.address` | A postal address for the legal notice and terms | Checkout opens |
-| `seller.governing_law` | e.g. "the Sultanate of Oman" (same as the EULA) | Checkout opens |
+| `seller.governing_law` | The country only, e.g. "the Sultanate of Oman" (the pages and the EULA add "the laws of"). The build stops on "the laws of the laws of" | Checkout opens |
 | `seller.email_sender` | "ZeptoMail (by Zoho)" or "Resend", whichever sends the key emails | Checkout opens |
 | `seller.privacy_email` | `admin@zemaris.com` now. Change to `privacy@zemaris.com` once that alias exists in Zoho | Any time |
 | `seller.data_kept_after_licence_ends` | Suggested "2 years". Your decision | Checkout opens |
