@@ -1,40 +1,110 @@
-<!-- Visitors – Zemaris (private) | Private visitor counts for zemaris.com. | none -->
+<!-- Analytics – Zemaris (private) | Private live analytics for zemaris.com. | none -->
 <!--HEAD
 <meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/assets/admin.css">
 <script src="/assets/admin.js" defer></script>
 HEAD-->
-<section class="section">
+<div class="za">
+<section class="za-top">
   <div class="wrap">
-    <h1>Visitors</h1>
-    <p class="muted">Only for the owner: the numbers show only with your admin key (the ADMIN_TOKEN of the licence server). The key stays in this browser tab and is forgotten when you close it.</p>
-    <form id="adm" class="adm-form" autocomplete="off">
-      <input type="password" id="admKey" placeholder="Admin key" aria-label="Admin key" title="Your admin key (ADMIN_TOKEN)" required>
-      <select id="admDays" aria-label="Period" title="How many days to show">
-        <option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last year</option>
-      </select>
-      <button class="btn primary" type="submit" title="Show the visitor numbers">Show</button>
+    <div class="za-title">
+      <div>
+        <p class="za-eyebrow"><span class="za-pulse" id="zLiveDot"></span><span id="zLiveText">Not connected</span><span class="za-sep">·</span><span id="zClock">Oman time</span></p>
+        <h1>Analytics</h1>
+        <p class="za-sub" id="zSince">Only for the owner. Numbers show only with your admin key (ADMIN_TOKEN of the licence server). The key stays in this tab and is forgotten when you close it.</p>
+      </div>
+      <label class="za-switch" title="Count visits from this device apart, as your own visits">
+        <input type="checkbox" id="zMine"><span class="za-knob"></span><span>This device is mine</span>
+      </label>
+    </div>
+    <form id="adm" class="za-bar" autocomplete="off">
+      <input type="password" id="admKey" placeholder="Admin key" aria-label="Admin key" title="Your admin key (ADMIN_TOKEN)">
+      <div class="za-seg" role="group" aria-label="Period">
+        <button type="button" data-days="1" title="Today and yesterday">24 h</button>
+        <button type="button" data-days="7" title="Last 7 days">7 d</button>
+        <button type="button" data-days="30" class="on" title="Last 30 days">30 d</button>
+        <button type="button" data-days="90" title="Last 90 days">90 d</button>
+      </div>
+      <button class="btn primary" type="submit" title="Load the numbers">Show</button>
+      <button class="btn" type="button" id="zCsv" title="Save the daily numbers and the purchases as a CSV file">Export CSV</button>
       <button class="btn" type="button" id="admForget" title="Forget the key in this tab">Forget key</button>
     </form>
-    <p id="admMsg" class="muted" role="status"></p>
-    <div id="admOut" hidden>
-      <div class="adm-kpis">
-        <div><span id="kVisits">0</span><small>Visits (arrived from outside)</small></div>
-        <div><span id="kViews">0</span><small>Page views</small></div>
-        <div><span id="kClicks">0</span><small>Button clicks</small></div>
-      </div>
-      <h2>Visits per day</h2>
-      <div id="admChart" class="adm-chart"></div>
-      <div class="adm-grid">
-        <div><h3>Pages</h3><table id="tPages"></table></div>
-        <div><h3>Clicks</h3><table id="tClicks"></table></div>
-        <div><h3>Countries</h3><table id="tCountries"></table></div>
-        <div><h3>Came from</h3><table id="tSources"></table></div>
-        <div><h3>Device</h3><table id="tDevices"></table></div>
-      </div>
-      <h2>Reviews</h2>
-      <p class="muted">New reviews wait here until you approve them. Approved ones show on the product pages.</p>
-      <div id="admReviews" class="adm-reviews"></div>
-      <p class="muted">Counted without cookies or personal data. People with ad blockers or "do not track" are not counted, so real numbers are a bit higher.</p>
-    </div>
+    <p id="admMsg" class="za-msg" role="status"></p>
   </div>
 </section>
+
+<section class="za-body" id="admOut" hidden>
+  <div class="wrap">
+    <p class="za-banner" id="zPre" hidden>Detailed analytics start once the D1 update (analytics.sql) has been run. Until then only the basic counts show.</p>
+
+    <div class="za-kpis" id="zKpis"></div>
+
+    <div class="za-row za-hero">
+      <article class="za-card za-map-card">
+        <header><h2>Where visitors are</h2><span class="za-hint" id="zMapNote">Visitors per country</span></header>
+        <div class="za-map" id="zMap"><p class="za-empty">Loading the map…</p></div>
+        <div class="za-cols2">
+          <div><h3>Countries</h3><ol class="za-list" id="tCountries"></ol></div>
+          <div><h3>Cities</h3><ol class="za-list" id="tCities"></ol></div>
+        </div>
+      </article>
+      <article class="za-card za-live">
+        <header><h2>Live</h2><span class="za-hint"><span class="za-pulse"></span>new events every 20 s</span></header>
+        <div class="za-today" id="zToday"></div>
+        <ol class="za-feed" id="zFeed" aria-live="polite"></ol>
+      </article>
+    </div>
+
+    <article class="za-card">
+      <header><h2>Day by day</h2>
+        <div class="za-seg small" role="group" aria-label="Chart" id="zMetric">
+          <button type="button" data-m="sessions" class="on" title="Visitors (browser tabs) per day">Visitors</button>
+          <button type="button" data-m="views" title="Page views per day">Views</button>
+          <button type="button" data-m="downloads" title="Downloads per day">Downloads</button>
+          <button type="button" data-m="revenue" title="Net revenue per day">Revenue</button>
+        </div>
+      </header>
+      <div class="za-bars" id="zBars"></div>
+    </article>
+
+    <div class="za-row">
+      <article class="za-card"><header><h2>Funnel</h2><span class="za-hint">from visit to activated licence</span></header><div class="za-funnel" id="zFunnel"></div></article>
+      <article class="za-card"><header><h2>Busy hours</h2><span class="za-hint">page views, Oman time</span></header><div class="za-heat" id="zHeat"></div></article>
+    </div>
+
+    <div class="za-grid">
+      <article class="za-card"><header><h2>Pages</h2></header><ol class="za-list" id="tPages"></ol></article>
+      <article class="za-card"><header><h2>Buttons</h2></header><ol class="za-list" id="tClicks"></ol></article>
+      <article class="za-card"><header><h2>Came from</h2></header><ol class="za-list" id="tSources"></ol></article>
+      <article class="za-card"><header><h2>Devices</h2></header><ol class="za-list" id="tDevices"></ol></article>
+      <article class="za-card"><header><h2>Browsers</h2></header><ol class="za-list" id="tBrowsers"></ol></article>
+      <article class="za-card"><header><h2>Systems</h2></header><ol class="za-list" id="tOs"></ol></article>
+    </div>
+
+    <article class="za-card">
+      <header><h2>Purchases</h2><span class="za-hint">Test purchases are never counted as revenue</span></header>
+      <div class="za-table-wrap"><table class="za-table" id="tSales">
+        <thead><tr><th>When (Oman)</th><th>Buyer</th><th>Plan</th><th class="num">Paid</th><th>Country</th><th>Status</th><th>Test</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+    </article>
+
+    <article class="za-card za-owner">
+      <header><h2>Your own visits</h2><span class="za-hint">devices marked "This device is mine"; never added to the numbers above</span></header>
+      <div class="za-owner-in">
+        <div class="za-owner-k"><b id="oViews">0</b><small>page views</small><b id="oClicks">0</b><small>clicks</small></div>
+        <div class="za-mini" id="oDaily"></div>
+        <ol class="za-list" id="oPages"></ol>
+      </div>
+    </article>
+
+    <article class="za-card">
+      <header><h2>Reviews</h2><span class="za-hint">new reviews wait here until you approve them</span></header>
+      <div id="admReviews" class="adm-reviews"></div>
+    </article>
+
+    <p class="za-foot">Counted without cookies. No IP address is kept: the place comes from the country and city the network gives. People with ad blockers or "do not track" are not counted. Events are kept 90 days.</p>
+  </div>
+</section>
+<div class="za-tip" id="zTip" hidden></div>
+</div>

@@ -61,6 +61,7 @@
         items: [{ priceId: price, quantity: 1 }],
         settings: { displayMode: "overlay", theme: dark() ? "dark" : "light", locale: "en", successUrl: cfg.successUrl }
       });
+      try { if (window.ZemarisStats) window.ZemarisStats.send("checkout_open", plan); } catch (e) {}
     }).catch(function () {
       say("The secure checkout could not open. Check your internet connection and try again, or email " + cfg.support + ".");
     }).then(function () {

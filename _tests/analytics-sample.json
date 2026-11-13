@@ -1,0 +1,105 @@
+{
+  "_sample": "Shape of POST /stats {days:7}. Numbers, emails and names are made up for the shape only; the admin page shows the server's real numbers.",
+  "ok": true,
+  "analytics": true,
+  "tz": "Asia/Muscat",
+  "since": "2026-11-07",
+  "days": 7,
+  "totals": {
+    "views": 412, "visits": 131, "clicks": 96, "sessions": 158, "downloads": 37, "checkouts": 9,
+    "purchases": 2, "activations": 3, "owner_views": 64,
+    "revenue": [{ "currency": "USD", "gross": 3998, "refunded": 0, "net": 3998, "count": 2 }]
+  },
+  "previous": {
+    "views": 351, "visits": 117, "clicks": 81, "sessions": 139, "downloads": 29, "checkouts": 6,
+    "purchases": 1, "activations": 1, "owner_views": 88,
+    "revenue": [{ "currency": "USD", "gross": 1999, "refunded": 0, "net": 1999, "count": 1 }]
+  },
+  "daily": [
+    { "day": "2026-11-07", "views": 48, "visits": 15, "clicks": 11, "sessions": 18, "downloads": 4, "checkouts": 1, "purchases": 0, "revenue": 0, "owner_views": 9 },
+    { "day": "2026-11-08", "views": 52, "visits": 17, "clicks": 12, "sessions": 20, "downloads": 5, "checkouts": 1, "purchases": 0, "revenue": 0, "owner_views": 7 },
+    { "day": "2026-11-09", "views": 61, "visits": 19, "clicks": 14, "sessions": 23, "downloads": 6, "checkouts": 2, "purchases": 1, "revenue": 1999, "owner_views": 11 },
+    { "day": "2026-11-10", "views": 57, "visits": 18, "clicks": 13, "sessions": 22, "downloads": 5, "checkouts": 1, "purchases": 0, "revenue": 0, "owner_views": 6 },
+    { "day": "2026-11-11", "views": 66, "visits": 21, "clicks": 16, "sessions": 25, "downloads": 6, "checkouts": 2, "purchases": 0, "revenue": 0, "owner_views": 10 },
+    { "day": "2026-11-12", "views": 70, "visits": 22, "clicks": 17, "sessions": 27, "downloads": 7, "checkouts": 1, "purchases": 1, "revenue": 1999, "owner_views": 14 },
+    { "day": "2026-11-13", "views": 58, "visits": 19, "clicks": 13, "sessions": 23, "downloads": 4, "checkouts": 1, "purchases": 0, "revenue": 0, "owner_views": 7 }
+  ],
+  "hours": [4, 3, 2, 2, 3, 5, 8, 12, 16, 20, 22, 24, 23, 21, 22, 24, 27, 29, 30, 31, 28, 22, 14, 7],
+  "hourly": [
+    [1, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 3, 3, 3, 4, 4, 4, 5, 5, 4, 3, 2, 1],
+    [1, 1, 0, 0, 1, 1, 1, 2, 3, 3, 4, 4, 4, 3, 3, 4, 4, 5, 4, 5, 4, 3, 2, 1],
+    [0, 0, 1, 0, 0, 1, 1, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 3, 2, 1],
+    [1, 1, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 3, 3, 3, 4, 4, 4, 4, 4, 3, 2, 1],
+    [0, 0, 1, 0, 0, 0, 1, 1, 2, 3, 3, 4, 3, 3, 4, 4, 4, 4, 5, 5, 4, 4, 2, 1],
+    [1, 1, 0, 1, 1, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 3, 2, 1],
+    [0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 3, 2, 1]
+  ],
+  "pages": [
+    { "name": "/", "n": 141 }, { "name": "/velocity", "n": 118 }, { "name": "/pricing", "n": 61 },
+    { "name": "/download", "n": 47 }, { "name": "/support", "n": 24 }, { "name": "/privacy", "n": 21 }
+  ],
+  "clicks": [
+    { "name": "Download free", "n": 37 }, { "name": "Buy Velocity Pro", "n": 22 }, { "name": "See pricing", "n": 19 },
+    { "name": "admin@zemaris.com", "n": 9 }, { "name": "Microsoft Store", "n": 9 }
+  ],
+  "countries": [
+    { "name": "OM", "n": 38, "visitors": 46 }, { "name": "IN", "n": 24, "visitors": 29 }, { "name": "US", "n": 19, "visitors": 23 },
+    { "name": "AE", "n": 14, "visitors": 17 }, { "name": "PK", "n": 11, "visitors": 13 }, { "name": "GB", "n": 9, "visitors": 11 },
+    { "name": "DE", "n": 7, "visitors": 8 }, { "name": "SA", "n": 5, "visitors": 6 }, { "name": "??", "n": 4, "visitors": 5 }
+  ],
+  "cities": [
+    { "name": "Muscat", "region": "Muscat", "country": "OM", "n": 29 },
+    { "name": "Dubai", "region": "Dubai", "country": "AE", "n": 12 },
+    { "name": "Mumbai", "region": "Maharashtra", "country": "IN", "n": 9 },
+    { "name": "Karachi", "region": "Sindh", "country": "PK", "n": 7 },
+    { "name": "London", "region": "England", "country": "GB", "n": 6 },
+    { "name": "Ashburn", "region": "Virginia", "country": "US", "n": 5 }
+  ],
+  "sources": [
+    { "name": "direct", "n": 61 }, { "name": "google.com", "n": 38 }, { "name": "bing.com", "n": 12 },
+    { "name": "linkedin.com", "n": 10 }, { "name": "apps.microsoft.com", "n": 6 }, { "name": "reddit.com", "n": 4 }
+  ],
+  "devices": [{ "name": "computer", "n": 92 }, { "name": "phone", "n": 34 }, { "name": "tablet", "n": 5 }],
+  "browsers": [
+    { "name": "Chrome", "n": 71 }, { "name": "Edge", "n": 29 }, { "name": "Safari", "n": 18 },
+    { "name": "Firefox", "n": 8 }, { "name": "Samsung", "n": 3 }, { "name": "Other", "n": 2 }
+  ],
+  "os": [
+    { "name": "Windows", "n": 84 }, { "name": "Android", "n": 21 }, { "name": "iOS", "n": 14 },
+    { "name": "macOS", "n": 8 }, { "name": "Linux", "n": 4 }
+  ],
+  "funnel": [
+    { "step": "visits", "n": 131 }, { "step": "downloads", "n": 37 }, { "step": "checkout_open", "n": 9 },
+    { "step": "purchase", "n": 2 }, { "step": "activate", "n": 3 }
+  ],
+  "sales": [
+    { "ts": 1794980400000, "txn": "txn_sample_0002", "serial": "SAMPLE02", "plan": "Pro", "pcs": 1, "amount": 1999, "currency": "USD",
+      "country": "AE", "email": "buyer.two@example.com", "name": "Sample Buyer Two", "status": "paid", "refunded": 0, "test": 0 },
+    { "ts": 1794932100000, "txn": "txn_sample_test", "serial": "C5058EA9", "plan": "Pro", "pcs": 1, "amount": 199, "currency": "USD",
+      "country": "OM", "email": "owner@example.com", "name": "Owner Test", "status": "refunded", "refunded": 199, "test": 1 },
+    { "ts": 1794722400000, "txn": "txn_sample_0001", "serial": "SAMPLE01", "plan": "Pro", "pcs": 1, "amount": 1999, "currency": "USD",
+      "country": "IN", "email": "buyer.one@example.com", "name": "Sample Buyer One", "status": "paid", "refunded": 0, "test": 0 }
+  ],
+  "live": [
+    { "ts": 1795077012000, "kind": "view", "name": "/velocity", "page": "/velocity", "country": "OM", "city": "Muscat", "region": "Muscat",
+      "source": "google.com", "device": "phone", "browser": "Chrome", "os": "Android", "tab": "k3v9q2m7xa", "owner": 0 },
+    { "ts": 1795076950000, "kind": "click", "name": "Download free", "page": "/", "country": "IN", "city": "Mumbai", "region": "Maharashtra",
+      "source": "direct", "device": "computer", "browser": "Edge", "os": "Windows", "tab": "p8w1z4c0rd", "owner": 0 },
+    { "ts": 1795076701000, "kind": "activate", "name": "Pro", "page": "", "country": "AE", "city": "Dubai", "region": "Dubai",
+      "source": "app", "device": "computer", "browser": "Other", "os": "Windows", "tab": "", "owner": 0, "serial": "SAMPLE02" },
+    { "ts": 1795076300000, "kind": "view", "name": "/pricing", "page": "/pricing", "country": "OM", "city": "Muscat", "region": "Muscat",
+      "source": "zemaris.com", "device": "computer", "browser": "Chrome", "os": "Windows", "tab": "ownr00tab1", "owner": 1 },
+    { "ts": 1794980400000, "kind": "purchase", "name": "Pro", "page": "", "country": "AE", "city": "", "region": "",
+      "source": "paddle", "device": "computer", "browser": "Other", "os": "Other", "tab": "", "owner": 0,
+      "amount": 1999, "currency": "USD", "serial": "SAMPLE02" }
+  ],
+  "owner": {
+    "views": 64, "clicks": 12,
+    "pages": [{ "name": "/", "n": 22 }, { "name": "/pricing", "n": 17 }, { "name": "/velocity", "n": 15 }, { "name": "/download", "n": 10 }],
+    "daily": [
+      { "day": "2026-11-07", "views": 9 }, { "day": "2026-11-08", "views": 7 }, { "day": "2026-11-09", "views": 11 },
+      { "day": "2026-11-10", "views": 6 }, { "day": "2026-11-11", "views": 10 }, { "day": "2026-11-12", "views": 14 },
+      { "day": "2026-11-13", "views": 7 }
+    ]
+  }
+}

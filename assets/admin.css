@@ -1,0 +1,200 @@
+/* zemaris.com private analytics page (admin.html) - light + dark, phone layout, reduced motion */
+.za {
+  --v1: #7c3aed; --v2: #4f46e5; --v3: #06b6d4;
+  --zg: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #06b6d4 100%);
+  --glass: color-mix(in srgb, var(--panel) 78%, transparent);
+  --glass-line: color-mix(in srgb, var(--v2) 18%, var(--line));
+  --heat0: color-mix(in srgb, var(--v2) 6%, var(--panel2));
+  --land: color-mix(in srgb, var(--text) 9%, var(--panel2));
+  position: relative; isolation: isolate; padding-bottom: 40px;
+}
+.za::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 760px; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 50% at 10% 0%, color-mix(in srgb, var(--v1) 22%, transparent), transparent 70%),
+              radial-gradient(50% 45% at 90% 10%, color-mix(in srgb, var(--v3) 20%, transparent), transparent 70%),
+              radial-gradient(40% 40% at 50% 40%, color-mix(in srgb, var(--v2) 12%, transparent), transparent 70%) }
+
+.za-top { padding: 34px 0 10px }
+.za-title { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap }
+.za h1 { margin: 4px 0 6px; font-size: clamp(34px, 5vw, 52px); line-height: 1.05; letter-spacing: -1px;
+  background: var(--zg); -webkit-background-clip: text; background-clip: text; color: transparent }
+.za-eyebrow { margin: 0; display: flex; align-items: center; gap: 8px; color: var(--text2); font-size: 14px; font-weight: 600 }
+.za-sep { color: var(--mute) }
+.za-sub { margin: 0; color: var(--mute); max-width: 720px; font-size: 15px }
+.za-pulse { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--mute); flex: none; position: relative }
+.za-pulse.on, .za-live .za-hint .za-pulse { background: #10b981 }
+.za-pulse.on::after, .za-live .za-hint .za-pulse::after { content: ""; position: absolute; inset: -5px; border-radius: 50%;
+  border: 2px solid #10b981; animation: zaPulse 1.8s ease-out infinite }
+@keyframes zaPulse { 0% { transform: scale(.4); opacity: .9 } 100% { transform: scale(1.4); opacity: 0 } }
+
+.za-switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14.5px; font-weight: 600; color: var(--text2);
+  padding: 8px 14px; border-radius: 999px; background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(12px) }
+.za-switch input { position: absolute; opacity: 0; width: 1px; height: 1px }
+.za-knob { width: 38px; height: 22px; border-radius: 999px; background: var(--line2); position: relative; transition: background .2s; flex: none }
+.za-knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .2s }
+.za-switch input:checked + .za-knob { background: var(--zg) }
+.za-switch input:checked + .za-knob::after { transform: translateX(16px) }
+.za-switch input:focus-visible + .za-knob { outline: 2px solid var(--v2); outline-offset: 2px }
+
+.za-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 20px }
+.za-bar input { flex: 1 1 220px; min-width: 0; height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--glass-line);
+  background: var(--glass); color: var(--text); font: inherit; font-size: 15px }
+.za-seg { display: inline-flex; padding: 3px; border-radius: 12px; background: var(--glass); border: 1px solid var(--glass-line) }
+.za-seg button { border: 0; background: none; color: var(--text2); font: 600 14px/1 inherit; font-family: inherit; padding: 10px 13px; border-radius: 9px; cursor: pointer }
+.za-seg button.on { background: var(--zg); color: #fff; box-shadow: 0 6px 18px color-mix(in srgb, var(--v2) 35%, transparent) }
+.za-seg.small button { padding: 7px 10px; font-size: 13px }
+.za-msg { min-height: 1.4em; margin: 10px 0 0; color: var(--mute); font-size: 14.5px }
+.za-msg.demo { color: var(--v1); font-weight: 600 }
+.za-banner { padding: 12px 16px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+  background: color-mix(in srgb, var(--warn) 10%, transparent); color: var(--text); font-size: 15px }
+
+.za-body { padding-top: 12px }
+.za-card { position: relative; border-radius: 20px; padding: 20px; margin-top: 18px; min-width: 0;
+  background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(16px) saturate(1.3); -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: 0 10px 40px color-mix(in srgb, var(--v2) 9%, transparent) }
+.za-card > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px }
+.za-card h2 { margin: 0; font-size: 18px; letter-spacing: -.2px }
+.za-card h3 { margin: 14px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .6px; color: var(--mute) }
+.za-hint { color: var(--mute); font-size: 13px; display: inline-flex; align-items: center; gap: 8px }
+.za-empty { color: var(--mute); font-size: 14px; margin: 6px 0 }
+
+/* KPI tiles */
+.za-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px }
+.za-kpi { position: relative; overflow: hidden; border-radius: 18px; padding: 16px 18px; background: var(--glass); border: 1px solid var(--glass-line);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px) }
+.za-kpi::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--zg) }
+.za-kpi.hero { background: var(--zg); border-color: transparent; color: #fff }
+.za-kpi.hero::before { display: none }
+.za-kpi small { display: block; font-size: 13px; font-weight: 600; color: var(--mute) }
+.za-kpi.hero small, .za-kpi.hero .za-d { color: rgba(255,255,255,.88) }
+.za-kpi b { display: block; font-size: clamp(26px, 3vw, 34px); line-height: 1.15; margin: 6px 0 4px; font-variant-numeric: tabular-nums; letter-spacing: -.5px }
+.za-d { font-size: 12.5px; font-weight: 700; color: var(--mute) }
+.za-d.up { color: var(--ok) } .za-d.down { color: var(--err) }
+.za-kpi.hero .za-d.up, .za-kpi.hero .za-d.down { color: #fff }
+
+.za-row { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px }
+.za-row > .za-card { margin-top: 18px }
+.za-row:not(.za-hero) { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) }
+.za-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 18px }
+.za-cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px }
+
+/* map */
+.za-map { position: relative; border-radius: 14px; overflow: hidden;
+  background: radial-gradient(80% 90% at 50% 40%, color-mix(in srgb, var(--v3) 10%, transparent), transparent) }
+.za-map svg { width: 100%; height: auto }
+.za-map path { fill: var(--land); stroke: var(--panel); stroke-width: .4; transition: fill .2s }
+.za-map path.has { cursor: pointer }
+.za-map path:hover { stroke: var(--v2); stroke-width: 1 }
+.za-map circle.ping { fill: none; stroke: #10b981; stroke-width: 1.6; animation: zaPing 2.2s ease-out infinite; transform-box: fill-box; transform-origin: center }
+.za-map circle.dot { fill: #10b981 }
+@keyframes zaPing { 0% { transform: scale(.3); opacity: 1 } 100% { transform: scale(2.2); opacity: 0 } }
+.za-legend { display: flex; flex-wrap: wrap; padding: 0 4px; align-items: center; gap: 8px; font-size: 12px; color: var(--mute); margin-top: 6px }
+.za-legend i { display: block; width: 120px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #c4b5fd, #7c3aed, #4f46e5, #06b6d4) }
+
+/* bar lists */
+.za-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px }
+.za-list li { position: relative; display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border-radius: 9px; font-size: 14.5px; overflow: hidden; z-index: 0 }
+.za-list li > i { position: absolute; inset: 0 auto 0 0; z-index: -1; border-radius: 9px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--v1) 22%, transparent), color-mix(in srgb, var(--v3) 20%, transparent)); transform-origin: left; animation: zaGrow .8s ease-out both }
+.za-list li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0 }
+.za-list li b { font-variant-numeric: tabular-nums; flex: none }
+.za-list li b small { color: var(--mute); font-weight: 500; margin-left: 6px }
+@keyframes zaGrow { from { transform: scaleX(0) } }
+
+/* live feed */
+.za-live { display: flex; flex-direction: column }
+.za-today { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px }
+.za-today div { border-radius: 12px; padding: 8px 10px; background: color-mix(in srgb, var(--v2) 7%, transparent) }
+.za-today b { display: block; font-size: 20px; font-variant-numeric: tabular-nums }
+.za-today small { color: var(--mute); font-size: 12px }
+.za-feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 520px; overflow-y: auto; flex: 1; align-content: start }
+.za-feed li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 12px;
+  background: color-mix(in srgb, var(--panel) 60%, transparent); border: 1px solid var(--line) }
+.za-feed li.new { animation: zaIn .6s cubic-bezier(.2,.8,.2,1) both }
+.za-feed li.mine { opacity: .62 }
+@keyframes zaIn { from { transform: translateY(-14px); opacity: 0; background: color-mix(in srgb, var(--v3) 22%, transparent) } }
+.za-ic { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; color: #fff; font: 700 12px/1 inherit; background: var(--zg) }
+.za-ic.k-view { background: linear-gradient(135deg, #6366f1, #06b6d4) }
+.za-ic.k-click { background: linear-gradient(135deg, #8b5cf6, #6366f1) }
+.za-ic.k-download { background: linear-gradient(135deg, #06b6d4, #10b981) }
+.za-ic.k-checkout_open { background: linear-gradient(135deg, #f59e0b, #ec4899) }
+.za-ic.k-purchase { background: linear-gradient(135deg, #10b981, #059669) }
+.za-ic.k-refund, .za-ic.k-chargeback { background: linear-gradient(135deg, #ef4444, #b91c1c) }
+.za-ic.k-activate, .za-ic.k-release { background: linear-gradient(135deg, #7c3aed, #db2777) }
+.za-feed .t { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.za-feed .m { font-size: 12.5px; color: var(--mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.za-feed time { font-size: 12px; color: var(--mute); font-variant-numeric: tabular-nums; text-align: right }
+
+/* daily bars */
+.za-bars { overflow-x: auto; padding-bottom: 4px }
+.za-bars-in { display: flex; align-items: flex-end; gap: 4px; height: 240px; min-width: 100%; padding-top: 22px }
+.za-bar1 { flex: 1 0 18px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; position: relative; cursor: default }
+.za-bar1 em { font: 700 11px/1 inherit; font-style: normal; color: var(--text2); margin-bottom: 4px; font-variant-numeric: tabular-nums; white-space: nowrap }
+.za-bar1 i { display: block; width: 100%; max-width: 38px; border-radius: 7px 7px 3px 3px; background: linear-gradient(180deg, #06b6d4, #4f46e5 60%, #7c3aed);
+  transform-origin: bottom; animation: zaRise .9s cubic-bezier(.2,.8,.2,1) both; min-height: 2px }
+.za-bar1.zero i { background: var(--line2) }
+.za-bar1:hover i { filter: brightness(1.15) saturate(1.2) }
+.za-bars-x { display: flex; gap: 4px; min-width: 100%; margin-top: 6px }
+.za-bars-x span { flex: 1 0 18px; text-align: center; font-size: 10.5px; color: var(--mute); white-space: nowrap; overflow: hidden }
+@keyframes zaRise { from { transform: scaleY(0) } }
+.za-mini .za-bars-in { height: 110px }
+
+/* funnel */
+.za-funnel { display: grid; gap: 10px }
+.za-fstep { display: grid; grid-template-columns: 130px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 14px }
+.za-fstep .bar { height: 30px; border-radius: 9px; background: color-mix(in srgb, var(--v2) 8%, transparent); overflow: hidden }
+.za-fstep .bar i { display: flex; align-items: center; height: 100%; border-radius: 9px; background: var(--zg); color: #fff; font: 700 13px/1 inherit; font-style: normal;
+  padding-left: 10px; min-width: 34px; transform-origin: left; animation: zaGrow .9s ease-out both }
+.za-fstep small { color: var(--mute); text-align: right; font-variant-numeric: tabular-nums }
+
+/* heat grid */
+.za-heat { display: grid; grid-template-columns: 34px repeat(24, minmax(0, 1fr)); gap: 3px; font-size: 10.5px; color: var(--mute) }
+.za-heat div { aspect-ratio: 1; border-radius: 4px; background: var(--heat0) }
+.za-heat span { display: flex; align-items: center; justify-content: center }
+.za-heat span.d { justify-content: flex-start; font-weight: 600 }
+
+/* purchases */
+.za-table-wrap { overflow-x: auto }
+.za-table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 760px }
+.za-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--mute); padding: 8px 10px; border-bottom: 1px solid var(--line) }
+.za-table td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle }
+.za-table .num { text-align: right; font-variant-numeric: tabular-nums }
+.za-table td small { display: block; color: var(--mute); font-size: 12.5px }
+.za-table tr.test td { opacity: .55 }
+.za-table tr.test td:last-child { opacity: 1 }
+.za-chip { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700 }
+.za-chip.paid { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok) }
+.za-chip.partly_refunded { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn) }
+.za-chip.refunded, .za-chip.chargeback { background: color-mix(in srgb, var(--err) 14%, transparent); color: var(--err) }
+.za-chip.test { background: color-mix(in srgb, var(--v1) 15%, transparent); color: var(--v1); margin-left: 6px }
+
+.za-owner-in { display: grid; grid-template-columns: 160px minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: start }
+.za-owner-k b { display: block; font-size: 28px; line-height: 1.1 }
+.za-owner-k small { display: block; color: var(--mute); font-size: 13px; margin-bottom: 10px }
+.za-foot { color: var(--mute); font-size: 13.5px; margin-top: 22px }
+.za .adm-reviews { display: grid; gap: 10px }
+
+.za-tip { position: fixed; z-index: 100; pointer-events: none; padding: 7px 10px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  background: var(--text); color: var(--bg); box-shadow: var(--shadow); white-space: pre; transform: translate(-50%, calc(-100% - 10px)) }
+
+@media (max-width: 1000px) {
+  .za-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .za-row, .za-row:not(.za-hero) { grid-template-columns: minmax(0, 1fr); gap: 0 }
+  .za-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .za-owner-in { grid-template-columns: minmax(0, 1fr) }
+}
+@media (max-width: 600px) {
+  .za .wrap { padding: 0 16px }
+  .za-top { padding-top: 20px }
+  .za-kpis { gap: 10px }
+  .za-kpi { padding: 12px 14px }
+  .za-grid, .za-cols2 { grid-template-columns: minmax(0, 1fr) }
+  .za-card { padding: 16px; border-radius: 16px }
+  .za-fstep { grid-template-columns: 96px minmax(0, 1fr) 52px; font-size: 13px }
+  .za-heat { grid-template-columns: 26px repeat(24, minmax(0, 1fr)); gap: 2px; font-size: 9px }
+  .za-bar input { flex-basis: 100% }
+}
+@media (prefers-reduced-motion: reduce) {
+  .za *, .za *::before, .za *::after { animation: none !important; transition: none !important }
+}
+.za-still .za *, .za-still .za *::before, .za-still .za *::after { animation: none !important; transition: none !important }
