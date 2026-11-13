@@ -234,6 +234,7 @@ class Built(unittest.TestCase):
                 if re.match(r"^(https?:|mailto:)", url):
                     continue
                 path, _, frag = url.partition("#")
+                path = path.partition("?")[0]          # a ?v=... cache-busting tag is not part of the file name
                 target = name if path == "" else path.lstrip("/") or "index.html"
                 if target.endswith(".html") or path == "" or path == "/":
                     self.assertIn(target, self.pages, f"{name}: link to missing page {url}")
