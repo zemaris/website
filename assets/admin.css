@@ -69,6 +69,8 @@
 .za-kpi.hero small, .za-kpi.hero .za-d { color: rgba(255,255,255,.88) }
 .za-kpi b { display: block; font-size: clamp(26px, 3vw, 34px); line-height: 1.15; margin: 6px 0 4px; font-variant-numeric: tabular-nums; letter-spacing: -.5px }
 .za-d { font-size: 12.5px; font-weight: 700; color: var(--mute) }
+.za-dv { white-space: nowrap }
+.za-more { display: block; font-size: 13px; font-weight: 700; margin: -2px 0 4px; font-variant-numeric: tabular-nums }
 .za-d.up { color: var(--ok) } .za-d.down { color: var(--err) }
 .za-kpi.hero .za-d.up, .za-kpi.hero .za-d.down { color: #fff }
 
@@ -138,6 +140,11 @@
 .za-bars-x span { flex: 1 0 18px; text-align: center; font-size: 10.5px; color: var(--mute); white-space: nowrap; overflow: hidden }
 @keyframes zaRise { from { transform: scaleY(0) } }
 .za-mini .za-bars-in { height: 110px }
+.za-mini { overflow-x: auto; padding-bottom: 4px; min-width: 0 }
+.za-mini .za-bars-in, .za-mini .za-bars-x { gap: 2px }
+.za-mini .za-bar1, .za-mini .za-bars-x span { flex-basis: 8px; min-width: 0 }
+.za-mini .za-bar1 em { display: none }
+.za-mini .za-bars-x span { overflow: visible; text-align: left }
 
 /* funnel */
 .za-funnel { display: grid; gap: 10px }
@@ -188,6 +195,7 @@
   .za-top { padding-top: 20px }
   .za-kpis { gap: 10px }
   .za-kpi { padding: 12px 14px }
+  .za-dv { display: block; font-weight: 600 }
   .za-grid, .za-cols2 { grid-template-columns: minmax(0, 1fr) }
   .za-card { padding: 16px; border-radius: 16px }
   .za-fstep { grid-template-columns: 96px minmax(0, 1fr) 52px; font-size: 13px }

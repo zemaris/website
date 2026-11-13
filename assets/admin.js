@@ -81,9 +81,10 @@
   function delta(cur, prev) {
     var d = el("span", "za-d");
     if (prev === undefined || prev === null) { d.textContent = " "; return d; }
-    if (!prev) { d.textContent = cur ? "new vs previous period" : "same as previous period"; if (cur) d.className += " up"; return d; }
+    if (!prev) { d.textContent = cur ? "new" : "same"; d.append(el("span", "za-dv", " vs prev. period")); if (cur) d.className += " up"; return d; }
     var p = Math.round((cur - prev) / prev * 100);
-    d.textContent = (p > 0 ? "▲ " : p < 0 ? "▼ " : "") + Math.abs(p) + "% vs previous " + state.days + " d";
+    d.textContent = (p > 0 ? "▲ " : p < 0 ? "▼ " : "") + Math.abs(p) + "%";
+    d.append(el("span", "za-dv", " vs prev. " + state.days + " days"));
     d.className += p > 0 ? " up" : p < 0 ? " down" : "";
     return d;
   }
@@ -92,6 +93,11 @@
   function mainRevenue(t) {
     var r = (t && t.revenue) || [];
     return r[0] || null;
+  }
+  // every currency after the first one, as text such as "€25.00 + £10.00" (empty when there is only one)
+  function otherRevenue(t) {
+    var r = (t && t.revenue) || [];
+    return r.slice(1).filter(function (x) { return +x.net; }).map(function (x) { return money(+x.net, x.currency); }).join(" + ");
   }
   function kpis(s) {
     var box = clear($("zKpis")), t = s.totals || {}, p = s.previous || null, rev = mainRevenue(t), prevRev = p ? mainRevenue(p) : null;
@@ -110,7 +116,13 @@
       if (k[1] === undefined) return;
       var c = tip(el("div", "za-kpi " + k[3]), k[4]);
       var b = el("b");
-      c.append(el("small", null, k[0]), b, delta(+k[1] || 0, p ? (+k[2] || 0) : null));
+      c.append(el("small", null, k[0]), b);
+      var more = k[3].indexOf("money") >= 0 ? otherRevenue(t) : "";
+      if (more) {
+        c.append(el("span", "za-more", "+ " + more));
+        tip(c, k[4] + ". The big number is " + cur + " only; other currencies are shown below it, not converted.");
+      }
+      c.append(delta(+k[1] || 0, p ? (+k[2] || 0) : null));
       box.append(c);
       countUp(b, +k[1] || 0, k[3].indexOf("money") >= 0 ? function (v) { return money(v, cur); } : num);
     });
@@ -139,13 +151,23 @@
     for (var i = 0; i < days; i++) out.push(new Date(t0 + i * 86400000).toISOString().slice(0, 10));
     return out;
   }
+  // The server counts new numbers by Oman day, so for 4 hours after Oman midnight its newest day can be one past
+  // since + days - 1 (since was a UTC date on older servers). End the range on the newest day the server sent.
+  function rangeKeys(s) {
+    var keys = dayKeys(s.since, s.days), last = keys[keys.length - 1] || "";
+    (s.daily || []).forEach(function (d) { if (d.day > last) last = d.day; });
+    if (!keys.length || last === keys[keys.length - 1]) return keys;
+    var t1 = Date.parse(last + "T00:00:00Z");
+    return dayKeys(new Date(t1 - (s.days - 1) * 86400000).toISOString().slice(0, 10), s.days);
+  }
   function bars(box, daily, keys, metric, fmt, label) {
     clear(box);
     var by = {}; (daily || []).forEach(function (d) { by[d.day] = d; });
     if (!keys.length) keys = (daily || []).map(function (d) { return d.day; });
     var vals = keys.map(function (k) { var d = by[k] || {}; var v = d[metric]; if (v === undefined && metric === "sessions") v = d.visits; return +v || 0; });
     var max = Math.max.apply(null, vals.concat([1]));
-    var inner = el("div", "za-bars-in"), axis = el("div", "za-bars-x"), every = keys.length > 31 ? 7 : 1;
+    var inner = el("div", "za-bars-in"), axis = el("div", "za-bars-x"), mini = box.classList.contains("za-mini"),
+      every = keys.length > 31 || (mini && keys.length > 10) ? 7 : 1;
     keys.forEach(function (k, i) {
       var v = vals[i], col = el("div", "za-bar1" + (v ? "" : " zero")), bar = el("i");
       bar.style.height = Math.max(1, v / max * 100) + "%";
@@ -153,16 +175,17 @@
       col.append(el("em", null, fmt(v, true)), bar);
       tip(col, dayLabel(k) + "\n" + fmt(v) + " " + label);
       inner.append(col);
-      axis.append(el("span", null, i % every === 0 || i === keys.length - 1 ? dayLabel(k) : ""));
+      axis.append(el("span", null, (i % every === 0 && !(mini && i > keys.length - 5)) || (!mini && i === keys.length - 1) ? dayLabel(k) : ""));
     });
     box.append(inner, axis);
   }
   function drawDaily() {
     var s = state.data; if (!s) return;
     var m = state.metric, rev = mainRevenue(s.totals), cur = rev ? rev.currency : "USD";
-    var labels = { sessions: "visitors", views: "page views", downloads: "downloads", revenue: "net revenue" };
+    var labels = { sessions: "visitors", views: "page views", downloads: "downloads",
+      revenue: "net revenue in " + cur + (otherRevenue(s.totals) ? " (other currencies not in this chart)" : "") };
     var fmt = m === "revenue" ? function (v, c) { return money(v, cur, c); } : function (v, c) { return c ? short(v) : num(v); };
-    bars($("zBars"), s.daily, dayKeys(s.since, s.days), m, fmt, labels[m]);
+    bars($("zBars"), s.daily, rangeKeys(s), m, fmt, labels[m]);
   }
 
   // ---------- funnel + heat ----------
@@ -393,7 +416,7 @@
     o = o || {};
     countUp($("oViews"), +o.views || 0); countUp($("oClicks"), +o.clicks || 0);
     var s = state.data;
-    bars($("oDaily"), (o.daily || []), dayKeys(s.since, s.days), "views", function (v, c) { return c ? short(v) : num(v); }, "of your page views");
+    bars($("oDaily"), (o.daily || []), rangeKeys(s), "views", function (v, c) { return c ? short(v) : num(v); }, "of your page views");
     rows("oPages", o.pages);
   }
 
@@ -407,7 +430,7 @@
     var s = state.data; if (!s) { say("Load the numbers first."); return; }
     var out = [["day", "visitors", "visits", "views", "clicks", "downloads", "checkouts", "purchases", "revenue_net_minor", "own_views"]];
     var by = {}; (s.daily || []).forEach(function (d) { by[d.day] = d; });
-    dayKeys(s.since, s.days).forEach(function (k) {
+    rangeKeys(s).forEach(function (k) {
       var d = by[k] || {};
       out.push([k, d.sessions, d.visits, d.views, d.clicks, d.downloads, d.checkouts, d.purchases, d.revenue, d.owner_views]);
     });
@@ -455,7 +478,7 @@
   function render(s, keepFeed) {
     state.data = s;
     $("zPre").hidden = s.analytics !== false;
-    $("zSince").textContent = "From " + dayLabel(s.since) + " · last " + s.days + " day" + (s.days === 1 ? "" : "s") + " · days and hours in Oman time" +
+    $("zSince").textContent = "From " + dayLabel(rangeKeys(s)[0] || s.since) + " · last " + s.days + " day" + (s.days === 1 ? "" : "s") + " · days and hours in Oman time" +
       (DEMO ? " · DEMO: sample numbers from _tests/analytics-sample.json, not real visitors" : "");
     kpis(s);
     drawMap(s);
