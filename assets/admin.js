@@ -289,7 +289,7 @@
     loadMap().then(function (shapes) {
       clear(box);
       var by = {}, max = 0;
-      (s.countries || []).forEach(function (c) { var v = +(c.visitors !== undefined ? c.visitors : c.n) || 0; by[c.name] = v; if (v > max) max = v; });
+      (s.countries || []).forEach(function (c) { var v = +(c.visitors || c.n) || 0; by[c.name] = v; if (v > max) max = v; });
       var svg = document.createElementNS(SVGNS, "svg");
       svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "World map of visitors");
       shapes.forEach(function (sh) {
@@ -482,7 +482,7 @@
       (DEMO ? " · DEMO: sample numbers from _tests/analytics-sample.json, not real visitors" : "");
     kpis(s);
     drawMap(s);
-    rows("tCountries", s.countries, function (r) { return flag(r.name) + " " + country(r.name); }, function (r) { return r.visitors !== undefined ? r.visitors : r.n; });
+    rows("tCountries", s.countries, function (r) { return flag(r.name) + " " + country(r.name); }, function (r) { return r.visitors || r.n; });
     rows("tCities", s.cities, function (r) { return r.name + ", " + country(r.country); });
     drawDaily();
     funnel(s.funnel);
