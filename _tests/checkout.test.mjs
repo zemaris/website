@@ -13,7 +13,7 @@ const GOOD = {
   paddleJs: "https://cdn.paddle.com/paddle/v2/paddle.js",
 };
 
-function page(cfg, { paddle = "stub", theme = null, scriptLoads = true } = {}) {
+function page(cfg, { paddle = "stub", theme = null, scriptLoads = true, elements = {} } = {}) {
   const handlers = {}, appended = [], calls = { env: [], init: [], open: [] };
   const msg = { textContent: "" };
   const cfgEl = cfg === null ? null : { textContent: typeof cfg === "string" ? cfg : JSON.stringify(cfg) };
@@ -26,7 +26,7 @@ function page(cfg, { paddle = "stub", theme = null, scriptLoads = true } = {}) {
   if (paddle === "stub") win.Paddle = fakePaddle;
   const doc = {
     documentElement: { getAttribute: () => theme },
-    getElementById: id => (id === "checkout-config" ? cfgEl : id === "checkoutMsg" ? msg : null),
+    getElementById: id => (id === "checkout-config" ? cfgEl : id === "checkoutMsg" ? msg : elements[id] || null),
     addEventListener: (t, f) => { (handlers[t] ||= []).push(f) },
     createElement: () => ({}),
     head: {
@@ -137,4 +137,65 @@ test("does nothing without a config, or with broken JSON", () => {
     assert.equal(p.handlers.click, undefined);
     assert.equal(p.win.ZemarisCheckout, undefined);
   }
+});
+
+// ---- Velocity PDF (GO-LIVE-CONTRACT.md section 5): data-product="pdf" uses pdfPrices, its own thank-you page,
+// and Business sends the PC count from the box on its card (5 to 255)
+const PDF = {
+  ...GOOD,
+  pdfPrices: { monthly: "pri_" + "d".repeat(26), yearly: "pri_" + "e".repeat(26), lifetime: "pri_" + "f".repeat(26),
+               business: "pri_" + "g".repeat(26) },
+  pdfSuccessUrl: "https://zemaris.com/thank-you.html?product=pdf",
+};
+
+function pdfPage(cfg, elements = {}) {
+  const p = page(cfg, { elements });
+  return { ...p, pdfButton(plan, qtyFrom) {
+    const b = p.button(plan);
+    b.attrs["data-product"] = "pdf";
+    if (qtyFrom) b.attrs["data-quantity-from"] = qtyFrom;
+    return b;
+  } };
+}
+
+test("a Velocity PDF button uses the PDF price and the PDF thank-you page; a DM button is unchanged", async () => {
+  const p = pdfPage(PDF);
+  await p.click(p.pdfButton("lifetime"));
+  assert.equal(p.calls.open[0].items[0].priceId, PDF.pdfPrices.lifetime);
+  assert.equal(p.calls.open[0].items[0].quantity, 1);
+  assert.equal(p.calls.open[0].settings.successUrl, PDF.pdfSuccessUrl);
+  await p.click(p.button("lifetime"));
+  assert.equal(p.calls.open[1].items[0].priceId, GOOD.prices.lifetime);
+  assert.equal(p.calls.open[1].settings.successUrl, GOOD.successUrl);
+});
+
+test("a placeholder PDF price id never opens checkout", async () => {
+  const p = pdfPage({ ...PDF, pdfPrices: { ...PDF.pdfPrices, yearly: "pri_PDF_YEARLY" } });
+  await p.click(p.pdfButton("yearly"));
+  assert.equal(p.calls.open.length, 0);
+  assert.match(p.msg.textContent, /isn't available/);
+  const q = pdfPage(GOOD);                       // no pdfPrices at all
+  await q.click(q.pdfButton("monthly"));
+  assert.equal(q.calls.open.length, 0);
+});
+
+test("Business sends the PC count from its box, kept between 5 and 255", async () => {
+  for (const [typed, sent] of [["7", 7], ["5", 5], ["3", 5], ["", 5], ["abc", 5], ["300", 255], ["255", 255]]) {
+    const box = { value: typed };
+    const p = pdfPage(PDF, { pdfPcs: box });
+    await p.click(p.pdfButton("business", "pdfPcs"));
+    assert.equal(p.calls.open.length, 1, typed);
+    assert.equal(p.calls.open[0].items[0].priceId, PDF.pdfPrices.business, typed);
+    assert.equal(p.calls.open[0].items[0].quantity, sent, typed);
+    assert.equal(box.value, String(sent), typed);     // the box shows what was sent
+  }
+});
+
+test("the stats event names the PDF plan", async () => {
+  const sent = [];
+  const p = pdfPage(PDF);
+  p.win.ZemarisStats = { send: (e, v) => sent.push([e, v]) };
+  await p.click(p.pdfButton("yearly"));
+  await p.click(p.button("yearly"));
+  assert.deepEqual(sent, [["checkout_open", "pdf:yearly"], ["checkout_open", "yearly"]]);
 });

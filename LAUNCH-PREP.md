@@ -44,6 +44,9 @@ into the server with `wrangler secret put` (see `..\server\README.md`).
 | `downloads.*` | Filled by Claude with `python _release.py` from the final signed build (`--stage` copies the installer and `velocity/update.json` into this repo) | Launch |
 | `downloads.windows.signed/publisher` | Set by `_release.py --signed --publisher "Name on the certificate"` once builds are signed | After signing |
 | `downloads.open` | `true` when you say the packages are final | Launch |
+| `checkout.pdf_prices.monthly/yearly/lifetime/business` | Velocity PDF: the four Paddle `pri_...` ids (now placeholders `pri_PDF_*`). Paste each one here AND in the server's `wrangler.toml` PRICES; a test fails while they differ. Until all four are real the PDF Buy buttons say "Coming soon" (the build never stops for them) | PDF checkout opens |
+| `downloads.pdf_windows.*` | Velocity PDF 0.8.0: size, SHA-256 and date filled by `python _release.py --product pdf --update-json ...elocity-pdf-update.json` (`--stage` copies the installer to `velocity-pdf/download/` and the signed file to `velocity-pdf/update.json`) | PDF launch |
+| `downloads.pdf_open` | `false` now: the PDF pages say "Download available soon". `true` when you publish Velocity PDF | PDF launch |
 
 The build prints "still to fill in: ..." for every placeholder that is still visible, and stops if checkout or downloads
 are switched on with something missing or wrong (bad token, an API key pasted by mistake, a wrong price id, the
@@ -94,7 +97,9 @@ itself (download page, checkout) still depends on this repo.
 - Nothing is published, no account was touched, no token or price id is real.
 - The live Paddle overlay was not opened (it needs a real client token): `checkout.js` was tested with a fake Paddle
   in Node and in the built-in browser.
-- Velocity PDF has no price, trial or licence agreement yet, so its page says "Coming soon" and "announced at launch",
-  and the EULA page says its agreement will follow.
+- Velocity PDF (14 Nov 2026, GO-LIVE-CONTRACT.md section 5): prices, plans, trial line, Buy buttons, download block,
+  thank-you and support text are on the site, but its price ids are placeholders and `downloads.pdf_open` is false, so
+  the Buy buttons say "Coming soon" and the download says "Download available soon". `velocity-pdf/update.json` is a
+  placeholder, not signed (the app ignores an unsigned file).
 - Launch-list buttons are still `mailto:` links; there is no mailing-list system.
 - `velocity/update.json` and the installer are not in the repo yet (`_release.py --stage` does that at launch).

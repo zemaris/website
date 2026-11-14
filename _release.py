@@ -8,6 +8,11 @@
                                            Commit and push those files ONLY when the owner has said the packages
                                            are final and approved the push.
 
+  python _release.py --product pdf --update-json X\\velocity-pdf-update.json [--stage]
+                                           the same for Velocity PDF: fills downloads.pdf_windows, and with --stage
+                                           copies to velocity-pdf/download/ and velocity-pdf/update.json. It never
+                                           copies legal texts and never changes downloads.pdf_open.
+
 What it writes:
   _launch.json  downloads.base_url and downloads.windows (version, file, size, sha256, date, signed, publisher)
   _legal/       EULA.txt and THIRD-PARTY-NOTICES.txt, the same files the installer shows and installs
@@ -48,7 +53,8 @@ def read_manifest(path):
     if not isinstance(size, int) or size <= 0:
         raise SystemExit(f"{path}: size is missing (make it with make_manifest.ps1)")
     base, file = url.rsplit("/", 1)
-    return {"version": ver, "base_url": base + "/", "file": file, "sha256": digest, "size": size}
+    return {"version": ver, "base_url": base + "/", "file": file, "sha256": digest, "size": size,
+            "product": m.get("product") or "dm"}
 
 
 def update_json_signed(path, app=APP):
@@ -74,7 +80,10 @@ def update_json_signed(path, app=APP):
 
 def main(argv=None, root=HERE, app=APP, today=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--update-json", default=os.path.join(app, "dist", "update.json"))
+    ap.add_argument("--product", choices=("dm", "pdf"), default="dm",
+                    help="dm = Velocity Download Manager (default), pdf = Velocity PDF")
+    ap.add_argument("--update-json", help="the release's update.json (default: dist\\update.json, or "
+                    "dist\\velocity-pdf-update.json for --product pdf)")
     ap.add_argument("--installer", help="installer file (default: next to update.json)")
     ap.add_argument("--legal", default=os.path.join(app, "legal"), help="folder with EULA.txt and THIRD-PARTY-NOTICES.txt")
     ap.add_argument("--no-release", action="store_true", help="only copy the legal texts")
@@ -82,6 +91,9 @@ def main(argv=None, root=HERE, app=APP, today=None):
     ap.add_argument("--publisher", help="the name on the code-signing certificate, as Windows shows it")
     ap.add_argument("--stage", action="store_true", help="copy installer and update.json into this repo")
     a = ap.parse_args(argv)
+    if a.product == "pdf":
+        return release_pdf(a, root, app, today)
+    a.update_json = a.update_json or os.path.join(app, "dist", "update.json")
 
     # legal texts
     dest = os.path.join(root, "_legal")
@@ -96,6 +108,8 @@ def main(argv=None, root=HERE, app=APP, today=None):
         return 0
 
     rel = read_manifest(a.update_json)
+    if rel["product"] != "dm":
+        raise SystemExit(f"{a.update_json} is a Velocity PDF update file: use --product pdf")
     installer = a.installer or os.path.join(os.path.dirname(os.path.abspath(a.update_json)), rel["file"])
     if not os.path.isfile(installer):
         raise SystemExit(f"installer not found: {installer}")
@@ -134,6 +148,53 @@ def main(argv=None, root=HERE, app=APP, today=None):
         os.makedirs(os.path.join(root, "velocity"), exist_ok=True)
         shutil.copyfile(a.update_json, os.path.join(root, "velocity", "update.json"))
         print("staged", os.path.relpath(os.path.join(folder, rel["file"]), root), "and velocity/update.json")
+        print("Do not commit or push these until the owner says the packages are final.")
+    return 0
+
+
+def release_pdf(a, root, app, today):
+    """Velocity PDF (GO-LIVE-CONTRACT.md sections 4 and 5): downloads.pdf_windows from the PDF update file."""
+    path = a.update_json or os.path.join(app, "dist", "velocity-pdf-update.json")
+    rel = read_manifest(path)
+    if rel["product"] != "pdf":
+        raise SystemExit(f'{path} does not say "product": "pdf", so it is not a Velocity PDF update file')
+    installer = a.installer or os.path.join(os.path.dirname(os.path.abspath(path)), rel["file"])
+    if not os.path.isfile(installer):
+        raise SystemExit(f"installer not found: {installer}")
+    if os.path.getsize(installer) != rel["size"] or sha256(installer) != rel["sha256"]:
+        raise SystemExit(f"{installer} does not match {os.path.basename(path)} (size or SHA-256 differ)")
+    cfg_path = os.path.join(root, "_launch.json")
+    with open(cfg_path, encoding="utf-8") as f:
+        cfg = json.load(f)
+    d = cfg.setdefault("downloads", {})
+    w = d.setdefault("pdf_windows", {})
+    w.update(version=rel["version"], file=rel["file"], base_url=rel["base_url"], size=rel["size"],
+             sha256=rel["sha256"], date=(today or datetime.date.today()).strftime("%B %Y"))
+    if a.signed:
+        if not (a.publisher or w.get("publisher")):
+            raise SystemExit("--signed needs --publisher (the exact name on the certificate)")
+        w["signed"] = True
+    if a.publisher:
+        w["publisher"] = a.publisher
+    with open(cfg_path, "w", encoding="utf-8", newline="\n") as f:
+        json.dump(cfg, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    print(f"_launch.json: Velocity PDF {rel['version']}, {rel['size']} bytes, SHA-256 {rel['sha256']}")
+    print("downloads.pdf_open is", d.get("pdf_open", False), "(this script never changes it)")
+    if a.stage:
+        if not rel["base_url"].startswith(SITE):
+            raise SystemExit(f"--stage only works for files served from {SITE} ({os.path.basename(path)} says {rel['base_url']})")
+        with open(path, encoding="utf-8-sig") as f:
+            sig = json.load(f).get("signature")
+        if not isinstance(sig, str) or not sig:
+            # the signature itself is checked by the owner's tools\sign_update.py --verify ... --product pdf
+            raise SystemExit(f"{path} is not signed: python tools\\sign_update.py --sign {os.path.basename(path)} --product pdf")
+        folder = os.path.join(root, *rel["base_url"][len(SITE):].strip("/").split("/"))
+        os.makedirs(folder, exist_ok=True)
+        shutil.copyfile(installer, os.path.join(folder, rel["file"]))
+        os.makedirs(os.path.join(root, "velocity-pdf"), exist_ok=True)
+        shutil.copyfile(path, os.path.join(root, "velocity-pdf", "update.json"))
+        print("staged", os.path.relpath(os.path.join(folder, rel["file"]), root), "and velocity-pdf/update.json")
         print("Do not commit or push these until the owner says the packages are final.")
     return 0
 

@@ -119,6 +119,17 @@ def parse(text):
     return p
 
 
+def dm_block(pricing):
+    """The Velocity Download Manager plans on pricing.html (the Velocity PDF plans follow in <section id="pdf">)."""
+    return pricing[pricing.index('id="dm"'):pricing.index('<section id="pdf">')]
+
+
+def pdf_block(page, start='<section id="pdf">'):
+    """The Velocity PDF plans: <section id="pdf"> on pricing.html, <section id="buy"> on velocity-pdf.html."""
+    i = page.index(start)
+    return page[i:page.index("</section>", i)]
+
+
 def final_section(page):
     """The end section of a page (<section class="final" id="launch">)."""
     m = re.search(r'<section class="final" id="launch">.*?</section>', page, re.S)
@@ -155,7 +166,8 @@ class Closed(unittest.TestCase):
         self.assertNotIn("checkout.js", pr)
         self.assertNotIn("paddle.js", pr.lower())
         self.assertNotIn("checkout-config", pr)
-        self.assertEqual(len(re.findall(r'class="btn[^"]*soon"[^>]*>Coming soon<', pr)), 3)
+        self.assertEqual(len(re.findall(r'class="btn[^"]*soon"[^>]*>Coming soon<', dm_block(pr))), 3)
+        self.assertEqual(len(re.findall(r'class="btn[^"]*soon"[^>]*>Coming soon<', pdf_block(pr))), 4)
         self.assertIn("Contact us", pr)
         dl = self.pages["download.html"]
         self.assertNotIn(".exe", dl)
@@ -188,8 +200,8 @@ class Built(unittest.TestCase):
             self.assertNotIn('src="https://cdn.paddle.com', text, name)
         if cfg["checkout"]["open"]:
             for plan in _build.PLANS:
-                self.assertIn(f'data-checkout="{plan}"', pr)
-            self.assertNotIn(">Coming soon<", pr)
+                self.assertIn(f'data-checkout="{plan}"', dm_block(pr))
+            self.assertNotIn(">Coming soon<", dm_block(pr))
             self.assertIn('<script src="/assets/checkout.js" defer></script>', pr)
             conf = json.loads(parse(pr).json_scripts[0])
             self.assertEqual(conf["prices"], {p: cfg["checkout"]["prices"][p] for p in _build.PLANS})
@@ -495,8 +507,8 @@ class Checkout(unittest.TestCase):
         pages = self.build(live_checkout(closed_cfg()))
         pr = pages["pricing.html"]
         for plan in ("monthly", "yearly", "lifetime"):
-            self.assertIn(f'data-checkout="{plan}"', pr)
-        self.assertNotIn(">Coming soon<", pr)
+            self.assertIn(f'data-checkout="{plan}"', dm_block(pr))
+        self.assertNotIn(">Coming soon<", dm_block(pr))
         self.assertIn('<script src="/assets/checkout.js" defer></script>', pr)
         conf = json.loads(parse(pr).json_scripts[0])
         self.assertEqual(conf["token"], TOKEN)
@@ -619,7 +631,7 @@ class Downloads(unittest.TestCase):
         self.assertNotIn("launch list", cards)
         self.assertEqual(len(re.findall(r">Email me when ready<", cards)), 4)
         # checkout still closed
-        self.assertEqual(len(re.findall(r">Coming soon<", pages["pricing.html"])), 3)
+        self.assertEqual(len(re.findall(r">Coming soon<", dm_block(pages["pricing.html"]))), 3)
 
     def test_signed(self):
         self.put_file()
@@ -818,6 +830,238 @@ class Release(unittest.TestCase):
         self.manifest(hashlib.sha256(self.data).hexdigest(), len(self.data), url="https://cdn.example.com/Velocity-Setup-2.0.1.exe")
         with self.assertRaises(SystemExit):
             self.run_release("--stage")
+
+
+PDF_PRICES = {"monthly": "pri_" + "d" * 26, "yearly": "pri_" + "e" * 26, "lifetime": "pri_" + "f" * 26,
+              "business": "pri_" + "g" * 26}
+
+
+class VelocityPdf(unittest.TestCase):
+    """Velocity PDF on the site (GO-LIVE-CONTRACT.md section 5): prices, Buy buttons, download switch, update.json."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp(prefix="zsite-pdf-")
+        self.out = os.path.join(self.tmp, "out")
+        os.makedirs(self.out)
+        self.data = b"MZ fake pdf installer " * 900
+        self.digest = hashlib.sha256(self.data).hexdigest()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def build(self, cfg, root=None):
+        return _build.build(self.out, cfg, quiet=True, root=root or self.tmp)
+
+    def pdf_open(self, cfg=None, **w):
+        c = copy.deepcopy(cfg or closed_cfg())
+        c["downloads"]["pdf_open"] = True
+        c["downloads"]["pdf_windows"].update(version="0.8.0", file="VelocityPDF-Setup-0.8.0.exe",
+                                             base_url="https://zemaris.com/velocity-pdf/download/",
+                                             size=len(self.data), sha256=self.digest, signed=False, publisher="")
+        c["downloads"]["pdf_windows"].update(w)
+        return c
+
+    def put_file(self, data=None, **uj):
+        d = os.path.join(self.tmp, "velocity-pdf", "download")
+        os.makedirs(d, exist_ok=True)
+        with open(os.path.join(d, "VelocityPDF-Setup-0.8.0.exe"), "wb") as f:
+            f.write(self.data if data is None else data)
+        m = {"version": "0.8.0", "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.0.exe",
+             "sha256": self.digest, "size": len(self.data), "notes": "", "product": "pdf", "signature": "c2lnbmVk"} | uj
+        with open(os.path.join(self.tmp, "velocity-pdf", "update.json"), "w", encoding="utf-8") as f:
+            json.dump({k: v for k, v in m.items() if v is not None}, f)
+
+    def test_config_holds_placeholders_in_one_place_and_switch_off(self):
+        cfg = base_cfg()
+        pp = cfg["checkout"]["pdf_prices"]
+        self.assertEqual({k: pp[k] for k in _build.PDF_PLANS},
+                         {"monthly": "pri_PDF_MONTHLY", "yearly": "pri_PDF_YEARLY", "lifetime": "pri_PDF_LIFETIME",
+                          "business": "pri_PDF_BUSINESS"})
+        self.assertIn("PLACEHOLDER", pp["_note"])
+        self.assertIs(cfg["downloads"]["pdf_open"], False)
+        w = cfg["downloads"]["pdf_windows"]
+        self.assertEqual((w["version"], w["file"], w["base_url"]),
+                         ("0.8.0", "VelocityPDF-Setup-0.8.0.exe", "https://zemaris.com/velocity-pdf/download/"))
+        with open(os.path.join(SITE, "velocity-pdf", "update.json"), encoding="utf-8") as f:
+            m = json.load(f)
+        self.assertEqual((m["version"], m["product"], m["url"]), ("0.8.0", "pdf", w["base_url"] + w["file"]))
+        self.assertEqual(m["signature"], "")      # not signed yet: the app ignores an unsigned file
+
+    def test_server_and_site_hold_the_same_pdf_ids(self):
+        """GO-LIVE-CONTRACT.md section 7: the live PDF price ids in server/wrangler.toml PRICES equal _launch.json's."""
+        toml = os.path.join(os.path.dirname(SITE), "pdf-live", "server", "wrangler.toml")
+        if not os.path.isfile(toml):
+            self.skipTest("server/wrangler.toml not next to this worktree")
+        text = open(toml, encoding="utf-8").read()
+        live = re.split(r"(?m)^\[+env\.", text, maxsplit=1)[0]      # the live part, before [env.sandbox]
+        ids = dict(re.findall(r'"(pri_[A-Za-z0-9_]+)"\s*:\s*\{[^}]*"product"\s*:\s*"pdf"[^}]*"plan"\s*:\s*"(\w+)"', live))
+        if not ids:
+            self.skipTest("server PRICES has no Velocity PDF entries yet")
+        site = {v: k for k, v in base_cfg()["checkout"]["pdf_prices"].items() if k in _build.PDF_PLANS}
+        self.assertEqual({plan: pid for pid, plan in ids.items()}, {plan: pid for pid, plan in site.items()})
+
+    def test_placeholders_keep_pdf_buttons_on_coming_soon_and_never_stop_the_build(self):
+        pages = self.build(live_checkout(closed_cfg()))      # DM checkout open, PDF ids still placeholders
+        for name, start in (("pricing.html", '<section id="pdf">'), ("velocity-pdf.html", '<section id="buy">')):
+            block = pdf_block(pages[name], start)
+            self.assertNotIn("data-checkout=", block, name)
+            self.assertEqual(len(re.findall(r'class="btn[^"]*soon"[^>]*>Coming soon<', block)), 4, name)
+        self.assertNotIn("checkout.js", pages["velocity-pdf.html"])
+        conf = json.loads(parse(pages["pricing.html"]).json_scripts[0])
+        self.assertEqual(conf["pdfPrices"]["lifetime"], "pri_PDF_LIFETIME")
+        self.assertEqual(conf["pdfSuccessUrl"], "https://zemaris.com/thank-you.html?product=pdf")
+        self.assertFalse(_build.check_pdf_checkout(base_cfg(), True))
+
+    def test_prices_shown(self):
+        pages = self.build(closed_cfg())
+        for name, start in (("pricing.html", '<section id="pdf">'), ("velocity-pdf.html", '<section id="buy">')):
+            t = plain(pdf_block(pages[name], start))
+            for words in ("$5.99 /month", "$29.99 /year", "Just $2.50 a month · save 58%", "$49 once",
+                          "1 PC · free updates for life", "$15 /PC/year", "From 5 PCs", "30 days free",
+                          "saving changes needs a licence key"):
+                self.assertIn(words, t, name)
+        # the arithmetic behind the words
+        self.assertEqual(f"{29.99 / 12:.2f}", "2.50")
+        self.assertEqual(round((1 - 29.99 / (5.99 * 12)) * 100), 58)
+        # the Download Manager prices are unchanged
+        dm = plain(dm_block(pages["pricing.html"]))
+        for words in ("$1.99 /month", "$9.99 /year", "$19.99 once", "$6 /PC/year"):
+            self.assertIn(words, dm)
+
+    def test_real_pdf_ids_open_the_pdf_buttons(self):
+        cfg = live_checkout(closed_cfg())
+        cfg["checkout"]["pdf_prices"] = dict(PDF_PRICES)
+        pages = self.build(cfg)
+        for name, start in (("pricing.html", '<section id="pdf">'), ("velocity-pdf.html", '<section id="buy">')):
+            block = pdf_block(pages[name], start)
+            for plan in _build.PDF_PLANS:
+                self.assertIn(f'data-checkout="{plan}" data-product="pdf"', block, name)
+            self.assertNotIn(">Coming soon<", block, name)
+            self.assertIn('data-quantity-from="pdfPcs"', block, name)
+            self.assertRegex(block, r'<input type="number" id="pdfPcs" min="5" max="255"')
+        vp = pages["velocity-pdf.html"]
+        self.assertIn('<script src="/assets/checkout.js" defer></script>', vp)
+        self.assertIn('id="checkoutMsg"', vp)
+        self.assertEqual(json.loads(parse(vp).json_scripts[0])["pdfPrices"], PDF_PRICES)
+        # checkout switched off closes the PDF buttons too
+        cfg["checkout"]["open"] = False
+        self.assertNotIn("data-checkout=", self.build(cfg)["velocity-pdf.html"])
+
+    def test_downloads_off_says_available_soon_without_a_dead_link(self):
+        pages = self.build(closed_cfg())
+        vp, dl = pages["velocity-pdf.html"], pages["download.html"]
+        self.assertIn(">Download available soon</button>", vp)
+        self.assertRegex(vp, r'<button class="btn primary soon" type="button" disabled title="[^"]+">Download available soon')
+        self.assertNotIn(".exe", vp)
+        self.assertNotIn("Coming soon</span>", vp)
+        self.assertIn('id="download"', vp)
+        self.assertIn("System requirements", vp)
+        card = dl[dl.index('data-app="pdf"'):dl.index('data-app="browser"')]
+        self.assertNotIn(".exe", card)
+        self.assertIn("Join the launch list", card)
+        self.assertIn("Version 0.8.0", card)
+
+    def test_downloads_open_with_matching_file(self):
+        self.put_file()
+        pages = self.build(self.pdf_open())
+        url = "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.0.exe"
+        vp, dl = pages["velocity-pdf.html"], pages["download.html"]
+        for t in (vp, dl):
+            self.assertIn(f'href="{url}"', t)
+            self.assertIn(self.digest, t)
+            self.assertIn(_build._size_text(len(self.data)), t)
+        self.assertNotIn("Download available soon", vp)
+        self.assertNotIn("launch list", vp)
+        self.assertIn("Seeing a warning when you download?", vp)
+        self.assertIn("Version 0.8.0", vp)
+        card = dl[dl.index('data-app="pdf"'):dl.index('data-app="browser"')]
+        self.assertNotIn("launch list", card)
+        self.assertIn("Download Velocity PDF", card)
+
+    def test_downloads_open_refuses_wrong_details(self):
+        with self.assertRaises(_build.BuildError):          # placeholders size 0 / no SHA-256
+            self.build(self.pdf_open(size=0, sha256=""))
+        with self.assertRaises(_build.BuildError):          # file not in the repo
+            self.build(self.pdf_open())
+        for bad in (dict(signature=""), dict(product=None), dict(product="dm"), dict(version="0.7.9")):
+            self.put_file(**bad)
+            with self.assertRaises(_build.BuildError, msg=str(bad)):
+                self.build(self.pdf_open())
+        self.put_file(b"other bytes")
+        with self.assertRaises(_build.BuildError):
+            self.build(self.pdf_open())
+        with self.assertRaises(_build.BuildError):
+            self.build(self.pdf_open(base_url="https://downloads.example.com/"))
+
+    def test_thank_you_and_support_for_pdf_keys(self):
+        pages = self.build(closed_cfg())
+        ty = pages["thank-you.html"]
+        self.assertIn('data-steps="pdf"', ty)
+        self.assertIn('data-steps="dm"', ty)
+        t = plain(ty)
+        self.assertIn("VPDF-", t)
+        self.assertIn("File → Licence", t)
+        self.assertIn('"Your Velocity PDF licence key"', t)
+        self.assertIn('get("product") === "pdf"', ty)
+        sp = pages["support.html"]
+        self.assertIn('id="pdf-licence"', sp)
+        self.assertIn("A key for one app is refused by the other", plain(sp))
+
+    def test_no_coming_soon_for_pdf_left(self):
+        pages = self.build(closed_cfg())
+        for n, text in pages.items():
+            self.assertNotRegex(plain(text), r"Velocity PDF,? coming soon", n)
+            self.assertNotIn("Velocity PDF</b> (coming soon)", text, n)
+        for n in ("terms.html", "refunds.html", "legal.html", "privacy.html", "eula.html"):
+            self.assertNotIn("will be sold in the Microsoft Store", pages[n], n)
+        self.assertIn("Velocity PDF", plain(pages["refunds.html"]))
+        self.assertIn("Velocity PDF key works only in Velocity PDF", plain(pages["terms.html"]))
+
+    def test_release_fills_pdf_details_and_stages_without_opening(self):
+        root = os.path.join(self.tmp, "site")
+        dist = os.path.join(self.tmp, "dist")
+        os.makedirs(root)
+        os.makedirs(dist)
+        with open(os.path.join(root, "_launch.json"), "w", encoding="utf-8") as f:
+            json.dump(closed_cfg(), f)
+        with open(os.path.join(dist, "VelocityPDF-Setup-0.8.0.exe"), "wb") as f:
+            f.write(self.data)
+        m = {"version": "0.8.0", "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.0.exe",
+             "sha256": self.digest, "size": len(self.data), "notes": "", "product": "pdf", "signature": ""}
+        uj = os.path.join(dist, "velocity-pdf-update.json")
+
+        def write(**kw):
+            with open(uj, "w", encoding="utf-8") as f:
+                json.dump(m | kw, f)
+
+        def run(*args):
+            import contextlib
+            import io
+            with contextlib.redirect_stdout(io.StringIO()):
+                return _release.main(["--product", "pdf", "--update-json", uj, *args], root=root, app=self.tmp,
+                                     today=__import__("datetime").date(2026, 11, 20))
+        write()
+        run()
+        cfg = json.load(open(os.path.join(root, "_launch.json"), encoding="utf-8"))
+        w = cfg["downloads"]["pdf_windows"]
+        self.assertEqual((w["size"], w["sha256"], w["date"]), (len(self.data), self.digest, "November 2026"))
+        self.assertFalse(cfg["downloads"]["pdf_open"])
+        self.assertEqual(cfg["downloads"]["windows"], closed_cfg()["downloads"]["windows"])   # DM untouched
+        self.assertFalse(os.path.exists(os.path.join(root, "_legal")))
+        with self.assertRaises(SystemExit):          # not signed: no staging
+            run("--stage")
+        self.assertFalse(os.path.exists(os.path.join(root, "velocity-pdf")))
+        write(signature="c2lnbmVk")
+        run("--stage")
+        self.assertEqual(open(os.path.join(root, "velocity-pdf", "download", "VelocityPDF-Setup-0.8.0.exe"), "rb").read(),
+                         self.data)
+        self.assertEqual(json.load(open(os.path.join(root, "velocity-pdf", "update.json")))["product"], "pdf")
+        write(product="dm")                          # a DM update file is refused for pdf
+        with self.assertRaises(SystemExit):
+            run()
+        write(sha256="0" * 64)
+        with self.assertRaises(SystemExit):
+            run()
 
 
 if __name__ == "__main__":

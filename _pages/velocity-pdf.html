@@ -1,16 +1,70 @@
-<!-- Velocity PDF – edit, sign and convert PDFs on your PC | Velocity PDF by Zemaris: edit text in the document's own font, sign with a digital ID, fill forms, convert to Word, Excel and PowerPoint, and redact for real. Coming soon for Windows. | none -->
+<!-- Velocity PDF – edit, sign and convert PDFs on your PC | Velocity PDF by Zemaris: edit text in the document's own font, sign with a digital ID, fill forms, convert to Office and redact for real. 30 days free. | none -->
 <div class="phero">
   <div class="wrap">
     <div class="crumbs"><a href="/">Home</a> › Velocity PDF</div>
     <h1>Velocity <span class="g">PDF</span></h1>
-    <p class="sub">Edit, sign, convert and protect PDFs on your own PC, with tools that are simple to find. Coming soon for Windows 11 and 10, in the Microsoft Store.</p>
-    <p><span class="chip warn">Coming soon</span></p>
+    <p class="sub">Edit, sign, convert and protect PDFs on your own PC, with tools that are simple to find. For Windows 11 and 10. Try every feature free for 30 days.</p>
+    <p><!--IF pdf_downloads_live--><span class="chip ok">Version {{PDF_VERSION}}</span><!--ELSE--><span class="chip">Version {{PDF_VERSION}}</span><!--ENDIF--></p>
     <p class="actions">
-      <a class="btn primary" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20PDF%20launches." title="Write us a short email to hear when Velocity PDF is ready">Join the launch list</a>
+<!--IF pdf_downloads_live-->      <a class="btn primary" href="{{PDF_URL}}" title="Download the Velocity PDF installer for Windows ({{PDF_SIZE}})">Download for Windows</a>
+<!--ELSE-->      <button class="btn primary soon" type="button" disabled title="The Velocity PDF installer will be here soon">Download available soon</button>
+<!--ENDIF-->      <a class="btn" href="#buy" title="See the Velocity PDF plans and prices">Plans and prices</a>
       <a class="btn" href="#features" title="Jump to the list of features">See the features</a>
     </p>
   </div>
 </div>
+
+<section id="download" style="padding-top:28px">
+  <div class="wrap">
+    <div class="dive rv" style="margin-bottom:0">
+      <div>
+        <div class="kicker">Download</div>
+        <h3>Velocity PDF {{PDF_VERSION}} for Windows</h3>
+        <p>30 days free, then saving needs a key. During the trial every feature works. After it ends your files still open, read and print; to save changes, buy a plan and paste your key into <b>File → Licence</b>.</p>
+<!--IF pdf_downloads_live-->        <table class="dl-facts">
+          <tr><td>Version</td><td>{{PDF_VERSION}} · {{PDF_DATE}}</td></tr>
+          <tr><td>File</td><td>{{PDF_FILE}} · {{PDF_SIZE}}</td></tr>
+          <tr><td>SHA-256</td><td><span class="hash" id="pdfHash">{{PDF_SHA256}}</span> <button class="copybtn" type="button" data-copy="pdfHash" title="Copy the SHA-256 checksum, to compare with your downloaded file">Copy</button></td></tr>
+          <tr><td>Publisher</td><td><!--IF pdf_signed-->Signed by {{PDF_PUBLISHER}}<!--ELSE-->Not digitally signed yet (<a href="#pdf-warning-help">what this means</a>)<!--ENDIF--></td></tr>
+        </table>
+        <p class="actions">
+          <a class="btn primary" href="{{PDF_URL}}" title="Download the Velocity PDF installer for Windows ({{PDF_SIZE}})">Download for Windows</a>
+          <a class="btn" href="/support.html#verify" title="How to check that your download is genuine">Check your download</a>
+        </p>
+        <details class="reqs warnhelp" id="pdf-warning-help"><summary>Seeing a warning when you download?</summary>
+          <p>That's normal for a new app, and usually a few clicks get you past it.</p>
+          <h4>In Microsoft Edge</h4>
+          <p>If it says the file <b>"isn't commonly downloaded"</b>, click the three dots (<b>...</b>) next to the download, choose <b>Keep</b>, then <b>Show more</b>, then <b>Keep anyway</b>.</p>
+          <h4>In Chrome</h4>
+          <p>Open your downloads (<b>Ctrl+J</b>). If the file is marked <b>"isn't commonly downloaded"</b> or <b>suspicious</b>, choose <b>Keep</b> (or <b>Download suspicious file</b>).</p>
+          <h4>In Windows</h4>
+          <p>If a blue box says <b>"Windows protected your PC"</b>, click <b>More info</b>, then <b>Run anyway</b>.<!--IF !pdf_signed--> The publisher shows as "Unknown publisher" for now.<!--ENDIF--></p>
+<!--IF !pdf_signed-->          <p>If Windows says <b>Smart App Control</b> blocked it, there is no Run anyway button yet. Email <a href="mailto:{{SUPPORT_EMAIL}}?subject=Smart%20App%20Control%20blocked%20Velocity%20PDF%20Setup">{{SUPPORT_EMAIL}}</a> and we'll help. This goes away once our installer is code-signed.</p>
+<!--ENDIF-->
+          <h4>Why it happens</h4>
+          <p><!--IF pdf_signed-->Our installer is signed by <b>{{PDF_PUBLISHER}}</b>, but Windows and browsers are careful with files they haven't seen many times yet, so a new version can be warned about for a while.<!--ELSE-->Velocity PDF is a new app, and our installer isn't code-signed yet, so Windows and your browser don't know it well. It's a caution, not a sign of a virus. Code signing is on the way.<!--ENDIF--></p>
+          <h4>Check the file</h4>
+          <p>Want to be sure it's ours? Its SHA-256 must match the one shown above. <a href="/support.html#verify">How to check your download</a>.</p>
+        </details>
+<!--ELSE-->        <p class="actions">
+          <button class="btn primary soon" type="button" disabled title="The Velocity PDF installer will be here soon">Download available soon</button>
+          <a class="btn" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20PDF%20can%20be%20downloaded." title="Write us a short email and we'll tell you when the download is ready">Email me when it's ready</a>
+        </p>
+<!--ENDIF-->        <p class="fine">A Microsoft Store version is on the way too. A copy bought in the Microsoft Store is sold, licensed and updated by the Store.</p>
+      </div>
+      <div class="visual">
+        <h3 style="margin-top:0">System requirements</h3>
+        <ul class="req">
+          <li>Windows 11, or Windows 10 version 1809 or later, 64-bit</li>
+          <li>Microsoft Edge WebView2, which comes with Windows 11 and current Windows 10 (the installer adds it if it is missing)</li>
+          <li>No administrator rights needed: installs for your Windows user</li>
+          <li>Microsoft Office only to create PDFs from Word, Excel and PowerPoint files</li>
+          <li>An internet connection to activate a licence key and for updates</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="features" style="padding-top:28px">
   <div class="wrap">
@@ -78,18 +132,44 @@
       <div>
         <div class="kicker">Private by design</div>
         <h3>Your documents stay on your PC</h3>
-        <p>Files are opened, edited and saved on your computer. Velocity PDF goes online only for features you choose: an online AI service with your own key, extra text-recognition languages and the voice-typing model (downloaded once), and trusted timestamps for digital signatures. Read the details in our <a href="/privacy.html">privacy policy</a>.</p>
+        <p>Files are opened, edited and saved on your computer. Velocity PDF goes online only for features you choose: an online AI service with your own key, extra text-recognition languages and the voice-typing model (downloaded once), and trusted timestamps for digital signatures. To check a licence key it sends the key and an anonymous PC code to our activation server, never your documents. Read the details in our <a href="/privacy.html">privacy policy</a>.</p>
       </div>
       <div class="visual">
         <table class="mini">
           <tr><td>Systems</td><td>Windows 11 & 10, 64-bit</td></tr>
-          <tr><td>Where to get it</td><td>Microsoft Store</td></tr>
-          <tr><td>Price and trial</td><td>Announced at launch</td></tr>
+          <tr><td>Where to get it</td><td>zemaris.com</td></tr>
+          <tr><td>Free trial</td><td>30 days, every feature</td></tr>
+          <tr><td>After the trial</td><td>Open, read and print stay free; saving needs a key</td></tr>
           <tr><td>macOS and Linux</td><td>Later</td></tr>
-          <tr><td>Status</td><td><span class="chip warn">Coming soon</span></td></tr>
         </table>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="buy">
+  <div class="wrap">
+    <div class="center rv"><div class="kicker">Plans</div><h2>Velocity PDF plans</h2>
+      <p class="muted">Every plan includes every feature. Your licence key is emailed to you straight away.</p></div>
+    <div class="plans">
+      <div class="plan rv"><h3>Monthly</h3><p class="desc">Pay as you go</p><div class="price">$5.99<small> /month</small></div><div class="per">Cancel any time</div>
+        <ul><li>Every feature</li><li>1 PC</li><li>All updates while subscribed</li><li>Email support</li></ul>
+        <!--IF pdf_checkout_live--><button class="btn" type="button" data-checkout="monthly" data-product="pdf" title="Buy Velocity PDF Monthly in a secure checkout window. Your key is emailed to you straight away.">Buy Monthly</button><!--ELSE--><a class="btn soon" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20I%20can%20buy%20Velocity%20PDF." title="Buying Velocity PDF opens soon. Click to write us a short email and we'll tell you when.">Coming soon</a><!--ENDIF--></div>
+      <div class="plan best rv"><span class="ribbon">Most popular</span><h3>Yearly</h3><p class="desc">Best for most people</p><div class="price">$29.99<small> /year</small></div><div class="per">Just $2.50 a month · save 58%</div>
+        <ul><li>Every feature</li><li>1 PC</li><li>All updates while subscribed</li><li>Priority email support</li></ul>
+        <!--IF pdf_checkout_live--><button class="btn primary" type="button" data-checkout="yearly" data-product="pdf" title="Buy Velocity PDF Yearly in a secure checkout window. Your key is emailed to you straight away.">Buy Yearly</button><!--ELSE--><a class="btn primary soon" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20I%20can%20buy%20Velocity%20PDF." title="Buying Velocity PDF opens soon. Click to write us a short email and we'll tell you when.">Coming soon</a><!--ENDIF--></div>
+      <div class="plan rv"><h3>Lifetime</h3><p class="desc">Pay once, keep forever</p><div class="price">$49<small> once</small></div><div class="per">1 PC · free updates for life</div>
+        <ul><li>Every feature, forever</li><li>1 PC</li><li>Free updates for life</li><li>Priority email support</li></ul>
+        <!--IF pdf_checkout_live--><button class="btn" type="button" data-checkout="lifetime" data-product="pdf" title="Buy Velocity PDF Lifetime in a secure checkout window. Your key is emailed to you straight away.">Buy Lifetime</button><!--ELSE--><a class="btn soon" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20I%20can%20buy%20Velocity%20PDF." title="Buying Velocity PDF opens soon. Click to write us a short email and we'll tell you when.">Coming soon</a><!--ENDIF--></div>
+      <div class="plan rv"><h3>Business</h3><p class="desc">Offices and teams</p><div class="price">$15<small> /PC/year</small></div><div class="per">From 5 PCs</div>
+        <ul><li>Every feature</li><li>Licensed for commercial use</li><li>One invoice, one key for all PCs</li><li>Priority support</li></ul>
+        <!--IF pdf_checkout_live--><label class="pcs">PCs <input type="number" id="pdfPcs" min="5" max="255" step="1" value="5" inputmode="numeric" title="How many PCs (5 to 255)"></label>
+        <button class="btn" type="button" data-checkout="business" data-product="pdf" data-quantity-from="pdfPcs" title="Buy Velocity PDF Business for the number of PCs above, in a secure checkout window. One key for all of them is emailed to you.">Buy Business</button><!--ELSE--><a class="btn soon" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20for%20business" title="Buying Velocity PDF opens soon. Click to email us how many PCs you need.">Coming soon</a><!--ENDIF--></div>
+    </div>
+    <p class="fine center">30 days free with every feature, no card needed. After the trial your files still open, read and print; saving changes needs a licence key.</p>
+    <p class="fine center">Prices in US dollars. Local taxes may be added at checkout. Orders are processed by our reseller Paddle.com, the Merchant of Record for all our orders.</p>
+    <p class="fine center" id="checkoutMsg" role="status" aria-live="polite"></p>
+    <p class="fine center">Questions about buying? See <a href="/pricing.html#pdf">pricing</a>, <a href="/support.html#pdf-licence">Velocity PDF licence help</a> and our <a href="/refunds.html">refund policy</a>.</p>
   </div>
 </section>
 
@@ -104,8 +184,14 @@
 
 <section class="final">
   <div class="wrap">
-    <h2>Be the first to try Velocity PDF</h2>
-    <p class="sub">Join the launch list and we'll email you when it's in the Microsoft Store.</p>
-    <a class="btn primary" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20PDF%20launches." title="Write us a short email to hear when Velocity PDF is ready">Join the launch list</a>
-  </div>
+<!--IF pdf_downloads_live-->    <h2>Try Velocity PDF free for 30 days</h2>
+    <p class="sub">Every feature, no card, no sign-up. When you buy, paste the key from your email into <b>File → Licence</b>.</p>
+    <a class="btn primary" href="{{PDF_URL}}" title="Download the Velocity PDF installer for Windows ({{PDF_SIZE}})">Download free trial</a>
+<!--ELSE-->    <h2>Velocity PDF download available soon</h2>
+    <p class="sub">Write to us and we'll email you as soon as the installer is ready.</p>
+    <a class="btn primary" href="mailto:{{SUPPORT_EMAIL}}?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20PDF%20can%20be%20downloaded." title="Write us a short email and we'll tell you when the download is ready">Email me when it's ready</a>
+<!--ENDIF-->  </div>
 </section>
+<!--IF pdf_checkout_live--><script type="application/json" id="checkout-config">{{CHECKOUT_JSON}}</script>
+<script src="/assets/checkout.js" defer></script>
+<!--ENDIF-->

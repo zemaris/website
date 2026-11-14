@@ -1,4 +1,4 @@
-<!-- Thank you – Velocity Download Manager | Thank you for buying Velocity Download Manager. Your licence key is on its way to your email. | none -->
+<!-- Thank you – Velocity Download Manager and Velocity PDF | Thank you for buying Velocity Download Manager or Velocity PDF. Your licence key is on its way to your email. | none -->
 <!--HEAD
 <meta name="robots" content="noindex">
 HEAD-->
@@ -16,16 +16,32 @@ HEAD-->
       <div>
         <div class="kicker">Next steps</div>
         <h3>Activate in 20 seconds</h3>
-        <ol style="color:var(--text2);font-size:17px;padding-left:22px">
-          <li>Open the email from Zemaris with your licence key (its subject starts with <b>"Your Velocity"</b>) and copy the key. It starts with <code>VEL-</code>.</li>
-          <li>In Velocity, open <b>Help → Licence</b>.</li>
-          <li>Paste the key and click <b>Activate</b>.</li>
-        </ol>
-        <p>Haven't installed Velocity Download Manager yet? <a href="/download.html">Get it here</a>, then paste your key.</p>
-        <p class="actions">
-          <a class="btn primary" href="/download.html" title="Go to the download page">Get Velocity</a>
-          <a class="btn" href="/support.html#licence" title="Read how licence keys and activation work">Licence help</a>
-        </p>
+        <div data-steps="dm">
+          <h4>Velocity Download Manager</h4>
+          <ol style="color:var(--text2);font-size:17px;padding-left:22px">
+            <li>Open the email from Zemaris with your licence key (its subject starts with <b>"Your Velocity"</b>) and copy the key. It starts with <code>VEL-</code>.</li>
+            <li>In Velocity, open <b>Help → Licence</b>.</li>
+            <li>Paste the key and click <b>Activate</b>.</li>
+          </ol>
+          <p>Haven't installed Velocity Download Manager yet? <a href="/download.html">Get it here</a>, then paste your key.</p>
+          <p class="actions">
+            <a class="btn primary" href="/download.html" title="Go to the download page">Get Velocity</a>
+            <a class="btn" href="/support.html#licence" title="Read how licence keys and activation work">Licence help</a>
+          </p>
+        </div>
+        <div data-steps="pdf">
+          <h4>Velocity PDF</h4>
+          <ol style="color:var(--text2);font-size:17px;padding-left:22px">
+            <li>Open the email from Zemaris with your licence key (its subject is <b>"Your Velocity PDF licence key"</b>) and copy the key. It starts with <code>VPDF-</code>.</li>
+            <li>Open Velocity PDF and click <b>File → Licence</b>.</li>
+            <li>Paste the whole key and click <b>Activate</b>.</li>
+          </ol>
+          <p>Haven't installed Velocity PDF yet? <a href="/velocity-pdf.html#download">Get it here</a>, then paste your key.</p>
+          <p class="actions">
+            <a class="btn primary" href="/velocity-pdf.html#download" title="Go to the Velocity PDF download">Get Velocity PDF</a>
+            <a class="btn" href="/support.html#pdf-licence" title="Read how Velocity PDF licence keys work">Licence help</a>
+          </p>
+        </div>
       </div>
       <div class="visual">
         <h3 style="margin-top:0">No email after 10 minutes?</h3>
@@ -39,3 +55,14 @@ HEAD-->
     </div>
   </div>
 </section>
+<script>
+(function () {
+  var p = "dm";
+  try { p = new URLSearchParams(location.search).get("product") === "pdf" ? "pdf" : "dm" } catch (e) {}
+  var all = document.querySelectorAll("[data-steps]");
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].getAttribute("data-steps") !== p) all[i].hidden = true;
+    else { var h = all[i].querySelector("h4"); if (h) h.hidden = true; }
+  }
+})();
+</script>

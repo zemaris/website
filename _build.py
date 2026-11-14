@@ -7,10 +7,16 @@ Launch switches and placeholders live in _launch.json (see LAUNCH-PREP.md):
   - checkout.open   false = every Buy button says "Coming soon" and no payment script is loaded.
   - downloads.open  false = the Download button says "Coming soon" and no file details are shown.
 Both only turn on when the rest of their settings are filled in correctly; otherwise the build stops and says why.
+Velocity PDF (GO-LIVE-CONTRACT.md section 5):
+  - checkout.pdf_prices      the four Velocity PDF price ids. A placeholder (anything that is not pri_ + 26 letters or
+                             digits) never stops the build: it only keeps the PDF Buy buttons on "Coming soon".
+  - downloads.pdf_open       false = the PDF pages say "Download available soon". When true, downloads.pdf_windows
+                             is checked as strictly as the Download Manager's installer.
 
 Page sources may use:
   {{NAME}}                                  a value from _launch.json (HTML-escaped), see values() below
-  <!--IF flag-->...<!--ELSE-->...<!--ENDIF-->  flags: checkout_live, downloads_live, signed, activation (and !flag),
+  <!--IF flag-->...<!--ELSE-->...<!--ENDIF-->  flags: checkout_live, downloads_live, signed, activation,
+                                            pdf_checkout_live, pdf_downloads_live, pdf_signed (and !flag),
                                             and released_1_7_5 (any version): true when downloads are open with
                                             that Windows version or a later one (What's new "Current" tags)
 The licence agreement and open-source notices are copied from the app with:  python _release.py --legal ..\\legal
@@ -31,6 +37,7 @@ PADDLE_JS = "https://cdn.paddle.com/paddle/v2/paddle.js"
 PRICE_RE = re.compile(r"^pri_[a-z0-9]{26}$")
 TOKEN_RE = {"sandbox": re.compile(r"^test_[A-Za-z0-9]{10,}$"), "production": re.compile(r"^live_[A-Za-z0-9]{10,}$")}
 PLANS = ("monthly", "yearly", "lifetime")
+PDF_PLANS = ("monthly", "yearly", "lifetime", "business")
 
 HEAD = """<!doctype html>
 <html lang="en">
@@ -78,7 +85,7 @@ FOOT = """</main>
     <div class="fcols">
       <div>
         <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="30" height="30">Zemaris</a>
-        <p>Fast, honest software: Velocity Download Manager for Windows, and Velocity PDF, coming soon.</p>
+        <p>Fast, honest software: Velocity Download Manager and Velocity PDF for Windows.</p>
       </div>
       <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/velocity-pdf.html">Velocity PDF</a><a href="/languages.html">Languages</a></div>
       <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:{{SUPPORT_EMAIL}}">Contact us</a></div>
@@ -183,6 +190,63 @@ def check_downloads(cfg, root=HERE):
     return True
 
 
+def check_pdf_checkout(cfg, checkout_live):
+    """True when the Velocity PDF Buy buttons may open checkout: checkout is open (and passed check_checkout) and all
+    four PDF price ids are real. Placeholders such as pri_PDF_MONTHLY only keep it off, never stop the build."""
+    prices = cfg.get("checkout", {}).get("pdf_prices") or {}
+    return bool(checkout_live) and all(PRICE_RE.match(prices.get(p) or "") for p in PDF_PLANS)
+
+
+def check_pdf_downloads(cfg, root=HERE):
+    """True when the Velocity PDF download button may show. Off while downloads.pdf_open is false; when it is true
+    the installer details must be complete and right, or the build stops (as for the Download Manager)."""
+    d = cfg.get("downloads", {})
+    if not d.get("pdf_open"):
+        return False
+    w = d.get("pdf_windows", {})
+    base = w.get("base_url") or ""
+    if not (base.startswith("https://") and base.endswith("/")):
+        fail("downloads.pdf_windows.base_url must start with https:// and end with /")
+    if not re.match(r"^https://(zemaris\.com|[a-z0-9-]+(\.[a-z0-9-]+)*\.zemaris\.com|github\.com/zemaris)/", base.lower()):
+        fail("downloads.pdf_windows.base_url must be on zemaris.com (or a subdomain) or github.com/zemaris/...: "
+             "Velocity PDF refuses installers from other hosts")
+    if not re.match(r"^\d+\.\d+\.\d+$", w.get("version") or ""):
+        fail("downloads.pdf_windows.version must look like 0.8.0")
+    if not re.match(r"^[A-Za-z0-9._-]+\.exe$", w.get("file") or ""):
+        fail("downloads.pdf_windows.file must be the installer's file name")
+    if not re.match(r"^[0-9a-f]{64}$", w.get("sha256") or ""):
+        fail("downloads.pdf_windows.sha256 must be 64 lowercase hex characters (python _release.py --product pdf)")
+    if not isinstance(w.get("size"), int) or w["size"] <= 0:
+        fail("downloads.pdf_windows.size must be the file size in bytes (python _release.py --product pdf)")
+    if w.get("signed") and not (w.get("publisher") or "").strip():
+        fail("downloads.pdf_windows.publisher must be the name on the code-signing certificate when signed is true")
+    if base.startswith("https://zemaris.com/"):
+        import hashlib
+        local = os.path.join(root, *base[len("https://zemaris.com/"):].strip("/").split("/"), w["file"])
+        if not os.path.isfile(local):
+            fail(f"the Velocity PDF installer is not in this repo at {os.path.relpath(local, root)} "
+                 "(python _release.py --product pdf --stage)")
+        h = hashlib.sha256()
+        with open(local, "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 20), b""):
+                h.update(chunk)
+        if h.hexdigest() != w["sha256"] or os.path.getsize(local) != w["size"]:
+            fail(f"{os.path.relpath(local, root)} does not match the SHA-256 or size in _launch.json pdf_windows")
+        uj = os.path.join(root, "velocity-pdf", "update.json")
+        try:
+            with open(uj, encoding="utf-8-sig") as f:
+                m = json.load(f)
+        except (OSError, ValueError):
+            fail("velocity-pdf/update.json is missing or not valid JSON (python _release.py --product pdf --stage)")
+        if (m.get("version"), (m.get("sha256") or "").lower()) != (w["version"], w["sha256"]):
+            fail("velocity-pdf/update.json names another version or file than _launch.json pdf_windows")
+        if m.get("product") != "pdf":
+            fail('velocity-pdf/update.json must say "product": "pdf"')
+        if not isinstance(m.get("signature"), str) or not m["signature"]:
+            fail("velocity-pdf/update.json is not signed (tools\\sign_update.py --sign ... --product pdf)")
+    return True
+
+
 def values(cfg):
     s, c, d = cfg.get("seller", {}), cfg.get("checkout", {}), cfg.get("downloads", {})
     w = d.get("windows", {})
@@ -208,9 +272,21 @@ def values(cfg):
         "WIN_PUBLISHER": v(w.get("publisher"), "[PUBLISHER NAME ON THE CERTIFICATE]"),
         "WIN_DATE": w.get("date") or "",
     }
+    pw = d.get("pdf_windows", {})
+    out.update({
+        "PDF_VERSION": pw.get("version") or "",
+        "PDF_FILE": pw.get("file") or "",
+        "PDF_SIZE": _size_text(pw["size"]) if isinstance(pw.get("size"), int) and pw["size"] > 0 else "",
+        "PDF_SHA256": pw.get("sha256") or "",
+        "PDF_URL": (pw.get("base_url") or "") + (pw.get("file") or ""),
+        "PDF_PUBLISHER": v(pw.get("publisher"), "[PUBLISHER NAME ON THE CERTIFICATE]"),
+        "PDF_DATE": pw.get("date") or "",
+    })
     conf = {"environment": c.get("environment"), "token": c.get("client_token") or "",
             "prices": {p: (c.get("prices") or {}).get(p) or "" for p in PLANS},
-            "successUrl": "https://zemaris.com/thank-you.html", "support": support, "paddleJs": PADDLE_JS}
+            "pdfPrices": {p: (c.get("pdf_prices") or {}).get(p) or "" for p in PDF_PLANS},
+            "successUrl": "https://zemaris.com/thank-you.html",
+            "pdfSuccessUrl": "https://zemaris.com/thank-you.html?product=pdf", "support": support, "paddleJs": PADDLE_JS}
     raw = {"CHECKOUT_JSON": json.dumps(conf).replace("<", "\\u003c").replace("&", "\\u0026")}
     return out, raw
 
@@ -303,6 +379,9 @@ def build(out_dir=None, cfg=None, quiet=False, root=HERE):
     flags = {"checkout_live": check_checkout(cfg), "downloads_live": check_downloads(cfg, root),
              "signed": bool(cfg.get("downloads", {}).get("windows", {}).get("signed")),
              "activation": bool(cfg.get("licence", {}).get("activation_server", True))}
+    flags.update(pdf_checkout_live=check_pdf_checkout(cfg, flags["checkout_live"]),
+                 pdf_downloads_live=check_pdf_downloads(cfg, root),
+                 pdf_signed=bool(cfg.get("downloads", {}).get("pdf_windows", {}).get("signed")))
     vals, raw = values(cfg)
     raw = dict(raw)
     src = os.path.join(HERE, "_pages")
@@ -339,6 +418,8 @@ def build(out_dir=None, cfg=None, quiet=False, root=HERE):
     if not quiet:
         print("checkout:", "OPEN (" + cfg["checkout"]["environment"] + ")" if flags["checkout_live"] else "Coming soon")
         print("downloads:", "OPEN" if flags["downloads_live"] else "Coming soon")
+        print("Velocity PDF checkout:", "OPEN" if flags["pdf_checkout_live"] else "Coming soon (price ids not set)")
+        print("Velocity PDF downloads:", "OPEN" if flags["pdf_downloads_live"] else "Download available soon")
         if placeholders:
             print("still to fill in:", ", ".join(sorted(placeholders)))
     return built

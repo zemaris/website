@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Thank you – Velocity Download Manager</title>
-<meta name="description" content="Thank you for buying Velocity Download Manager. Your licence key is on its way to your email.">
+<title>Thank you – Velocity Download Manager and Velocity PDF</title>
+<meta name="description" content="Thank you for buying Velocity Download Manager or Velocity PDF. Your licence key is on its way to your email.">
 <meta name="theme-color" content="#0b1020">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="canonical" href="https://zemaris.com/thank-you.html">
 <meta property="og:site_name" content="Zemaris">
-<meta property="og:title" content="Thank you – Velocity Download Manager">
-<meta property="og:description" content="Thank you for buying Velocity Download Manager. Your licence key is on its way to your email.">
+<meta property="og:title" content="Thank you – Velocity Download Manager and Velocity PDF">
+<meta property="og:description" content="Thank you for buying Velocity Download Manager or Velocity PDF. Your licence key is on its way to your email.">
 <meta property="og:url" content="https://zemaris.com/thank-you.html">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
@@ -51,16 +51,32 @@
       <div>
         <div class="kicker">Next steps</div>
         <h3>Activate in 20 seconds</h3>
-        <ol style="color:var(--text2);font-size:17px;padding-left:22px">
-          <li>Open the email from Zemaris with your licence key (its subject starts with <b>"Your Velocity"</b>) and copy the key. It starts with <code>VEL-</code>.</li>
-          <li>In Velocity, open <b>Help → Licence</b>.</li>
-          <li>Paste the key and click <b>Activate</b>.</li>
-        </ol>
-        <p>Haven't installed Velocity Download Manager yet? <a href="/download.html">Get it here</a>, then paste your key.</p>
-        <p class="actions">
-          <a class="btn primary" href="/download.html" title="Go to the download page">Get Velocity</a>
-          <a class="btn" href="/support.html#licence" title="Read how licence keys and activation work">Licence help</a>
-        </p>
+        <div data-steps="dm">
+          <h4>Velocity Download Manager</h4>
+          <ol style="color:var(--text2);font-size:17px;padding-left:22px">
+            <li>Open the email from Zemaris with your licence key (its subject starts with <b>"Your Velocity"</b>) and copy the key. It starts with <code>VEL-</code>.</li>
+            <li>In Velocity, open <b>Help → Licence</b>.</li>
+            <li>Paste the key and click <b>Activate</b>.</li>
+          </ol>
+          <p>Haven't installed Velocity Download Manager yet? <a href="/download.html">Get it here</a>, then paste your key.</p>
+          <p class="actions">
+            <a class="btn primary" href="/download.html" title="Go to the download page">Get Velocity</a>
+            <a class="btn" href="/support.html#licence" title="Read how licence keys and activation work">Licence help</a>
+          </p>
+        </div>
+        <div data-steps="pdf">
+          <h4>Velocity PDF</h4>
+          <ol style="color:var(--text2);font-size:17px;padding-left:22px">
+            <li>Open the email from Zemaris with your licence key (its subject is <b>"Your Velocity PDF licence key"</b>) and copy the key. It starts with <code>VPDF-</code>.</li>
+            <li>Open Velocity PDF and click <b>File → Licence</b>.</li>
+            <li>Paste the whole key and click <b>Activate</b>.</li>
+          </ol>
+          <p>Haven't installed Velocity PDF yet? <a href="/velocity-pdf.html#download">Get it here</a>, then paste your key.</p>
+          <p class="actions">
+            <a class="btn primary" href="/velocity-pdf.html#download" title="Go to the Velocity PDF download">Get Velocity PDF</a>
+            <a class="btn" href="/support.html#pdf-licence" title="Read how Velocity PDF licence keys work">Licence help</a>
+          </p>
+        </div>
       </div>
       <div class="visual">
         <h3 style="margin-top:0">No email after 10 minutes?</h3>
@@ -74,13 +90,24 @@
     </div>
   </div>
 </section>
+<script>
+(function () {
+  var p = "dm";
+  try { p = new URLSearchParams(location.search).get("product") === "pdf" ? "pdf" : "dm" } catch (e) {}
+  var all = document.querySelectorAll("[data-steps]");
+  for (var i = 0; i < all.length; i++) {
+    if (all[i].getAttribute("data-steps") !== p) all[i].hidden = true;
+    else { var h = all[i].querySelector("h4"); if (h) h.hidden = true; }
+  }
+})();
+</script>
 </main>
 <footer class="site">
   <div class="wrap">
     <div class="fcols">
       <div>
         <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="30" height="30">Zemaris</a>
-        <p>Fast, honest software: Velocity Download Manager for Windows, and Velocity PDF, coming soon.</p>
+        <p>Fast, honest software: Velocity Download Manager and Velocity PDF for Windows.</p>
       </div>
       <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/velocity-pdf.html">Velocity PDF</a><a href="/languages.html">Languages</a></div>
       <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:admin@zemaris.com">Contact us</a></div>

@@ -1,6 +1,8 @@
 /* zemaris.com checkout: opens Paddle's secure checkout over the pricing page.
    The page only includes this file when checkout is switched on in _launch.json (see LAUNCH-PREP.md).
-   Paddle's own script is fetched only when someone points at or clicks a Buy button. */
+   Paddle's own script is fetched only when someone points at or clicks a Buy button.
+   Velocity PDF buttons carry data-product="pdf" and use the pdfPrices from the same config (_launch.json
+   checkout.pdf_prices); its Business button reads the PC count from data-quantity-from (5 to 255). */
 (function () {
   "use strict";
   var el = document.getElementById("checkout-config");
@@ -46,8 +48,20 @@
     return loading;
   }
 
+  // Velocity PDF Business: the number of PCs from the box on its card (5 to 255, 5 when empty or not a number)
+  function quantity(btn) {
+    var id = btn.getAttribute("data-quantity-from");
+    if (!id) return 1;
+    var box = document.getElementById(id), n = parseInt(box && box.value, 10);
+    if (!(n >= 5)) n = 5;
+    if (n > 255) n = 255;
+    if (box) box.value = String(n);
+    return n;
+  }
+
   function buy(btn) {
-    var plan = btn.getAttribute("data-checkout"), price = (cfg.prices || {})[plan];
+    var plan = btn.getAttribute("data-checkout"), pdf = btn.getAttribute("data-product") === "pdf";
+    var price = ((pdf ? cfg.pdfPrices : cfg.prices) || {})[plan];
     if (!ok || !PRICE.test(price || "")) {
       say("Checkout isn't available right now. Please email " + cfg.support + " and we'll help you buy.");
       return;
@@ -58,10 +72,11 @@
     say("");
     paddle().then(function (P) {
       P.Checkout.open({
-        items: [{ priceId: price, quantity: 1 }],
-        settings: { displayMode: "overlay", theme: dark() ? "dark" : "light", locale: "en", successUrl: cfg.successUrl }
+        items: [{ priceId: price, quantity: pdf ? quantity(btn) : 1 }],
+        settings: { displayMode: "overlay", theme: dark() ? "dark" : "light", locale: "en",
+                    successUrl: pdf ? cfg.pdfSuccessUrl : cfg.successUrl }
       });
-      try { if (window.ZemarisStats) window.ZemarisStats.send("checkout_open", plan); } catch (e) {}
+      try { if (window.ZemarisStats) window.ZemarisStats.send("checkout_open", pdf ? "pdf:" + plan : plan); } catch (e) {}
     }).catch(function () {
       say("The secure checkout could not open. Check your internet connection and try again, or email " + cfg.support + ".");
     }).then(function () {

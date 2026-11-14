@@ -502,3 +502,7 @@ button.btn { line-height: inherit }
 .adm-reviews { display: grid; gap: 10px; margin-bottom: 18px }
 .adm-rv .adm-rv-act { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap }
 .adm-rv.pending { border-color: var(--warn) }
+/* Velocity PDF Business card: number of PCs */
+.plan .pcs { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: var(--text2); font-size: 15px }
+.plan .pcs input { font: inherit; width: 84px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text) }
+.btn[disabled] { cursor: default }
