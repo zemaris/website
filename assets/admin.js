@@ -11,7 +11,7 @@
   // ?still (for screenshots) or the system's reduce-motion setting: no count-up or moving bars
   var REDUCED = /(^|[?&])still\b/.test(location.search) || !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
   if (REDUCED) document.documentElement.classList.add("za-still");
-  var state = { key: "", days: 30, data: null, metric: "sessions", maxTs: 0, timer: 0, seen: {} };
+  var state = { key: "", days: 30, data: null, metric: "sessions", maxTs: 0, timer: 0, seen: {}, product: "" };
 
   // ---------- small helpers ----------
   function el(tag, cls, text) {
@@ -370,14 +370,27 @@
   }
 
   // ---------- purchases ----------
-  function sales(list) {
-    var tb = clear($("tSales").tBodies[0]); list = list || [];
-    if (!list.length) { var r = tb.insertRow(), c = r.insertCell(); c.colSpan = 7; c.className = "za-empty"; c.textContent = "No purchases in this period."; return; }
+  // Both apps use the same plan names (Yearly, Lifetime...), so every sale shows which app it was for. The server sends
+  // product "pdf" for Velocity PDF; old rows and Download Manager rows say "dm" or nothing.
+  var PRODUCTS = { dm: "Download Manager", pdf: "Velocity PDF" };
+  function productOf(s) { return s && String(s.product || "").toLowerCase() === "pdf" ? "pdf" : "dm"; }
+  function saleLabel(s) { return PRODUCTS[productOf(s)] + " · " + (s.plan || "?") + (s.pcs > 1 ? " ×" + s.pcs : ""); }
+  function salesFor(list, product) { return (list || []).filter(function (s) { return !product || productOf(s) === product; }); }
+  var SALES_CSV_HEAD = ["time_utc", "txn", "serial", "product", "plan", "pcs", "amount_minor", "currency", "country", "email", "name", "status", "refunded_minor", "test"];
+  function csvSaleRow(x) {
+    return [new Date(x.ts).toISOString(), x.txn, x.serial, productOf(x), x.plan, x.pcs, x.amount, x.currency, x.country, x.email, x.name, x.status, x.refunded, x.test ? 1 : 0];
+  }
+  function sales(all) {
+    var tb = clear($("tSales").tBodies[0]), list = salesFor(all, state.product);
+    if (!list.length) {
+      var r = tb.insertRow(), c = r.insertCell(); c.colSpan = 7; c.className = "za-empty";
+      c.textContent = state.product ? "No " + PRODUCTS[state.product] + " purchases in this period." : "No purchases in this period."; return;
+    }
     list.forEach(function (s) {
       var tr = tb.insertRow(); if (s.test) tr.className = "test";
       tr.insertCell().textContent = when(s.ts);
       var b = tr.insertCell(); b.append(document.createTextNode(s.name || "(no name)"), el("small", null, s.email || "(no email)"));
-      var p = tr.insertCell(); p.append(document.createTextNode(s.plan + (s.pcs > 1 ? " ×" + s.pcs : "")), el("small", null, "Key " + s.serial));
+      var p = tr.insertCell(); p.append(document.createTextNode(saleLabel(s)), el("small", null, "Key " + s.serial));
       var a = tr.insertCell(); a.className = "num"; a.append(document.createTextNode(money(s.amount, s.currency)));
       if (s.refunded) a.append(el("small", null, "refunded " + money(s.refunded, s.currency)));
       tr.insertCell().textContent = flag(s.country) + " " + country(s.country);
@@ -435,10 +448,8 @@
       out.push([k, d.sessions, d.visits, d.views, d.clicks, d.downloads, d.checkouts, d.purchases, d.revenue, d.owner_views]);
     });
     out.push([]);
-    out.push(["time_utc", "txn", "serial", "plan", "pcs", "amount_minor", "currency", "country", "email", "name", "status", "refunded_minor", "test"]);
-    (s.sales || []).forEach(function (x) {
-      out.push([new Date(x.ts).toISOString(), x.txn, x.serial, x.plan, x.pcs, x.amount, x.currency, x.country, x.email, x.name, x.status, x.refunded, x.test ? 1 : 0]);
-    });
+    out.push(SALES_CSV_HEAD);
+    (s.sales || []).forEach(function (x) { out.push(csvSaleRow(x)); });
     var text = out.map(function (r) { return r.map(csvCell).join(","); }).join("\r\n");
     var a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(["﻿" + text], { type: "text/csv" }));
@@ -524,6 +535,9 @@
     }).catch(function () { say("Could not reach the server. Check the internet connection."); live(false); });
   }
 
+  // the pure purchase helpers, for _tests/admin.test.mjs (no DOM, no network)
+  window.ZemarisAdmin = { productOf: productOf, saleLabel: saleLabel, salesFor: salesFor, SALES_CSV_HEAD: SALES_CSV_HEAD, csvSaleRow: csvSaleRow };
+
   // ---------- wiring ----------
   function clock() { $("zClock").textContent = fmtTime.format(new Date()) + " Oman time"; }
   document.addEventListener("DOMContentLoaded", function () {
@@ -545,6 +559,12 @@
       b.addEventListener("click", function () {
         document.querySelectorAll("#zMetric [data-m]").forEach(function (x) { x.classList.toggle("on", x === b); });
         state.metric = b.getAttribute("data-m"); drawDaily();
+      });
+    });
+    document.querySelectorAll("#zProduct [data-p]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        document.querySelectorAll("#zProduct [data-p]").forEach(function (x) { x.classList.toggle("on", x === b); });
+        state.product = b.getAttribute("data-p"); if (state.data) sales(state.data.sales);
       });
     });
     $("adm").addEventListener("submit", function (e) { e.preventDefault(); state.key = $("admKey").value.trim(); load(); });

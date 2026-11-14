@@ -2,7 +2,7 @@
 <!--HEAD
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="/assets/admin.css?v=20261114b">
-<script src="/assets/admin.js?v=20261114b" defer></script>
+<script src="/assets/admin.js?v=20261115a" defer></script>
 HEAD-->
 <div class="za">
 <section class="za-top">
@@ -82,7 +82,12 @@ HEAD-->
     </div>
 
     <article class="za-card">
-      <header><h2>Purchases</h2><span class="za-hint">Test purchases are never counted as revenue</span></header>
+      <header><h2>Purchases</h2><span class="za-hint">Test purchases are never counted as revenue</span>
+        <div class="za-seg small" role="group" aria-label="Which app" id="zProduct">
+          <button type="button" data-p="" class="on" title="Purchases of both apps">All</button>
+          <button type="button" data-p="dm" title="Only Velocity Download Manager purchases">Download Manager</button>
+          <button type="button" data-p="pdf" title="Only Velocity PDF purchases">Velocity PDF</button>
+        </div></header>
       <div class="za-table-wrap"><table class="za-table" id="tSales">
         <thead><tr><th>When (Oman)</th><th>Buyer</th><th>Plan</th><th class="num">Paid</th><th>Country</th><th>Status</th><th>Test</th></tr></thead>
         <tbody></tbody>

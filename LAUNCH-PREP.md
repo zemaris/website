@@ -21,7 +21,7 @@ This file and `README.md` are kept off the live site by `_config.yml`.
 | Download page | Windows card ready behind `downloads.open`: version, date, file, size, SHA-256 with a Copy button, signed / not signed, system requirements, Download button. Filled from the release files by `_release.py`. While closed it shows "Coming soon" and no file details. | `_pages/download.html`, `_release.py` |
 | Velocity PDF page | "Coming soon" product page with features checked against the code, privacy summary, Microsoft Store, price "announced at launch". Linked from the footer, the download page and About. | `_pages/velocity-pdf.html` |
 | Tooltips | Every button and button-style link has a tooltip; the build stops if one is missing. | `_build.py` |
-| Tests | `python _tests\test_site.py` (27 checks) and `node --test _tests\checkout.test.mjs` (7 checks). | `_tests/` |
+| Tests | `python _tests\test_site.py` (49 checks) and `node --test _tests\checkout.test.mjs _tests\admin.test.mjs _tests\site_links.test.mjs` (18 checks). | `_tests/` |
 
 ## What the owner fills in (in `_launch.json`, then `python _build.py`)
 
@@ -44,7 +44,7 @@ into the server with `wrangler secret put` (see `..\server\README.md`).
 | `downloads.*` | Filled by Claude with `python _release.py` from the final signed build (`--stage` copies the installer and `velocity/update.json` into this repo) | Launch |
 | `downloads.windows.signed/publisher` | Set by `_release.py --signed --publisher "Name on the certificate"` once builds are signed | After signing |
 | `downloads.open` | `true` when you say the packages are final | Launch |
-| `checkout.pdf_prices.monthly/yearly/lifetime/business` | Velocity PDF: the four Paddle `pri_...` ids (now placeholders `pri_PDF_*`). Paste each one here AND in the server's `wrangler.toml` PRICES; a test fails while they differ. Until all four are real the PDF Buy buttons say "Coming soon" (the build never stops for them) | PDF checkout opens |
+| `checkout.pdf_prices.monthly/yearly/lifetime/business` | Velocity PDF: the four Paddle `pri_...` ids (now placeholders `pri_PDF_*`). Paste each one here AND in the server's `wrangler.toml` PRICES in the same sitting. `test_server_and_site_hold_the_same_pdf_ids` fails while they differ, but it can only see the server file when the two worktrees sit side by side (`..\pdf-live\server\wrangler.toml`) or when `ZEMARIS_SERVER_TOML` names that file (then a missing file fails too). From the website repo on its own it is skipped, so run it with `set ZEMARIS_SERVER_TOML=<path to server\wrangler.toml>` after pasting. Until all four are real the PDF Buy buttons say "Coming soon" (the build never stops for them) | PDF checkout opens |
 | `downloads.pdf_windows.*` | Velocity PDF 0.8.0: size, SHA-256 and date filled by `python _release.py --product pdf --update-json ...elocity-pdf-update.json` (`--stage` copies the installer to `velocity-pdf/download/` and the signed file to `velocity-pdf/update.json`) | PDF launch |
 | `downloads.pdf_open` | `false` now: the PDF pages say "Download available soon". `true` when you publish Velocity PDF | PDF launch |
 

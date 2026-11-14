@@ -882,20 +882,34 @@ class VelocityPdf(unittest.TestCase):
         w = cfg["downloads"]["pdf_windows"]
         self.assertEqual((w["version"], w["file"], w["base_url"]),
                          ("0.8.0", "VelocityPDF-Setup-0.8.0.exe", "https://zemaris.com/velocity-pdf/download/"))
-        with open(os.path.join(SITE, "velocity-pdf", "update.json"), encoding="utf-8") as f:
-            m = json.load(f)
-        self.assertEqual((m["version"], m["product"], m["url"]), ("0.8.0", "pdf", w["base_url"] + w["file"]))
-        self.assertEqual(m["signature"], "")      # not signed yet: the app ignores an unsigned file
+        # No velocity-pdf/update.json on the site until _release.py --product pdf --stage writes the signed one. An
+        # unsigned file is worse than none: File > Check for updates in the app says "isn't signed by Zemaris" for it,
+        # while a missing file (404) quietly means "you have the latest version".
+        uj = os.path.join(SITE, "velocity-pdf", "update.json")
+        if os.path.exists(uj):
+            with open(uj, encoding="utf-8-sig") as f:
+                m = json.load(f)
+            self.assertEqual((m["product"], m["url"]), ("pdf", w["base_url"] + w["file"]))
+            self.assertTrue(isinstance(m.get("signature"), str) and m["signature"], "velocity-pdf/update.json is not signed")
 
     def test_server_and_site_hold_the_same_pdf_ids(self):
-        """GO-LIVE-CONTRACT.md section 7: the live PDF price ids in server/wrangler.toml PRICES equal _launch.json's."""
-        toml = os.path.join(os.path.dirname(SITE), "pdf-live", "server", "wrangler.toml")
+        """GO-LIVE-CONTRACT.md section 7: the live PDF price ids in server/wrangler.toml PRICES equal _launch.json's.
+
+        The server's wrangler.toml is found through ZEMARIS_SERVER_TOML (a path), or else next to this worktree
+        (../pdf-live/server/wrangler.toml). With the variable set the check never skips: a missing file fails.
+        Without it, and without the side-by-side worktrees (the website repo on its own), the check is skipped."""
+        given = os.environ.get("ZEMARIS_SERVER_TOML", "").strip()
+        toml = given or os.path.join(os.path.dirname(SITE), "pdf-live", "server", "wrangler.toml")
         if not os.path.isfile(toml):
-            self.skipTest("server/wrangler.toml not next to this worktree")
+            if given:
+                self.fail(f"ZEMARIS_SERVER_TOML names {given}, which is not a file")
+            self.skipTest("server/wrangler.toml not next to this worktree (set ZEMARIS_SERVER_TOML to check)")
         text = open(toml, encoding="utf-8").read()
         live = re.split(r"(?m)^\[+env\.", text, maxsplit=1)[0]      # the live part, before [env.sandbox]
         ids = dict(re.findall(r'"(pri_[A-Za-z0-9_]+)"\s*:\s*\{[^}]*"product"\s*:\s*"pdf"[^}]*"plan"\s*:\s*"(\w+)"', live))
         if not ids:
+            if given:
+                self.fail(f"{given} has no Velocity PDF entries in PRICES")
             self.skipTest("server PRICES has no Velocity PDF entries yet")
         site = {v: k for k, v in base_cfg()["checkout"]["pdf_prices"].items() if k in _build.PDF_PLANS}
         self.assertEqual({plan: pid for pid, plan in ids.items()}, {plan: pid for pid, plan in site.items()})
