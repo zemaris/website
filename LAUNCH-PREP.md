@@ -59,6 +59,10 @@ installer missing from the repo or not matching its SHA-256).
    approval.
 2. Make a client-side token (sandbox first) and send Claude the token and the three price ids, or paste them into
    `_launch.json` yourself.
+   **Quantity ranges** (each price in Paddle > Catalog, in live and in the sandbox): set the Velocity PDF Monthly, Yearly
+   and Lifetime prices to **1-1**, and Business to **5-255**. Paddle's default range is 1-100: left like that, a buyer
+   who raises the quantity at checkout pays several times for one 1-PC key (the licence server then makes one key and
+   emails you to refund the extra). The same 1-1 is wise for the Download Manager's Monthly, Yearly and Lifetime prices.
 3. Decide: the seller name, address and governing law (the same go into the installer's EULA, so tell Claude both);
    the retention period; whether `privacy@zemaris.com` will exist.
 4. Policy points to confirm (change them if you disagree): refunds within 14 days of **each** payment, renewals
