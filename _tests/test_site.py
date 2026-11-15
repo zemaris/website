@@ -19,6 +19,11 @@ warnings.simplefilter("ignore", ResourceWarning)  # short read-and-forget opens 
 
 SITE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APP = os.path.dirname(SITE)
+if not os.path.isfile(os.path.join(APP, "tests", "isolation.py")):  # a worktree: the app is the pdf-live worktree or main
+    for _c in (os.environ.get("ZEMARIS_APP", ""), os.path.join(APP, "pdf-live"), "D:/Zemaris/09-Source-Code/Velocity"):
+        if _c and os.path.isfile(os.path.join(_c, "tests", "isolation.py")):
+            APP = _c
+            break
 sys.path.insert(0, SITE)
 import _build  # noqa: E402
 import _release  # noqa: E402
@@ -50,6 +55,17 @@ def closed_cfg():
     cfg = copy.deepcopy(base_cfg())
     cfg["checkout"]["open"] = False
     cfg["downloads"]["open"] = False
+    return cfg
+
+
+PDF_PLACEHOLDERS = {"monthly": "pri_PDF_MONTHLY", "yearly": "pri_PDF_YEARLY", "lifetime": "pri_PDF_LIFETIME",
+                    "business": "pri_PDF_BUSINESS"}
+
+
+def pdf_placeholders(cfg):
+    """The settings with the Velocity PDF price ids put back to placeholders (the state before 14 Nov 2026)."""
+    cfg = copy.deepcopy(cfg)
+    cfg["checkout"]["pdf_prices"].update(PDF_PLACEHOLDERS)
     return cfg
 
 
@@ -874,10 +890,9 @@ class VelocityPdf(unittest.TestCase):
     def test_config_holds_placeholders_in_one_place_and_switch_off(self):
         cfg = base_cfg()
         pp = cfg["checkout"]["pdf_prices"]
-        self.assertEqual({k: pp[k] for k in _build.PDF_PLANS},
-                         {"monthly": "pri_PDF_MONTHLY", "yearly": "pri_PDF_YEARLY", "lifetime": "pri_PDF_LIFETIME",
-                          "business": "pri_PDF_BUSINESS"})
-        self.assertIn("PLACEHOLDER", pp["_note"])
+        for k in _build.PDF_PLANS:  # the live ids since 14 Nov 2026: real pri_ ids, no placeholder left
+            self.assertRegex(pp[k], r"^pri_[a-z0-9]{26}$", k)
+        self.assertEqual(len({pp[k] for k in _build.PDF_PLANS}), 4)
         self.assertIs(cfg["downloads"]["pdf_open"], False)
         w = cfg["downloads"]["pdf_windows"]
         self.assertEqual((w["version"], w["file"], w["base_url"]),
@@ -915,7 +930,8 @@ class VelocityPdf(unittest.TestCase):
         self.assertEqual({plan: pid for pid, plan in ids.items()}, {plan: pid for pid, plan in site.items()})
 
     def test_placeholders_keep_pdf_buttons_on_coming_soon_and_never_stop_the_build(self):
-        pages = self.build(live_checkout(closed_cfg()))      # DM checkout open, PDF ids still placeholders
+        cfg = pdf_placeholders(live_checkout(closed_cfg()))   # DM checkout open, PDF ids still placeholders
+        pages = self.build(cfg)
         for name, start in (("pricing.html", '<section id="pdf">'), ("velocity-pdf.html", '<section id="buy">')):
             block = pdf_block(pages[name], start)
             self.assertNotIn("data-checkout=", block, name)
@@ -924,7 +940,7 @@ class VelocityPdf(unittest.TestCase):
         conf = json.loads(parse(pages["pricing.html"]).json_scripts[0])
         self.assertEqual(conf["pdfPrices"]["lifetime"], "pri_PDF_LIFETIME")
         self.assertEqual(conf["pdfSuccessUrl"], "https://zemaris.com/thank-you.html?product=pdf")
-        self.assertFalse(_build.check_pdf_checkout(base_cfg(), True))
+        self.assertFalse(_build.check_pdf_checkout(cfg, True))
 
     def test_prices_shown(self):
         pages = self.build(closed_cfg())
