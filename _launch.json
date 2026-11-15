@@ -24,11 +24,11 @@
       "business": "pri_01m5wavfzx17jej3q47ewq8xvg"
     },
     "pdf_prices": {
-      "_note": "PLACEHOLDER ids for Velocity PDF: paste each Paddle price id here AND in the licence server's server/wrangler.toml PRICES (the same id in both). Until an id is a real pri_ id (pri_ + 26 letters/digits) the Velocity PDF Buy buttons say Coming soon.",
-      "monthly": "pri_PDF_MONTHLY",
-      "yearly": "pri_PDF_YEARLY",
-      "lifetime": "pri_PDF_LIFETIME",
-      "business": "pri_PDF_BUSINESS"
+      "_note": "Velocity PDF live Paddle price ids (14 Nov 2026); keep them the same as in the licence server's server/wrangler.toml PRICES (the same id in both). Until an id is a real pri_ id (pri_ + 26 letters/digits) the Velocity PDF Buy buttons say Coming soon.",
+      "monthly": "pri_01m7dsd835y6krsy7sb4h9g0qe",
+      "yearly": "pri_01m7dsgsswrhd84r6zfmt8jr9q",
+      "lifetime": "pri_01m7dsr2wbxkr15emt6spx525x",
+      "business": "pri_01m7dsw2gvcty3vqn9a9ngnq0v"
     }
   },
   "downloads": {

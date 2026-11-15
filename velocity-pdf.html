@@ -165,16 +165,17 @@
     <div class="plans">
       <div class="plan rv"><h3>Monthly</h3><p class="desc">Pay as you go</p><div class="price">$5.99<small> /month</small></div><div class="per">Cancel any time</div>
         <ul><li>Every feature</li><li>1 PC</li><li>All updates while subscribed</li><li>Email support</li></ul>
-        <a class="btn soon" href="mailto:admin@zemaris.com?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20I%20can%20buy%20Velocity%20PDF." title="Buying Velocity PDF opens soon. Click to write us a short email and we'll tell you when.">Coming soon</a></div>
+        <button class="btn" type="button" data-checkout="monthly" data-product="pdf" title="Buy Velocity PDF Monthly in a secure checkout window. Your key is emailed to you straight away.">Buy Monthly</button></div>
       <div class="plan best rv"><span class="ribbon">Most popular</span><h3>Yearly</h3><p class="desc">Best for most people</p><div class="price">$29.99<small> /year</small></div><div class="per">Just $2.50 a month · save 58%</div>
         <ul><li>Every feature</li><li>1 PC</li><li>All updates while subscribed</li><li>Priority email support</li></ul>
-        <a class="btn primary soon" href="mailto:admin@zemaris.com?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20I%20can%20buy%20Velocity%20PDF." title="Buying Velocity PDF opens soon. Click to write us a short email and we'll tell you when.">Coming soon</a></div>
+        <button class="btn primary" type="button" data-checkout="yearly" data-product="pdf" title="Buy Velocity PDF Yearly in a secure checkout window. Your key is emailed to you straight away.">Buy Yearly</button></div>
       <div class="plan rv"><h3>Lifetime</h3><p class="desc">Pay once, keep forever</p><div class="price">$49<small> once</small></div><div class="per">1 PC · free updates for life</div>
         <ul><li>Every feature, forever</li><li>1 PC</li><li>Free updates for life</li><li>Priority email support</li></ul>
-        <a class="btn soon" href="mailto:admin@zemaris.com?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20I%20can%20buy%20Velocity%20PDF." title="Buying Velocity PDF opens soon. Click to write us a short email and we'll tell you when.">Coming soon</a></div>
+        <button class="btn" type="button" data-checkout="lifetime" data-product="pdf" title="Buy Velocity PDF Lifetime in a secure checkout window. Your key is emailed to you straight away.">Buy Lifetime</button></div>
       <div class="plan rv"><h3>Business</h3><p class="desc">Offices and teams</p><div class="price">$15<small> /PC/year</small></div><div class="per">From 5 PCs</div>
         <ul><li>Every feature</li><li>Licensed for commercial use</li><li>One invoice, one key for all PCs</li><li>Priority support</li></ul>
-        <a class="btn soon" href="mailto:admin@zemaris.com?subject=Velocity%20PDF%20for%20business" title="Buying Velocity PDF opens soon. Click to email us how many PCs you need.">Coming soon</a></div>
+        <label class="pcs">PCs <input type="number" id="pdfPcs" min="5" max="255" step="1" value="5" inputmode="numeric" title="How many PCs (5 to 255)"></label>
+        <button class="btn" type="button" data-checkout="business" data-product="pdf" data-quantity-from="pdfPcs" title="Buy Velocity PDF Business for the number of PCs above, in a secure checkout window. One key for all of them is emailed to you.">Buy Business</button></div>
     </div>
     <p class="fine center">30 days free with every feature, no card needed. After the trial your files still open, read and print; saving changes needs a licence key.</p>
     <p class="fine center">Prices in US dollars. Local taxes may be added at checkout. Orders are processed by our reseller Paddle.com, the Merchant of Record for all our orders.</p>
@@ -199,6 +200,8 @@
     <a class="btn primary" href="mailto:admin@zemaris.com?subject=Velocity%20PDF%20launch%20list&amp;body=Please%20tell%20me%20when%20Velocity%20PDF%20can%20be%20downloaded." title="Write us a short email and we'll tell you when the download is ready">Email me when it's ready</a>
   </div>
 </section>
+<script type="application/json" id="checkout-config">{"environment": "production", "token": "live_9f8409f49d177fd2ee25bccf469", "prices": {"monthly": "pri_01m5was7vtz65wpd88mnh3kjn0", "yearly": "pri_01m5wasxq5hp8pbnq8z0mkq8yy", "lifetime": "pri_01m5watybxhx32sk1ejh3cpwy8"}, "pdfPrices": {"monthly": "pri_01m7dsd835y6krsy7sb4h9g0qe", "yearly": "pri_01m7dsgsswrhd84r6zfmt8jr9q", "lifetime": "pri_01m7dsr2wbxkr15emt6spx525x", "business": "pri_01m7dsw2gvcty3vqn9a9ngnq0v"}, "successUrl": "https://zemaris.com/thank-you.html", "pdfSuccessUrl": "https://zemaris.com/thank-you.html?product=pdf", "support": "admin@zemaris.com", "paddleJs": "https://cdn.paddle.com/paddle/v2/paddle.js"}</script>
+<script src="/assets/checkout.js" defer></script>
 
 </main>
 <footer class="site">
