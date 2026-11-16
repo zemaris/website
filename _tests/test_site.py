@@ -55,6 +55,7 @@ def closed_cfg():
     cfg = copy.deepcopy(base_cfg())
     cfg["checkout"]["open"] = False
     cfg["downloads"]["open"] = False
+    cfg["downloads"]["pdf_open"] = False
     return cfg
 
 
@@ -897,7 +898,8 @@ class VelocityPdf(unittest.TestCase):
     def test_home_shows_both_apps_and_pdf_download_stays_off_until_pdf_open(self):
         """The home page presents Zemaris with both apps side by side; the Velocity PDF card's download button follows
         downloads.pdf_open like velocity-pdf.html: disabled "Download available soon" while it is false."""
-        for cfg, root in ((base_cfg(), SITE), (closed_cfg(), None)):   # as configured now, and both switches off
+        for cfg, root in ((dict(base_cfg(), downloads=dict(base_cfg()["downloads"], pdf_open=False)), SITE),
+                          (closed_cfg(), None)):   # as configured, PDF downloads off; and both switches off
             home = self.build(cfg, root)["index.html"]
             cards = self.home_cards(home)
             dm, pdf = cards["dm"], cards["pdf"]
@@ -928,7 +930,7 @@ class VelocityPdf(unittest.TestCase):
         for k in _build.PDF_PLANS:  # the live ids since 14 Nov 2026: real pri_ ids, no placeholder left
             self.assertRegex(pp[k], r"^pri_[a-z0-9]{26}$", k)
         self.assertEqual(len({pp[k] for k in _build.PDF_PLANS}), 4)
-        self.assertIs(cfg["downloads"]["pdf_open"], False)
+        self.assertIsInstance(cfg["downloads"]["pdf_open"], bool)  # true from the PDF launch (owner's publish)
         w = cfg["downloads"]["pdf_windows"]
         self.assertEqual((w["version"], w["file"], w["base_url"]),
                          ("0.8.0", "VelocityPDF-Setup-0.8.0.exe", "https://zemaris.com/velocity-pdf/download/"))
