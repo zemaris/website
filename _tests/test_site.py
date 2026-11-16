@@ -460,8 +460,9 @@ class Built(unittest.TestCase):
             self.assertIsNotNone(m, "server/worker.js: the key email's subject")
             keys = [s for s in re.findall(r'"([^"]*)"', m.group(1)) if " " in s]     # the texts, not "resend"
             self.assertTrue(keys and all("licence key" in s for s in keys), keys)
-            for s in keys:
-                self.assertTrue(s.startswith("Your Velocity"), s)
+            for s in keys:  # "Your new ..." is the admin reissue email, never the one sent after a purchase
+                if not s.startswith("Your new "):
+                    self.assertTrue(s.startswith("Your Velocity"), s)
 
     def test_titles_and_descriptions_fit_search_results(self):
         """Search results show about 60 characters of a title and 160 of a description. The longer name pushed the
