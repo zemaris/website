@@ -29,7 +29,8 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-NAV = [("features", "/features.html", "Features"), ("compare", "/compare.html", "Compare"),
+NAV = [("features", "/features.html", "Download Manager"), ("pdf", "/velocity-pdf.html", "Velocity PDF"),
+       ("compare", "/compare.html", "Compare"),
        ("pricing", "/pricing.html", "Pricing"), ("support", "/support.html", "Support"),
        ("whatsnew", "/whats-new.html", "What's new"), ("download", "/download.html", "Download")]
 

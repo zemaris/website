@@ -887,6 +887,40 @@ class VelocityPdf(unittest.TestCase):
         with open(os.path.join(self.tmp, "velocity-pdf", "update.json"), "w", encoding="utf-8") as f:
             json.dump({k: v for k, v in m.items() if v is not None}, f)
 
+    def home_cards(self, home):
+        """The two product cards in the home page's opening: {"dm": html, "pdf": html}."""
+        cards = {m.group(1): m.group(0) for m in re.finditer(r'<article class="pcard (dm|pdf)".*?</article>', home, re.S)}
+        self.assertEqual(sorted(cards), ["dm", "pdf"])
+        return cards
+
+    def test_home_shows_both_apps_and_pdf_download_stays_off_until_pdf_open(self):
+        """The home page presents Zemaris with both apps side by side; the Velocity PDF card's download button follows
+        downloads.pdf_open like velocity-pdf.html: disabled "Download available soon" while it is false."""
+        for cfg, root in ((base_cfg(), SITE), (closed_cfg(), None)):   # as configured now, and both switches off
+            home = self.build(cfg, root)["index.html"]
+            cards = self.home_cards(home)
+            dm, pdf = cards["dm"], cards["pdf"]
+            for card, name, logo, page in ((dm, "Velocity Download Manager", "velocity-icon.svg", "/features.html"),
+                                           (pdf, "Velocity PDF", "velocity-pdf-icon.svg", "/velocity-pdf.html")):
+                self.assertIn(f">{name}</h2>", card)
+                self.assertIn(f'src="/assets/{logo}" alt="{name} logo"', card)
+                self.assertIn(f'href="{page}"', card)
+                self.assertIn("See features", card)
+                self.assertRegex(plain(card), r"From \$\d")
+            self.assertIn('href="/velocity-pdf.html"', home[home.index("<header"):home.index("</header>")])  # top nav
+            self.assertRegex(pdf, r'<button class="btn primary soon" type="button" disabled title="[^"]+">'
+                                  r'Download available soon</button>')
+            self.assertNotIn(".exe", pdf)
+            self.assertNotIn("Start 30-day free trial", pdf)
+            self.assertNotIn("velocity-pdf/download/", final_section(home))
+        self.put_file()
+        home = self.build(self.pdf_open())["index.html"]
+        pdf = self.home_cards(home)["pdf"]
+        url = "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.0.exe"
+        self.assertIn(f'href="{url}"', pdf)
+        self.assertIn("Start 30-day free trial", pdf)
+        self.assertNotIn("disabled", pdf)
+
     def test_config_holds_placeholders_in_one_place_and_switch_off(self):
         cfg = base_cfg()
         pp = cfg["checkout"]["pdf_prices"]

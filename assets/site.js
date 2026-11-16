@@ -48,6 +48,14 @@
       }); o.observe(el);
     });
 
+    // home page product cards: a soft light follows the pointer (CSS reads --mx / --my)
+    if (!reduce) document.querySelectorAll(".pcard").forEach(function (c) {
+      c.addEventListener("pointermove", function (e) {
+        var r = c.getBoundingClientRect();
+        c.style.setProperty("--mx", (e.clientX - r.left) + "px"); c.style.setProperty("--my", (e.clientY - r.top) + "px");
+      });
+    });
+
     appDemo(); raceDemo(); netBg(); cinema(); openTarget();
   });
 

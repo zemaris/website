@@ -511,3 +511,156 @@ button.btn { line-height: inherit }
 .plan .pcs { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: var(--text2); font-size: 15px }
 .plan .pcs input { font: inherit; width: 84px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text) }
 .btn[disabled] { cursor: default }
+
+/* ---------- home page: Zemaris first, two products side by side ---------- */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px }
+.hero :focus-visible, .final :focus-visible { outline-color: #b9c9ff }
+@property --spin { syntax: "<angle>"; inherits: false; initial-value: 0deg }
+.hero.home { padding: 76px 0 96px; background: radial-gradient(1000px 520px at 82% -8%, #3b2a8a 0%, transparent 62%),
+  radial-gradient(800px 480px at 8% 100%, #12406f 0%, transparent 58%), linear-gradient(180deg, var(--hero1), var(--hero2)) }
+.hero.home .wrap { display: block }
+.hero .orb { position: absolute; border-radius: 50%; filter: blur(70px); pointer-events: none; animation: drift 18s ease-in-out infinite alternate }
+.hero .o1 { width: 420px; height: 420px; background: #a21caf; top: -140px; right: 6%; opacity: .32 }
+.hero .o2 { width: 360px; height: 360px; background: #4f46e5; top: 34%; left: -120px; animation-duration: 22s; opacity: .34 }
+.hero .o3 { width: 300px; height: 300px; background: #22d3ee; bottom: -120px; right: 30%; animation-duration: 26s; opacity: .16 }
+@keyframes drift { to { transform: translate(60px, 40px) scale(1.12) } }
+.hero.home .intro { text-align: center; max-width: 820px; margin: 0 auto 56px; position: relative }
+.hero.home .intro .lead { margin: 0 auto 30px; max-width: 640px }
+.hero.home .intro .cta { justify-content: center }
+.hero.home h1 { margin-top: 20px }
+.hero.home .g { background-image: linear-gradient(90deg, #6ea2ff, #a78bff 35%, #e879f9 65%, #6ea2ff) }
+.prod-sec .g { animation: none; background-image: linear-gradient(90deg, var(--accent), #a855f7) }
+.pdf-sec .g { background-image: linear-gradient(90deg, #7c3aed, #c026d3) }
+
+.showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; position: relative }
+.pcard { --c1: #4f8cff; --c2: #7c5cff; --mx: 50%; --my: 0%; position: relative; display: flex; flex-direction: column; min-width: 0;
+  border-radius: 24px; border: 1px solid rgba(255, 255, 255, .09); color: #fff; isolation: isolate; overflow: hidden;
+  background: radial-gradient(520px 320px at var(--mx) var(--my), color-mix(in srgb, var(--c2) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, rgba(24, 30, 52, .9), rgba(11, 14, 26, .94));
+  box-shadow: 0 30px 80px -24px color-mix(in srgb, var(--c1) 55%, transparent), 0 0 0 1px rgba(255, 255, 255, .03) inset;
+  transition: transform .35s ease, box-shadow .35s ease; animation: rise .8s ease backwards }
+.pcard.pdf { --c1: #c026d3; --c2: #7c3aed; animation-delay: .12s }
+.pcard::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none; z-index: 2;
+  background: conic-gradient(from var(--spin), transparent 0deg, var(--c1) 70deg, var(--c2) 140deg, transparent 210deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: spin 7s linear infinite; opacity: .85 }
+.pcard:hover { transform: translateY(-6px); box-shadow: 0 40px 100px -20px color-mix(in srgb, var(--c1) 75%, transparent), 0 0 0 1px rgba(255, 255, 255, .05) inset }
+@keyframes spin { to { --spin: 360deg } }
+@keyframes rise { from { transform: translateY(26px) } }  /* movement only: the cards are never hidden, even if animations stall */
+.pc-media { padding: 22px 22px 0; position: relative; background: linear-gradient(180deg, color-mix(in srgb, var(--c2) 14%, transparent), transparent) }
+.pcard .app, .pcard .pdfapp { transform: none; box-shadow: 0 24px 60px rgba(0, 0, 0, .5); border-bottom-left-radius: 0; border-bottom-right-radius: 0; height: 292px }
+.pcard .app .srch, .pcard .app .tb .pill.h:last-of-type { display: none }
+.pcard .app .side { padding-top: 6px } .pcard .app .side div { padding: 4px 8px }
+.pcard .app .r { padding: 6px 12px }
+.pcard .app .r > * { min-width: 0 }  /* long file names shrink instead of pushing the speed out of the row */
+.pc-body { padding: 22px 28px 28px; display: flex; flex-direction: column; flex: 1; border-top: 1px solid rgba(255, 255, 255, .07) }
+.pc-head { display: flex; align-items: center; gap: 16px }
+.pc-head img { width: 56px; height: 56px; flex: none; filter: drop-shadow(0 8px 22px color-mix(in srgb, var(--c1) 60%, transparent)) }
+.pc-head h2 { font-size: clamp(22px, 2.2vw, 28px); margin: 0; letter-spacing: -.5px; color: #fff }
+.pc-os { margin: 2px 0 0; color: #a9b5cc; font-size: 14.5px }
+.pc-os .new { display: inline-block; padding: 1px 9px; border-radius: 99px; font-size: 12px; font-weight: 750; color: #fff; background: linear-gradient(135deg, #c026d3, #7c3aed); vertical-align: 1px }
+.pc-pitch { color: #d5ddeb; font-size: 17px; margin: 16px 0 14px }
+.pc-points { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 9px; color: #c4cee0; font-size: 15.5px }
+.pc-points li { display: flex; gap: 10px }
+.pc-points li::before { content: ""; flex: none; width: 9px; height: 9px; margin: 8px 4px 0 2px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--c1), var(--c2)); box-shadow: 0 0 10px 1px var(--c1) }
+.pc-price { margin-top: auto; color: #a9b5cc; font-size: 15px; padding-top: 4px }
+.pc-price b { color: #fff; font-size: 20px; font-weight: 800 }
+.pc-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px }
+.pc-cta .btn { flex: 1 1 auto }
+.pcard.pdf .btn.primary { background: linear-gradient(135deg, #7c3aed, #c026d3); box-shadow: 0 10px 30px rgba(192, 38, 211, .35) }
+.pcard .btn.soon[disabled] { opacity: .72; transform: none; filter: none }
+.pc-note { margin: 14px 0 0; color: #a9b5cc; font-size: 13.5px }
+
+/* Velocity PDF app mock (HTML/CSS only, like the download manager mock) */
+.pdfapp { background: #0f1318; color: #f1f4f8; border: 1px solid #2b3440; border-radius: 14px; overflow: hidden; font-size: 12.5px; display: flex; flex-direction: column }
+.pdfapp .tb { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #161b22; border-bottom: 1px solid #2b3440; white-space: nowrap }
+.pdfapp .lg { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 13.5px }
+.pdfapp .lg img { width: 18px; height: 18px }
+.pdfapp .lg small { font-size: 9.5px; color: #c9b6ff; font-weight: 700; align-self: flex-end; margin-left: -2px }
+.pdfapp .fname { color: #98a4b3; font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; margin-right: auto; min-width: 0 }
+.pdfapp .pill { padding: 5px 10px; border-radius: 7px; border: 1px solid #2b3440; background: #1d242d; font-weight: 600; font-size: 11.5px }
+.pdfapp .pill.p { background: linear-gradient(135deg, #7c3aed, #c026d3); border-color: transparent }
+.pdfapp .ribbon { display: flex; gap: 4px; padding: 5px 10px; background: #12171d; border-bottom: 1px solid #2b3440; color: #98a4b3; font-size: 11.5px; overflow: hidden }
+.pdfapp .ribbon span { padding: 3px 9px; border-radius: 6px }
+.pdfapp .ribbon .on { color: #fff; background: rgba(168, 85, 247, .22); font-weight: 650 }
+.pdfapp .bd { flex: 1; display: grid; grid-template-columns: 54px 1fr 88px; min-height: 0 }
+.pdfapp .thumbs { display: grid; align-content: start; gap: 8px; padding: 10px 9px; background: #12171d; border-right: 1px solid #2b3440 }
+.pdfapp .thumbs i { display: block; aspect-ratio: 3 / 4; border-radius: 3px; background: #e9edf3; opacity: .55 }
+.pdfapp .thumbs i.on { opacity: 1; outline: 2px solid #a855f7; outline-offset: 2px }
+.pdfapp .canvas { background: #1a2029; padding: 12px 14px 0; overflow: hidden; min-width: 0 }
+.pdfapp .page { background: #fff; color: #1d2633; border-radius: 4px 4px 0 0; padding: 14px 16px; height: 100%; display: grid; align-content: start; grid-auto-rows: max-content; overflow: hidden; gap: 7px; box-shadow: 0 10px 30px rgba(0, 0, 0, .4) }
+.pdfapp .ph { font-weight: 800; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: #111827; margin-bottom: 2px }
+.pdfapp .ln { display: block; height: 5px; border-radius: 3px; background: #d6dce5 }
+.pdfapp .edit { font-size: 11px; color: #374151; padding: 3px 6px; margin: 0 -6px; border-radius: 4px; border: 1.5px solid #a855f7; box-shadow: 0 0 0 4px rgba(168, 85, 247, .14); white-space: nowrap; overflow: hidden }
+.pdfapp .edit b { color: #111827 }
+.pdfapp .caret { display: inline-block; width: 1.5px; height: 12px; background: #7c3aed; margin-left: 2px; vertical-align: -2px; animation: blink 1s steps(1) infinite }
+@keyframes blink { 50% { opacity: 0 } }
+.pdfapp .redact { position: relative }
+.pdfapp .redact i { position: absolute; left: 0; top: -3px; height: 11px; width: 64%; background: #111; border-radius: 2px; transform-origin: left; animation: redact 5s ease-in-out infinite }
+@keyframes redact { 0%, 58% { transform: scaleX(1) } 70%, 76% { transform: scaleX(0) } 94%, 100% { transform: scaleX(1) } }
+.pdfapp .sig { display: flex; align-items: center; gap: 8px; margin-top: 4px }
+.pdfapp .sig svg { width: 112px; height: 30px; flex: none }
+.pdfapp .sig path { fill: none; stroke: #4338ca; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 420; stroke-dashoffset: 0; animation: sign 5s ease-in-out infinite }
+@keyframes sign { 0%, 52% { stroke-dashoffset: 0 } 60%, 64% { stroke-dashoffset: 420 } 96%, 100% { stroke-dashoffset: 0 } }
+.pdfapp .sigok { font-size: 10px; font-weight: 750; color: #0f7a4a; background: #dcf5e8; border-radius: 99px; padding: 2px 8px; white-space: nowrap }
+.pdfapp .tools { display: grid; align-content: start; gap: 6px; padding: 10px 8px; background: #12171d; border-left: 1px solid #2b3440 }
+.pdfapp .tools span { padding: 6px 8px; border-radius: 7px; background: #1d242d; border: 1px solid #2b3440; font-size: 11px; font-weight: 600; color: #c9d1dc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.pdfapp .tools .on { color: #fff; border-color: transparent; background: linear-gradient(135deg, rgba(124, 58, 237, .7), rgba(192, 38, 211, .7)); box-shadow: 0 0 14px rgba(192, 38, 211, .45) }
+.pdfapp .st { display: flex; gap: 14px; padding: 7px 12px; background: #161b22; border-top: 1px solid #2b3440; color: #98a4b3; font-size: 11px }
+.pdfapp .st .ok { margin-left: auto; color: #34c77b; font-weight: 650 }
+
+/* Why Zemaris strip, product sections, pricing at a glance */
+.why { padding: 84px 0 }
+.why h2 { margin-bottom: 40px }
+.why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px }
+.why-item { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; transition: transform .2s, box-shadow .2s, border-color .2s }
+.why-item:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--line2) }
+.why-item h3 { margin: 16px 0 6px; font-size: 18px }
+.why-item p { margin: 0; color: var(--text2); font-size: 15px }
+.wi { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; color: #fff; background: linear-gradient(135deg, #4f8cff, #a855f7); box-shadow: 0 8px 24px rgba(124, 92, 255, .35) }
+.wi svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.1; stroke-linecap: round; stroke-linejoin: round }
+.prod-head { display: flex; gap: 22px; align-items: flex-start; margin-bottom: 40px }
+.prod-head img { width: 64px; height: 64px; flex: none; margin-top: 4px }
+.prod-head .sub { margin-bottom: 0 }
+.pdf-sec .prod-head img { filter: drop-shadow(0 10px 26px rgba(192, 38, 211, .45)) }
+.pdf-sec .kicker { color: #9333ea }
+:root[data-theme="dark"] .pdf-sec .kicker { color: #c084fc }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pdf-sec .kicker { color: #c084fc } }
+.price-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; max-width: 920px; margin: 0 auto }
+.pd-card { background: linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(135deg, #4f8cff, #7c5cff) border-box; border: 2px solid transparent; border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 14px; transition: transform .2s, box-shadow .2s }
+.pd-card.pdf { background: linear-gradient(var(--panel), var(--panel)) padding-box, linear-gradient(135deg, #7c3aed, #c026d3) border-box }
+.pd-card:hover { transform: translateY(-3px); box-shadow: var(--shadow) }
+.pd-head { display: flex; align-items: center; gap: 12px }
+.pd-head img { width: 40px; height: 40px } .pd-head h3 { margin: 0; font-size: 20px }
+.pd-card .mini td:last-child { color: var(--text); font-weight: 650; white-space: nowrap }
+.pd-card .btn { margin-top: auto }
+.pd-card.pdf .btn.primary { background: linear-gradient(135deg, #7c3aed, #c026d3); box-shadow: 0 10px 30px rgba(192, 38, 211, .3) }
+.final-logos { display: flex; justify-content: center; gap: 18px; margin: 0 auto 22px }
+.final-logos img { width: 68px; height: 68px }
+nav.links a { white-space: nowrap }
+@media (max-width: 1280px) { nav.links a { padding: 8px 9px; font-size: 15px } header.top .wrap { gap: 18px } }
+/* seven nav items since Velocity PDF joined: the menu button takes over below 1180 px (it was 920 px) */
+@media (max-width: 1180px) {
+  #menuBtn { display: grid }
+  nav.links { display: none; position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 2px;
+    background: var(--bg); border-bottom: 1px solid var(--line); padding: 10px 16px 16px; box-shadow: var(--shadow) }
+  nav.links.open { display: flex }
+  nav.links a { padding: 12px 14px; font-size: 16.5px }
+}
+@media (max-width: 1080px) { .why-grid { grid-template-columns: repeat(2, 1fr) } }
+@media (max-width: 980px) { .showcase { grid-template-columns: 1fr; max-width: 640px; margin: 0 auto } }
+@media (max-width: 760px) { .price-duo { grid-template-columns: 1fr } }
+@media (max-width: 600px) {
+  .hero.home { padding: 48px 0 64px } .hero.home .intro { margin-bottom: 36px }
+  .why-grid { grid-template-columns: 1fr }
+  .pc-media { padding: 14px 14px 0 } .pc-body { padding: 18px 18px 22px }
+  .pcard .app, .pcard .pdfapp { height: 262px }
+  .pdfapp .bd { grid-template-columns: 1fr } .pdfapp .thumbs, .pdfapp .tools, .pdfapp .pill.h { display: none }
+  .prod-head { flex-direction: column; gap: 12px }
+  .pc-cta .btn { flex: 1 1 100% }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero .orb, .pcard, .pcard::before, .pdfapp .caret, .pdfapp .redact i, .pdfapp .sig path { animation: none }
+  .pcard:hover, .why-item:hover, .pd-card:hover { transform: none }
+}
