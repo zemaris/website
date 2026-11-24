@@ -674,7 +674,9 @@ class Downloads(unittest.TestCase):
         self.assertEqual(e["1.7.4"], ('<span class="tag new">Current</span>', "November 2026"))
         for v in ("1.7.5", "1.7.10", "2.0.0"):
             e, wn = entries(v)
-            self.assertEqual(e["1.7.5"], ('<span class="tag new">Current</span>', "January 2027"), v)
+            # 1.7.5 is "Current" only while it is the newest on the site; from 1.7.6 on, 1.7.6 is.
+            want = '<span class="tag new">Current</span>' if v == "1.7.5" else ""
+            self.assertEqual(e["1.7.5"], (want, "January 2027"), v)
             self.assertEqual(e["1.7.4"], ('<span class="tag">First public release</span>', "November 2026"), v)
             self.assertEqual(wn.count("Current</span>"), 1, v)
         closed = _build.build(self.out, closed_cfg(), quiet=True)["whats-new.html"]   # downloads off: nothing current
@@ -933,7 +935,7 @@ class VelocityPdf(unittest.TestCase):
         self.assertIsInstance(cfg["downloads"]["pdf_open"], bool)  # true from the PDF launch (owner's publish)
         w = cfg["downloads"]["pdf_windows"]
         self.assertEqual((w["version"], w["file"], w["base_url"]),
-                         ("0.8.0", "VelocityPDF-Setup-0.8.0.exe", "https://zemaris.com/velocity-pdf/download/"))
+                         (w["version"], f"VelocityPDF-Setup-{w['version']}.exe", "https://zemaris.com/velocity-pdf/download/"))
         # No velocity-pdf/update.json on the site until _release.py --product pdf --stage writes the signed one. An
         # unsigned file is worse than none: File > Check for updates in the app says "isn't signed by Zemaris" for it,
         # while a missing file (404) quietly means "you have the latest version".
@@ -1026,7 +1028,7 @@ class VelocityPdf(unittest.TestCase):
         card = dl[dl.index('data-app="pdf"'):dl.index('data-app="browser"')]
         self.assertNotIn(".exe", card)
         self.assertIn("Join the launch list", card)
-        self.assertIn("Version 0.8.0", card)
+        self.assertIn("Version " + base_cfg()["downloads"]["pdf_windows"]["version"], card)
 
     def test_downloads_open_with_matching_file(self):
         self.put_file()

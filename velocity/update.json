@@ -1,8 +1,8 @@
 {
-  "version": "1.7.5",
-  "url": "https://zemaris.com/velocity/download/Velocity-Setup-1.7.5.exe",
-  "sha256": "5f1dd0a64c79a09687fadf5baa37a2d426ad93b7c4cdff5290501fcb110f6d9e",
-  "size": 22355532,
-  "notes": "",
-  "signature": "MUln53UN7IfgwGYSESaxIgWIT8X/PCVGl3vyJC/ZToljs/LXo+luIM3I0/QFoqf+/aZc1ODVrT7Ms45R2DUVpQ=="
+  "version": "1.7.6",
+  "url": "https://zemaris.com/velocity/download/Velocity-Setup-1.7.6.exe",
+  "sha256": "8e465ff194f705f84de5d9b6d3a0938fdc537a20453020f95b94d67c9844c41c",
+  "size": 22516430,
+  "notes": "The browser extension now starts Velocity with its own link, the Updates window is translated into all 88 languages, and your licence key is confirmed about once a day. Safer trial and key checks.",
+  "signature": "Hw4hn70HWA5B6w/f32g6suWbY8swQ50PLrwG0ce75A/QMBRlMiX3HobInZ4SJfc9KOcVzaDVVOnhzElaBBZ7tA=="
 }

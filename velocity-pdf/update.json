@@ -1,9 +1,9 @@
 {
-  "version": "0.8.0",
-  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.0.exe",
-  "sha256": "0e65b7758ef015276756a6b5231a4bb86dbcad77f2997c63eb8a4e9b8158780b",
-  "size": 68529765,
-  "notes": "Velocity PDF 0.8.0: 30-day free trial, licence keys, automatic signed updates, new logo.",
+  "version": "0.8.1",
+  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.1.exe",
+  "sha256": "5d33b3ad860fe5cb54a653b65a34cd4b13914c43ed9d334e1c1d2989594970b7",
+  "size": 68509472,
+  "notes": "Velocity PDF 0.8.1: removing a key respects the monthly limit and keeps the key, and a changed plan's new key is picked up automatically.",
   "product": "pdf",
-  "signature": "J7Vcsj5JNdvfON+OJaxZGaBUGLKH5MCpusPu7XJZPqynepF3FI+FHUz+smA6XgIU1s9ICobOta20NAj4OVAG1Q=="
+  "signature": "imCQC4tOYb1KNYAPT7j6O4d9zxbJ//lvhMOtwXu5+Frv4aWIXcwYUNBcdUf1qxl5aWgNHZziwvvD0yqwAcBrvw=="
 }

@@ -35,10 +35,10 @@
     "open": true,
     "base_url": "https://zemaris.com/velocity/download/",
     "windows": {
-      "version": "1.7.5",
-      "file": "Velocity-Setup-1.7.5.exe",
-      "size": 22355532,
-      "sha256": "5f1dd0a64c79a09687fadf5baa37a2d426ad93b7c4cdff5290501fcb110f6d9e",
+      "version": "1.7.6",
+      "file": "Velocity-Setup-1.7.6.exe",
+      "size": 22516430,
+      "sha256": "8e465ff194f705f84de5d9b6d3a0938fdc537a20453020f95b94d67c9844c41c",
       "signed": false,
       "publisher": "",
       "date": "November 2026"
@@ -46,11 +46,11 @@
     "pdf_open": true,
     "pdf_windows": {
       "_note": "Velocity PDF installer. version/file/base_url set; size, sha256 and date are filled by python _release.py --product pdf. pdf_open stays false until the owner publishes: the pages then say Download available soon.",
-      "version": "0.8.0",
-      "file": "VelocityPDF-Setup-0.8.0.exe",
+      "version": "0.8.1",
+      "file": "VelocityPDF-Setup-0.8.1.exe",
       "base_url": "https://zemaris.com/velocity-pdf/download/",
-      "size": 68529765,
-      "sha256": "0e65b7758ef015276756a6b5231a4bb86dbcad77f2997c63eb8a4e9b8158780b",
+      "size": 68509472,
+      "sha256": "5d33b3ad860fe5cb54a653b65a34cd4b13914c43ed9d334e1c1d2989594970b7",
       "signed": false,
       "publisher": "",
       "date": "November 2026"
