@@ -9,7 +9,7 @@
                                            are final and approved the push.
 
   python _release.py --product pdf --update-json X\\velocity-pdf-update.json [--stage]
-                                           the same for Velocity PDF: fills downloads.pdf_windows, and with --stage
+                                           the same for Zemaris PDF: fills downloads.pdf_windows, and with --stage
                                            copies to velocity-pdf/download/ and velocity-pdf/update.json. It never
                                            copies legal texts and never changes downloads.pdf_open.
 
@@ -81,7 +81,7 @@ def update_json_signed(path, app=APP):
 def main(argv=None, root=HERE, app=APP, today=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--product", choices=("dm", "pdf"), default="dm",
-                    help="dm = Velocity Download Manager (default), pdf = Velocity PDF")
+                    help="dm = Velocity Download Manager (default), pdf = Zemaris PDF")
     ap.add_argument("--update-json", help="the release's update.json (default: dist\\update.json, or "
                     "dist\\velocity-pdf-update.json for --product pdf)")
     ap.add_argument("--installer", help="installer file (default: next to update.json)")
@@ -109,7 +109,7 @@ def main(argv=None, root=HERE, app=APP, today=None):
 
     rel = read_manifest(a.update_json)
     if rel["product"] != "dm":
-        raise SystemExit(f"{a.update_json} is a Velocity PDF update file: use --product pdf")
+        raise SystemExit(f"{a.update_json} is a Zemaris PDF update file: use --product pdf")
     installer = a.installer or os.path.join(os.path.dirname(os.path.abspath(a.update_json)), rel["file"])
     if not os.path.isfile(installer):
         raise SystemExit(f"installer not found: {installer}")
@@ -153,11 +153,11 @@ def main(argv=None, root=HERE, app=APP, today=None):
 
 
 def release_pdf(a, root, app, today):
-    """Velocity PDF (GO-LIVE-CONTRACT.md sections 4 and 5): downloads.pdf_windows from the PDF update file."""
+    """Zemaris PDF (GO-LIVE-CONTRACT.md sections 4 and 5): downloads.pdf_windows from the PDF update file."""
     path = a.update_json or os.path.join(app, "dist", "velocity-pdf-update.json")
     rel = read_manifest(path)
     if rel["product"] != "pdf":
-        raise SystemExit(f'{path} does not say "product": "pdf", so it is not a Velocity PDF update file')
+        raise SystemExit(f'{path} does not say "product": "pdf", so it is not a Zemaris PDF update file')
     installer = a.installer or os.path.join(os.path.dirname(os.path.abspath(path)), rel["file"])
     if not os.path.isfile(installer):
         raise SystemExit(f"installer not found: {installer}")
@@ -179,7 +179,7 @@ def release_pdf(a, root, app, today):
     with open(cfg_path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(cfg, f, indent=2, ensure_ascii=False)
         f.write("\n")
-    print(f"_launch.json: Velocity PDF {rel['version']}, {rel['size']} bytes, SHA-256 {rel['sha256']}")
+    print(f"_launch.json: Zemaris PDF {rel['version']}, {rel['size']} bytes, SHA-256 {rel['sha256']}")
     print("downloads.pdf_open is", d.get("pdf_open", False), "(this script never changes it)")
     if a.stage:
         if not rel["base_url"].startswith(SITE):

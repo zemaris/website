@@ -1,5 +1,5 @@
 // assets/admin.js: every purchase shows which app it was for (both apps use the same plan names), the
-// All / Download Manager / Velocity PDF filter, and the product column of the CSV export.
+// All / Download Manager / Zemaris PDF filter, and the product column of the CSV export.
 // A tiny stand-in page in Node (no browser, no network).
 // Run:  node --test _tests/admin.test.mjs   (portable Node 24 in D:\Zemaris\07-Server-and-Tools\Local-Tools\node)
 import { test } from "node:test";
@@ -26,12 +26,12 @@ const dm = { ts: Date.UTC(2026, 10, 14, 8), txn: "txn_t_dm", serial: "DM000001",
   amount: 1999, currency: "USD", country: "AE", email: "b@example.com", name: "B", status: "paid", refunded: 0, test: 0 };
 const old = { ...dm, txn: "txn_t_old", serial: "OLD00001", product: undefined, plan: "Pro", pcs: 1 };
 
-test("a Velocity PDF sale shows its product next to the plan", () => {
+test("a Zemaris PDF sale shows its product next to the plan", () => {
   const a = load();
-  assert.equal(a.saleLabel(pdf), "Velocity PDF · Lifetime");
+  assert.equal(a.saleLabel(pdf), "Zemaris PDF · Lifetime");
   assert.equal(a.saleLabel(dm), "Download Manager · Lifetime ×3");
   assert.equal(a.saleLabel(old), "Download Manager · Pro");          // rows from before the product column
-  assert.equal(a.saleLabel({ ...pdf, product: "PDF" }), "Velocity PDF · Lifetime");
+  assert.equal(a.saleLabel({ ...pdf, product: "PDF" }), "Zemaris PDF · Lifetime");
 });
 
 test("the filter keeps only the chosen app", () => {
@@ -53,7 +53,7 @@ test("the CSV export has a product column", () => {
   assert.equal(a.csvSaleRow(pdf)[head.indexOf("amount_minor")], 4900);
 });
 
-test("the admin page has the All / Download Manager / Velocity PDF filter above the purchases", () => {
+test("the admin page has the All / Download Manager / Zemaris PDF filter above the purchases", () => {
   const page = readFileSync(new URL("../admin.html", import.meta.url), "utf8");
   const m = /<div class="za-seg small" role="group" aria-label="Which app" id="zProduct">(.*?)<\/div>/s.exec(page);
   assert.ok(m, "no product filter on admin.html");

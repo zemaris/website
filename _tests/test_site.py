@@ -64,7 +64,7 @@ PDF_PLACEHOLDERS = {"monthly": "pri_PDF_MONTHLY", "yearly": "pri_PDF_YEARLY", "l
 
 
 def pdf_placeholders(cfg):
-    """The settings with the Velocity PDF price ids put back to placeholders (the state before 14 Nov 2026)."""
+    """The settings with the Zemaris PDF price ids put back to placeholders (the state before 14 Nov 2026)."""
     cfg = copy.deepcopy(cfg)
     cfg["checkout"]["pdf_prices"].update(PDF_PLACEHOLDERS)
     return cfg
@@ -137,12 +137,12 @@ def parse(text):
 
 
 def dm_block(pricing):
-    """The Velocity Download Manager plans on pricing.html (the Velocity PDF plans follow in <section id="pdf">)."""
+    """The Velocity Download Manager plans on pricing.html (the Zemaris PDF plans follow in <section id="pdf">)."""
     return pricing[pricing.index('id="dm"'):pricing.index('<section id="pdf">')]
 
 
 def pdf_block(page, start='<section id="pdf">'):
-    """The Velocity PDF plans: <section id="pdf"> on pricing.html, <section id="buy"> on velocity-pdf.html."""
+    """The Zemaris PDF plans: <section id="pdf"> on pricing.html, <section id="buy"> on zemaris-pdf.html."""
     i = page.index(start)
     return page[i:page.index("</section>", i)]
 
@@ -243,8 +243,9 @@ class Built(unittest.TestCase):
 
     def test_every_source_page_is_built(self):
         src = sorted(n for n in os.listdir(os.path.join(SITE, "_pages")) if n.endswith(".html"))
-        self.assertEqual(sorted(self.pages), src)
-        for n in ("thank-you.html", "refunds.html", "legal.html", "third-party.html", "eula.html", "velocity-pdf.html"):
+        old = [o for names in _build.ALIASES.values() for o in names]  # old addresses kept working
+        self.assertEqual(sorted(self.pages), sorted(src + old))
+        for n in ("thank-you.html", "refunds.html", "legal.html", "third-party.html", "eula.html", "zemaris-pdf.html"):
             self.assertIn(n, self.pages)
 
     def test_html_is_well_formed_and_json_parses(self):
@@ -299,8 +300,8 @@ class Built(unittest.TestCase):
         wn = self.pages["whats-new.html"]
         self.assertIn("Velocity 1.7.2", wn)
         self.assertIn("Velocity 1.7.1", wn)
-        self.assertIn("Velocity PDF", self.pages["index.html"])  # footer link
-        self.assertIn('href="/velocity-pdf.html"', self.pages["download.html"])
+        self.assertIn("Zemaris PDF", self.pages["index.html"])  # footer link
+        self.assertIn('href="/zemaris-pdf.html"', self.pages["download.html"])
 
     def test_no_competitor_names(self):
         allt = "\n".join(self.pages.values()).lower()
@@ -322,7 +323,7 @@ class Built(unittest.TestCase):
     def test_terms_and_privacy_cover_both_apps_and_paddle(self):
         t, p = self.pages["terms.html"], self.pages["privacy.html"]
         for text in (t, p):
-            self.assertIn("Velocity PDF", text)
+            self.assertIn("Zemaris PDF", text)
             self.assertIn("Paddle", text)
         self.assertIn("Merchant of Record", t)
         s = base_cfg()["seller"]
@@ -643,7 +644,7 @@ class Downloads(unittest.TestCase):
                 self.assertNotIn(gone, end, n)
             self.assertNotIn("Please%20tell%20me%20when%20Velocity%20launches", pages[n], n)
         # the macOS, Linux and phone cards ask for an email, never the launch list that no longer exists
-        # (Velocity PDF and Velocity Browser cards further down keep their own launch list: not released yet)
+        # (Zemaris PDF and Velocity Browser cards further down keep their own launch list: not released yet)
         cards = dl[dl.index('data-os="mac"'):dl.index('data-os="ext"')]
         self.assertNotIn('href="#launch"', dl)
         self.assertNotIn("launch list", cards)
@@ -857,7 +858,7 @@ PDF_PRICES = {"monthly": "pri_" + "d" * 26, "yearly": "pri_" + "e" * 26, "lifeti
 
 
 class VelocityPdf(unittest.TestCase):
-    """Velocity PDF on the site (GO-LIVE-CONTRACT.md section 5): prices, Buy buttons, download switch, update.json."""
+    """Zemaris PDF on the site (GO-LIVE-CONTRACT.md section 5): prices, Buy buttons, download switch, update.json."""
 
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="zsite-pdf-")
@@ -898,21 +899,21 @@ class VelocityPdf(unittest.TestCase):
         return cards
 
     def test_home_shows_both_apps_and_pdf_download_stays_off_until_pdf_open(self):
-        """The home page presents Zemaris with both apps side by side; the Velocity PDF card's download button follows
-        downloads.pdf_open like velocity-pdf.html: disabled "Download available soon" while it is false."""
+        """The home page presents Zemaris with both apps side by side; the Zemaris PDF card's download button follows
+        downloads.pdf_open like zemaris-pdf.html: disabled "Download available soon" while it is false."""
         for cfg, root in ((dict(base_cfg(), downloads=dict(base_cfg()["downloads"], pdf_open=False)), SITE),
                           (closed_cfg(), None)):   # as configured, PDF downloads off; and both switches off
             home = self.build(cfg, root)["index.html"]
             cards = self.home_cards(home)
             dm, pdf = cards["dm"], cards["pdf"]
             for card, name, logo, page in ((dm, "Velocity Download Manager", "velocity-icon.svg", "/features.html"),
-                                           (pdf, "Velocity PDF", "velocity-pdf-icon.svg", "/velocity-pdf.html")):
+                                           (pdf, "Zemaris PDF", "velocity-pdf-icon.svg", "/zemaris-pdf.html")):
                 self.assertIn(f">{name}</h2>", card)
                 self.assertIn(f'src="/assets/{logo}" alt="{name} logo"', card)
                 self.assertIn(f'href="{page}"', card)
                 self.assertIn("See features", card)
                 self.assertRegex(plain(card), r"From \$\d")
-            self.assertIn('href="/velocity-pdf.html"', home[home.index("<header"):home.index("</header>")])  # top nav
+            self.assertIn('href="/zemaris-pdf.html"', home[home.index("<header"):home.index("</header>")])  # top nav
             self.assertRegex(pdf, r'<button class="btn primary soon" type="button" disabled title="[^"]+">'
                                   r'Download available soon</button>')
             self.assertNotIn(".exe", pdf)
@@ -963,19 +964,19 @@ class VelocityPdf(unittest.TestCase):
         ids = dict(re.findall(r'"(pri_[A-Za-z0-9_]+)"\s*:\s*\{[^}]*"product"\s*:\s*"pdf"[^}]*"plan"\s*:\s*"(\w+)"', live))
         if not ids:
             if given:
-                self.fail(f"{given} has no Velocity PDF entries in PRICES")
-            self.skipTest("server PRICES has no Velocity PDF entries yet")
+                self.fail(f"{given} has no Zemaris PDF entries in PRICES")
+            self.skipTest("server PRICES has no Zemaris PDF entries yet")
         site = {v: k for k, v in base_cfg()["checkout"]["pdf_prices"].items() if k in _build.PDF_PLANS}
         self.assertEqual({plan: pid for pid, plan in ids.items()}, {plan: pid for pid, plan in site.items()})
 
     def test_placeholders_keep_pdf_buttons_on_coming_soon_and_never_stop_the_build(self):
         cfg = pdf_placeholders(live_checkout(closed_cfg()))   # DM checkout open, PDF ids still placeholders
         pages = self.build(cfg)
-        for name, start in (("pricing.html", '<section id="pdf">'), ("velocity-pdf.html", '<section id="buy">')):
+        for name, start in (("pricing.html", '<section id="pdf">'), ("zemaris-pdf.html", '<section id="buy">')):
             block = pdf_block(pages[name], start)
             self.assertNotIn("data-checkout=", block, name)
             self.assertEqual(len(re.findall(r'class="btn[^"]*soon"[^>]*>Coming soon<', block)), 4, name)
-        self.assertNotIn("checkout.js", pages["velocity-pdf.html"])
+        self.assertNotIn("checkout.js", pages["zemaris-pdf.html"])
         conf = json.loads(parse(pages["pricing.html"]).json_scripts[0])
         self.assertEqual(conf["pdfPrices"]["lifetime"], "pri_PDF_LIFETIME")
         self.assertEqual(conf["pdfSuccessUrl"], "https://zemaris.com/thank-you.html?product=pdf")
@@ -983,7 +984,7 @@ class VelocityPdf(unittest.TestCase):
 
     def test_prices_shown(self):
         pages = self.build(closed_cfg())
-        for name, start in (("pricing.html", '<section id="pdf">'), ("velocity-pdf.html", '<section id="buy">')):
+        for name, start in (("pricing.html", '<section id="pdf">'), ("zemaris-pdf.html", '<section id="buy">')):
             t = plain(pdf_block(pages[name], start))
             for words in ("$5.99 /month", "$29.99 /year", "Just $2.50 a month · save 58%", "$49 once",
                           "1 PC · free updates for life", "$15 /PC/year", "From 5 PCs", "30 days free",
@@ -1001,24 +1002,24 @@ class VelocityPdf(unittest.TestCase):
         cfg = live_checkout(closed_cfg())
         cfg["checkout"]["pdf_prices"] = dict(PDF_PRICES)
         pages = self.build(cfg)
-        for name, start in (("pricing.html", '<section id="pdf">'), ("velocity-pdf.html", '<section id="buy">')):
+        for name, start in (("pricing.html", '<section id="pdf">'), ("zemaris-pdf.html", '<section id="buy">')):
             block = pdf_block(pages[name], start)
             for plan in _build.PDF_PLANS:
                 self.assertIn(f'data-checkout="{plan}" data-product="pdf"', block, name)
             self.assertNotIn(">Coming soon<", block, name)
             self.assertIn('data-quantity-from="pdfPcs"', block, name)
             self.assertRegex(block, r'<input type="number" id="pdfPcs" min="5" max="255"')
-        vp = pages["velocity-pdf.html"]
+        vp = pages["zemaris-pdf.html"]
         self.assertIn('<script src="/assets/checkout.js" defer></script>', vp)
         self.assertIn('id="checkoutMsg"', vp)
         self.assertEqual(json.loads(parse(vp).json_scripts[0])["pdfPrices"], PDF_PRICES)
         # checkout switched off closes the PDF buttons too
         cfg["checkout"]["open"] = False
-        self.assertNotIn("data-checkout=", self.build(cfg)["velocity-pdf.html"])
+        self.assertNotIn("data-checkout=", self.build(cfg)["zemaris-pdf.html"])
 
     def test_downloads_off_says_available_soon_without_a_dead_link(self):
         pages = self.build(closed_cfg())
-        vp, dl = pages["velocity-pdf.html"], pages["download.html"]
+        vp, dl = pages["zemaris-pdf.html"], pages["download.html"]
         self.assertIn(">Download available soon</button>", vp)
         self.assertRegex(vp, r'<button class="btn primary soon" type="button" disabled title="[^"]+">Download available soon')
         self.assertNotIn(".exe", vp)
@@ -1034,7 +1035,7 @@ class VelocityPdf(unittest.TestCase):
         self.put_file()
         pages = self.build(self.pdf_open())
         url = "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.0.exe"
-        vp, dl = pages["velocity-pdf.html"], pages["download.html"]
+        vp, dl = pages["zemaris-pdf.html"], pages["download.html"]
         for t in (vp, dl):
             self.assertIn(f'href="{url}"', t)
             self.assertIn(self.digest, t)
@@ -1045,7 +1046,7 @@ class VelocityPdf(unittest.TestCase):
         self.assertIn("Version 0.8.0", vp)
         card = dl[dl.index('data-app="pdf"'):dl.index('data-app="browser"')]
         self.assertNotIn("launch list", card)
-        self.assertIn("Download Velocity PDF", card)
+        self.assertIn("Download Zemaris PDF", card)
 
     def test_downloads_open_refuses_wrong_details(self):
         with self.assertRaises(_build.BuildError):          # placeholders size 0 / no SHA-256
@@ -1070,7 +1071,7 @@ class VelocityPdf(unittest.TestCase):
         t = plain(ty)
         self.assertIn("VPDF-", t)
         self.assertIn("File → Licence", t)
-        self.assertIn('"Your Velocity PDF licence key"', t)
+        self.assertIn('subject says "PDF licence key"', t)  # true for the old and the new name in the email
         self.assertIn('get("product") === "pdf"', ty)
         sp = pages["support.html"]
         self.assertIn('id="pdf-licence"', sp)
@@ -1079,12 +1080,43 @@ class VelocityPdf(unittest.TestCase):
     def test_no_coming_soon_for_pdf_left(self):
         pages = self.build(closed_cfg())
         for n, text in pages.items():
-            self.assertNotRegex(plain(text), r"Velocity PDF,? coming soon", n)
-            self.assertNotIn("Velocity PDF</b> (coming soon)", text, n)
+            self.assertNotRegex(plain(text), r"Zemaris PDF,? coming soon", n)
+            self.assertNotIn("Zemaris PDF</b> (coming soon)", text, n)
         for n in ("terms.html", "refunds.html", "legal.html", "privacy.html", "eula.html"):
             self.assertNotIn("will be sold in the Microsoft Store", pages[n], n)
-        self.assertIn("Velocity PDF", plain(pages["refunds.html"]))
-        self.assertIn("Velocity PDF key works only in Velocity PDF", plain(pages["terms.html"]))
+        self.assertIn("Zemaris PDF", plain(pages["refunds.html"]))
+        self.assertIn("Zemaris PDF key works only in Zemaris PDF", plain(pages["terms.html"]))
+
+    def test_old_name_velocity_pdf_is_gone_from_the_site(self):
+        """The app is Zemaris PDF (owner's decision, Nov 2026). No built page and no script may still say
+        "Velocity PDF", except: the one "formerly Velocity PDF" line and description on the PDF page, and the
+        alternateName in the home page's schema, for people who search the old name. Installer file names
+        (VelocityPDF-Setup-<version>.exe) and the /velocity-pdf/ folder are addresses, not names, and stay."""
+        old_name = re.compile(r"Velocity(\s|&nbsp;|%20|<[^>]+>)*PDF(?!-Setup)", re.I)
+        allowed = {"zemaris-pdf.html": ("Zemaris PDF (formerly Velocity PDF)", "Formerly Velocity PDF: the same app"),
+                   "index.html": ('"alternateName":"Velocity PDF"',)}
+        allowed["velocity-pdf.html"] = allowed["zemaris-pdf.html"]
+        self.put_file()
+        for cfg in (closed_cfg(), pdf_placeholders(live_checkout(closed_cfg())), self.pdf_open()):
+            for n, text in self.build(cfg).items():
+                for ok in allowed.get(n, ()):
+                    self.assertIn(ok, text, n)
+                    text = text.replace(ok, "")
+                self.assertIsNone(old_name.search(text), f"{n}: {old_name.search(text)}")
+        for n in ("admin.js", "checkout.js", "reviews.js", "site.js", "stats.js"):
+            with open(os.path.join(SITE, "assets", n), encoding="utf-8") as f:
+                self.assertIsNone(old_name.search(f.read()), n)
+
+    def test_pdf_page_has_a_new_address_and_the_old_one_still_works(self):
+        """/zemaris-pdf.html is the page's address; /velocity-pdf.html (in emails and older app versions) is the same
+        page, and both name the new address as canonical. Every link on the site goes to the new address."""
+        pages = self.build(closed_cfg())
+        self.assertEqual(pages["velocity-pdf.html"], pages["zemaris-pdf.html"])
+        self.assertIn('<link rel="canonical" href="https://zemaris.com/zemaris-pdf.html">', pages["velocity-pdf.html"])
+        self.assertIn('<title>Zemaris PDF', pages["zemaris-pdf.html"])
+        for n, text in pages.items():
+            self.assertNotIn("velocity-pdf.html", text, n)
+        self.assertTrue(os.path.isfile(os.path.join(self.out, "velocity-pdf.html")))
 
     def test_release_fills_pdf_details_and_stages_without_opening(self):
         root = os.path.join(self.tmp, "site")

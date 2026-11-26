@@ -11,15 +11,15 @@ This file and `README.md` are kept off the live site by `_config.yml`.
 | Launch switches | One settings file. `checkout.open` and `downloads.open` are both **false**: every Buy button and the Windows download say "Coming soon". The build refuses to switch either on until its settings are complete and valid. | `_launch.json`, `_build.py` |
 | Checkout | Paddle.js v2 overlay on the pricing page for Monthly, Yearly, Lifetime (Business stays "Contact us"). Paddle's script is only fetched when someone points at or clicks a Buy button, and never while checkout is off. A friendly message shows if it cannot load. | `_pages/pricing.html`, `assets/checkout.js` |
 | Thank-you page | "Check your email for your key", how to activate, what to do if no email arrives. Not indexed by search engines. Paddle sends buyers here after paying. | `_pages/thank-you.html` |
-| Terms | Rewritten for both apps: seller name and address (placeholders), Paddle as reseller and Merchant of Record, subscriptions and cancelling through Paddle's customer portal / paddle.net, Microsoft Store for Velocity PDF, AI features, governing law (placeholder). | `_pages/terms.html` |
+| Terms | Rewritten for both apps: seller name and address (placeholders), Paddle as reseller and Merchant of Record, subscriptions and cancelling through Paddle's customer portal / paddle.net, Microsoft Store for Zemaris PDF, AI features, governing law (placeholder). | `_pages/terms.html` |
 | Refund policy | 14 days, full refund, how to ask, what happens to the key, Store purchases refunded by Microsoft. | `_pages/refunds.html` |
 | Legal notice | Seller, address, emails, Paddle as Merchant of Record, links to all legal pages. | `_pages/legal.html` |
 | Licence agreement | The installer's `legal\EULA.txt`, word for word (placeholders filled from `_launch.json` once set). | `_pages/eula.html`, `_legal/EULA.txt` |
-| Open-source notices | The installer's `THIRD-PARTY-NOTICES.txt` word for word, plus a short Velocity PDF list. | `_pages/third-party.html`, `_legal/` |
-| Privacy | Rewritten for both apps: activation server on Cloudflare (key + anonymous PC code), update checks, the email sender (placeholder), Paddle, Zoho mailbox, GitHub Pages, everything Velocity PDF can send (AI with your own key, OCR languages, voice model, timestamp and revocation servers, web pages), Microsoft Store, retention, rights, contact. | `_pages/privacy.html` |
+| Open-source notices | The installer's `THIRD-PARTY-NOTICES.txt` word for word, plus a short Zemaris PDF list. | `_pages/third-party.html`, `_legal/` |
+| Privacy | Rewritten for both apps: activation server on Cloudflare (key + anonymous PC code), update checks, the email sender (placeholder), Paddle, Zoho mailbox, GitHub Pages, everything Zemaris PDF can send (AI with your own key, OCR languages, voice model, timestamp and revocation servers, web pages), Microsoft Store, retention, rights, contact. | `_pages/privacy.html` |
 | Honest text | SmartScreen help true for unsigned and signed builds, and a "check your download" (SHA-256) guide; FFmpeg described as an optional tick box (footer now "Nothing installed without asking"); "Windows · Mac & Linux in testing"; Android and iPhone "Planned"; offline-licence text matches the activation server; what's new for 1.7.1 and 1.7.2; PDF/UA claim removed ("tags and reading order for screen readers" instead). | support, features, about, index, download, whats-new, compare |
 | Download page | Windows card ready behind `downloads.open`: version, date, file, size, SHA-256 with a Copy button, signed / not signed, system requirements, Download button. Filled from the release files by `_release.py`. While closed it shows "Coming soon" and no file details. | `_pages/download.html`, `_release.py` |
-| Velocity PDF page | "Coming soon" product page with features checked against the code, privacy summary, Microsoft Store, price "announced at launch". Linked from the footer, the download page and About. | `_pages/velocity-pdf.html` |
+| Zemaris PDF page | "Coming soon" product page with features checked against the code, privacy summary, Microsoft Store, price "announced at launch". Linked from the footer, the download page and About. | `_pages/zemaris-pdf.html` |
 | Tooltips | Every button and button-style link has a tooltip; the build stops if one is missing. | `_build.py` |
 | Tests | `python _tests\test_site.py` (49 checks) and `node --test _tests\checkout.test.mjs _tests\admin.test.mjs _tests\site_links.test.mjs` (18 checks). | `_tests/` |
 
@@ -44,9 +44,9 @@ into the server with `wrangler secret put` (see `..\server\README.md`).
 | `downloads.*` | Filled by Claude with `python _release.py` from the final signed build (`--stage` copies the installer and `velocity/update.json` into this repo) | Launch |
 | `downloads.windows.signed/publisher` | Set by `_release.py --signed --publisher "Name on the certificate"` once builds are signed | After signing |
 | `downloads.open` | `true` when you say the packages are final | Launch |
-| `checkout.pdf_prices.monthly/yearly/lifetime/business` | Velocity PDF: the four Paddle `pri_...` ids (now placeholders `pri_PDF_*`). Paste each one here AND in the server's `wrangler.toml` PRICES in the same sitting. `test_server_and_site_hold_the_same_pdf_ids` fails while they differ, but it can only see the server file when the two worktrees sit side by side (`..\pdf-live\server\wrangler.toml`) or when `ZEMARIS_SERVER_TOML` names that file (then a missing file fails too). From the website repo on its own it is skipped, so run it with `set ZEMARIS_SERVER_TOML=<path to server\wrangler.toml>` after pasting. Until all four are real the PDF Buy buttons say "Coming soon" (the build never stops for them) | PDF checkout opens |
-| `downloads.pdf_windows.*` | Velocity PDF 0.8.0: size, SHA-256 and date filled by `python _release.py --product pdf --update-json ...elocity-pdf-update.json` (`--stage` copies the installer to `velocity-pdf/download/` and the signed file to `velocity-pdf/update.json`) | PDF launch |
-| `downloads.pdf_open` | `false` now: the PDF pages say "Download available soon". `true` when you publish Velocity PDF | PDF launch |
+| `checkout.pdf_prices.monthly/yearly/lifetime/business` | Zemaris PDF: the four Paddle `pri_...` ids (now placeholders `pri_PDF_*`). Paste each one here AND in the server's `wrangler.toml` PRICES in the same sitting. `test_server_and_site_hold_the_same_pdf_ids` fails while they differ, but it can only see the server file when the two worktrees sit side by side (`..\pdf-live\server\wrangler.toml`) or when `ZEMARIS_SERVER_TOML` names that file (then a missing file fails too). From the website repo on its own it is skipped, so run it with `set ZEMARIS_SERVER_TOML=<path to server\wrangler.toml>` after pasting. Until all four are real the PDF Buy buttons say "Coming soon" (the build never stops for them) | PDF checkout opens |
+| `downloads.pdf_windows.*` | Zemaris PDF 0.8.0: size, SHA-256 and date filled by `python _release.py --product pdf --update-json ...elocity-pdf-update.json` (`--stage` copies the installer to `velocity-pdf/download/` and the signed file to `velocity-pdf/update.json`) | PDF launch |
+| `downloads.pdf_open` | `false` now: the PDF pages say "Download available soon". `true` when you publish Zemaris PDF | PDF launch |
 
 The build prints "still to fill in: ..." for every placeholder that is still visible, and stops if checkout or downloads
 are switched on with something missing or wrong (bad token, an API key pasted by mistake, a wrong price id, the
@@ -59,7 +59,7 @@ installer missing from the repo or not matching its SHA-256).
    approval.
 2. Make a client-side token (sandbox first) and send Claude the token and the three price ids, or paste them into
    `_launch.json` yourself.
-   **Quantity ranges** (each price in Paddle > Catalog, in live and in the sandbox): set the Velocity PDF Monthly, Yearly
+   **Quantity ranges** (each price in Paddle > Catalog, in live and in the sandbox): set the Zemaris PDF Monthly, Yearly
    and Lifetime prices to **1-1**, and Business to **5-255**. Paddle's default range is 1-100: left like that, a buyer
    who raises the quantity at checkout pays several times for one 1-PC key (the licence server then makes one key and
    emails you to refund the extra). The same 1-1 is wise for the Download Manager's Monthly, Yearly and Lifetime prices.
@@ -101,7 +101,7 @@ itself (download page, checkout) still depends on this repo.
 - Nothing is published, no account was touched, no token or price id is real.
 - The live Paddle overlay was not opened (it needs a real client token): `checkout.js` was tested with a fake Paddle
   in Node and in the built-in browser.
-- Velocity PDF (14 Nov 2026, GO-LIVE-CONTRACT.md section 5): prices, plans, trial line, Buy buttons, download block,
+- Zemaris PDF (14 Nov 2026, GO-LIVE-CONTRACT.md section 5): prices, plans, trial line, Buy buttons, download block,
   thank-you and support text are on the site, but its price ids are placeholders and `downloads.pdf_open` is false, so
   the Buy buttons say "Coming soon" and the download says "Download available soon". `velocity-pdf/update.json` is a
   placeholder, not signed (the app ignores an unsigned file).

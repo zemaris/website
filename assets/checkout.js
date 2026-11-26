@@ -1,7 +1,7 @@
 /* zemaris.com checkout: opens Paddle's secure checkout over the pricing page.
    The page only includes this file when checkout is switched on in _launch.json (see LAUNCH-PREP.md).
    Paddle's own script is fetched only when someone points at or clicks a Buy button.
-   Velocity PDF buttons carry data-product="pdf" and use the pdfPrices from the same config (_launch.json
+   Zemaris PDF buttons carry data-product="pdf" and use the pdfPrices from the same config (_launch.json
    checkout.pdf_prices); its Business button reads the PC count from data-quantity-from (5 to 255). */
 (function () {
   "use strict";
@@ -48,7 +48,7 @@
     return loading;
   }
 
-  // Velocity PDF Business: the number of PCs from the box on its card (5 to 255, 5 when empty or not a number)
+  // Zemaris PDF Business: the number of PCs from the box on its card (5 to 255, 5 when empty or not a number)
   function quantity(btn) {
     var id = btn.getAttribute("data-quantity-from");
     if (!id) return 1;

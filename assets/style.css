@@ -359,7 +359,7 @@ footer.site { background: var(--panel); border-top: 1px solid var(--line); paddi
 .plat .pi svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round }
 .plat .pi.logo { background: none }
 .plat .pi.logo img { width: 56px; height: 56px; display: block }
-/* a product's own app icon above its heading (Velocity PDF page and the pricing page's PDF plans) */
+/* a product's own app icon above its heading (Zemaris PDF page and the pricing page's PDF plans) */
 .picon { display: block; width: 96px; height: 96px; margin: 0 auto 18px }
 .picon.sm { width: 64px; height: 64px; margin-bottom: 10px }
 .plat h3 { margin: 18px 0 2px; font-size: 22px }
@@ -507,7 +507,7 @@ button.btn { line-height: inherit }
 .adm-reviews { display: grid; gap: 10px; margin-bottom: 18px }
 .adm-rv .adm-rv-act { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap }
 .adm-rv.pending { border-color: var(--warn) }
-/* Velocity PDF Business card: number of PCs */
+/* Zemaris PDF Business card: number of PCs */
 .plan .pcs { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: var(--text2); font-size: 15px }
 .plan .pcs input { font: inherit; width: 84px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line2); background: var(--bg); color: var(--text) }
 .btn[disabled] { cursor: default }
@@ -572,7 +572,7 @@ button.btn { line-height: inherit }
 .pcard .btn.soon[disabled] { opacity: .72; transform: none; filter: none }
 .pc-note { margin: 14px 0 0; color: #a9b5cc; font-size: 13.5px }
 
-/* Velocity PDF app mock (HTML/CSS only, like the download manager mock) */
+/* Zemaris PDF app mock (HTML/CSS only, like the download manager mock) */
 .pdfapp { background: #0f1318; color: #f1f4f8; border: 1px solid #2b3440; border-radius: 14px; overflow: hidden; font-size: 12.5px; display: flex; flex-direction: column }
 .pdfapp .tb { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #161b22; border-bottom: 1px solid #2b3440; white-space: nowrap }
 .pdfapp .lg { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 13.5px }
@@ -640,7 +640,7 @@ button.btn { line-height: inherit }
 .final-logos img { width: 68px; height: 68px }
 nav.links a { white-space: nowrap }
 @media (max-width: 1280px) { nav.links a { padding: 8px 9px; font-size: 15px } header.top .wrap { gap: 18px } }
-/* seven nav items since Velocity PDF joined: the menu button takes over below 1180 px (it was 920 px) */
+/* seven nav items since Zemaris PDF joined: the menu button takes over below 1180 px (it was 920 px) */
 @media (max-width: 1180px) {
   #menuBtn { display: grid }
   nav.links { display: none; position: absolute; top: 68px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 2px;

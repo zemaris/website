@@ -139,7 +139,7 @@ test("does nothing without a config, or with broken JSON", () => {
   }
 });
 
-// ---- Velocity PDF (GO-LIVE-CONTRACT.md section 5): data-product="pdf" uses pdfPrices, its own thank-you page,
+// ---- Zemaris PDF (GO-LIVE-CONTRACT.md section 5): data-product="pdf" uses pdfPrices, its own thank-you page,
 // and Business sends the PC count from the box on its card (5 to 255)
 const PDF = {
   ...GOOD,
@@ -158,7 +158,7 @@ function pdfPage(cfg, elements = {}) {
   } };
 }
 
-test("a Velocity PDF button uses the PDF price and the PDF thank-you page; a DM button is unchanged", async () => {
+test("a Zemaris PDF button uses the PDF price and the PDF thank-you page; a DM button is unchanged", async () => {
   const p = pdfPage(PDF);
   await p.click(p.pdfButton("lifetime"));
   assert.equal(p.calls.open[0].items[0].priceId, PDF.pdfPrices.lifetime);

@@ -7,8 +7,8 @@ Launch switches and placeholders live in _launch.json (see LAUNCH-PREP.md):
   - checkout.open   false = every Buy button says "Coming soon" and no payment script is loaded.
   - downloads.open  false = the Download button says "Coming soon" and no file details are shown.
 Both only turn on when the rest of their settings are filled in correctly; otherwise the build stops and says why.
-Velocity PDF (GO-LIVE-CONTRACT.md section 5):
-  - checkout.pdf_prices      the four Velocity PDF price ids. A placeholder (anything that is not pri_ + 26 letters or
+Zemaris PDF (GO-LIVE-CONTRACT.md section 5):
+  - checkout.pdf_prices      the four Zemaris PDF price ids. A placeholder (anything that is not pri_ + 26 letters or
                              digits) never stops the build: it only keeps the PDF Buy buttons on "Coming soon".
   - downloads.pdf_open       false = the PDF pages say "Download available soon". When true, downloads.pdf_windows
                              is checked as strictly as the Download Manager's installer.
@@ -29,10 +29,14 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-NAV = [("features", "/features.html", "Download Manager"), ("pdf", "/velocity-pdf.html", "Velocity PDF"),
+NAV = [("features", "/features.html", "Download Manager"), ("pdf", "/zemaris-pdf.html", "Zemaris PDF"),
        ("compare", "/compare.html", "Compare"),
        ("pricing", "/pricing.html", "Pricing"), ("support", "/support.html", "Support"),
        ("whatsnew", "/whats-new.html", "What's new"), ("download", "/download.html", "Download")]
+
+# Old page addresses that must keep working (emails, installed apps and other sites link to them): the build writes
+# the same page there too. Its canonical link and og:url name the new address, so search engines keep one page.
+ALIASES = {"zemaris-pdf.html": ("velocity-pdf.html",)}
 
 PADDLE_JS = "https://cdn.paddle.com/paddle/v2/paddle.js"
 PRICE_RE = re.compile(r"^pri_[a-z0-9]{26}$")
@@ -86,9 +90,9 @@ FOOT = """</main>
     <div class="fcols">
       <div>
         <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="30" height="30">Zemaris</a>
-        <p>Fast, honest software: Velocity Download Manager and Velocity PDF for Windows.</p>
+        <p>Fast, honest software: Velocity Download Manager and Zemaris PDF for Windows.</p>
       </div>
-      <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/velocity-pdf.html">Velocity PDF</a><a href="/languages.html">Languages</a></div>
+      <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/zemaris-pdf.html">Zemaris PDF</a><a href="/languages.html">Languages</a></div>
       <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:{{SUPPORT_EMAIL}}">Contact us</a></div>
       <div><h5>Company</h5><a href="/about.html">About Zemaris</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/eula.html">Licence agreement</a><a href="/legal.html">Legal notice</a><a href="/third-party.html">Open-source notices</a><a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a></div>
     </div>
@@ -192,14 +196,14 @@ def check_downloads(cfg, root=HERE):
 
 
 def check_pdf_checkout(cfg, checkout_live):
-    """True when the Velocity PDF Buy buttons may open checkout: checkout is open (and passed check_checkout) and all
+    """True when the Zemaris PDF Buy buttons may open checkout: checkout is open (and passed check_checkout) and all
     four PDF price ids are real. Placeholders such as pri_PDF_MONTHLY only keep it off, never stop the build."""
     prices = cfg.get("checkout", {}).get("pdf_prices") or {}
     return bool(checkout_live) and all(PRICE_RE.match(prices.get(p) or "") for p in PDF_PLANS)
 
 
 def check_pdf_downloads(cfg, root=HERE):
-    """True when the Velocity PDF download button may show. Off while downloads.pdf_open is false; when it is true
+    """True when the Zemaris PDF download button may show. Off while downloads.pdf_open is false; when it is true
     the installer details must be complete and right, or the build stops (as for the Download Manager)."""
     d = cfg.get("downloads", {})
     if not d.get("pdf_open"):
@@ -210,7 +214,7 @@ def check_pdf_downloads(cfg, root=HERE):
         fail("downloads.pdf_windows.base_url must start with https:// and end with /")
     if not re.match(r"^https://(zemaris\.com|[a-z0-9-]+(\.[a-z0-9-]+)*\.zemaris\.com|github\.com/zemaris)/", base.lower()):
         fail("downloads.pdf_windows.base_url must be on zemaris.com (or a subdomain) or github.com/zemaris/...: "
-             "Velocity PDF refuses installers from other hosts")
+             "Zemaris PDF refuses installers from other hosts")
     if not re.match(r"^\d+\.\d+\.\d+$", w.get("version") or ""):
         fail("downloads.pdf_windows.version must look like 0.8.0")
     if not re.match(r"^[A-Za-z0-9._-]+\.exe$", w.get("file") or ""):
@@ -225,7 +229,7 @@ def check_pdf_downloads(cfg, root=HERE):
         import hashlib
         local = os.path.join(root, *base[len("https://zemaris.com/"):].strip("/").split("/"), w["file"])
         if not os.path.isfile(local):
-            fail(f"the Velocity PDF installer is not in this repo at {os.path.relpath(local, root)} "
+            fail(f"the Zemaris PDF installer is not in this repo at {os.path.relpath(local, root)} "
                  "(python _release.py --product pdf --stage)")
         h = hashlib.sha256()
         with open(local, "rb") as f:
@@ -414,13 +418,17 @@ def build(out_dir=None, cfg=None, quiet=False, root=HERE):
         with open(os.path.join(out_dir, name), "w", encoding="utf-8", newline="\n") as f:
             f.write(page)
         built[name] = page
+        for old in ALIASES.get(name, ()):  # same page at the old address; its canonical link names the new one
+            with open(os.path.join(out_dir, old), "w", encoding="utf-8", newline="\n") as f:
+                f.write(page)
+            built[old] = page
         if not quiet:
             print("built", name)
     if not quiet:
         print("checkout:", "OPEN (" + cfg["checkout"]["environment"] + ")" if flags["checkout_live"] else "Coming soon")
         print("downloads:", "OPEN" if flags["downloads_live"] else "Coming soon")
-        print("Velocity PDF checkout:", "OPEN" if flags["pdf_checkout_live"] else "Coming soon (price ids not set)")
-        print("Velocity PDF downloads:", "OPEN" if flags["pdf_downloads_live"] else "Download available soon")
+        print("Zemaris PDF checkout:", "OPEN" if flags["pdf_checkout_live"] else "Coming soon (price ids not set)")
+        print("Zemaris PDF downloads:", "OPEN" if flags["pdf_downloads_live"] else "Download available soon")
         if placeholders:
             print("still to fill in:", ", ".join(sorted(placeholders)))
     return built

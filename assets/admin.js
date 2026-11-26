@@ -371,8 +371,8 @@
 
   // ---------- purchases ----------
   // Both apps use the same plan names (Yearly, Lifetime...), so every sale shows which app it was for. The server sends
-  // product "pdf" for Velocity PDF; old rows and Download Manager rows say "dm" or nothing.
-  var PRODUCTS = { dm: "Download Manager", pdf: "Velocity PDF" };
+  // product "pdf" for Zemaris PDF; old rows and Download Manager rows say "dm" or nothing.
+  var PRODUCTS = { dm: "Download Manager", pdf: "Zemaris PDF" };
   function productOf(s) { return s && String(s.product || "").toLowerCase() === "pdf" ? "pdf" : "dm"; }
   function saleLabel(s) { return PRODUCTS[productOf(s)] + " · " + (s.plan || "?") + (s.pcs > 1 ? " ×" + s.pcs : ""); }
   function salesFor(list, product) { return (list || []).filter(function (s) { return !product || productOf(s) === product; }); }
@@ -460,7 +460,7 @@
 
   // ---------- reviews (unchanged behaviour) ----------
   function reviews(key, action, id) {
-    var box = $("admReviews"), names = { velocity: "Velocity Download Manager", "velocity-pdf": "Velocity PDF" };
+    var box = $("admReviews"), names = { velocity: "Velocity Download Manager", "velocity-pdf": "Zemaris PDF" };
     if (DEMO) { box.textContent = "Reviews load from the server (not shown in the demo)."; return; }
     post("/reviews-admin", { token: key, action: action || "list", id: id }).then(function (x) {
       var d = x.j || {};
