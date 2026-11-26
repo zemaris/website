@@ -69,15 +69,43 @@ does not limit any right these licences give you.
    Source:   https://github.com/pyinstaller/pyinstaller
 
 ------------------------------------------------------------------------------------------
-6. FFmpeg (optional, for MP3 audio and HD video)
-   FFmpeg is NOT part of Velocity and is not shipped in this installer. If you tick the
-   FFmpeg box during setup, Setup asks the Windows package manager (winget) to install the
-   separate "FFmpeg Essentials" build, which comes from its own publisher. Velocity then
-   starts it as a separate program when it needs it.
-   Licence:  FFmpeg is licensed under the GNU LGPL 2.1 or later; the Essentials build
-             includes GPL parts, so that build is under the GNU GPL version 3.
-   Source:   https://ffmpeg.org/download.html and https://www.gyan.dev/ffmpeg/builds/
-   FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
+6. FFmpeg (for MP3 audio and HD video)
+   FFmpeg is NOT part of Velocity and is not shipped in this installer. Velocity uses an
+   FFmpeg that is already on the PC. It starts ffmpeg.exe as a separate program when a
+   download needs it (to join a video's picture and sound, or to make an MP3); it does not
+   link to FFmpeg's code or change it. An FFmpeg can reach the PC in two ways:
+
+   a) Fetched by Velocity. When a download needs FFmpeg and the PC has none, Velocity
+      downloads one build, straight from the project that makes it, into its own data
+      folder (%APPDATA%\Velocity\ffmpeg) and checks it against a fixed SHA-256 first:
+        Build:    FFmpeg-Builds "win64-lgpl-shared" build of the FFmpeg 9.0 release branch
+                  (n9.0.2-39-g7adfbe40dc, built 31 October 2026), or a later build of the
+                  same kind if Zemaris names one in Velocity's signed update information.
+        From:     https://github.com/FFmpeg-Builds/FFmpeg-Builds/releases
+                  (formerly https://github.com/BtbN/FFmpeg-Builds)
+        Licence:  GNU Lesser General Public License, version 3 or later (LGPL-3.0-or-later).
+                  This build contains no GPL-only or non-free parts. The licence text is
+                  saved next to the program as LICENSE.txt, and is at
+                  https://www.gnu.org/licenses/lgpl-3.0.html
+        Source:   FFmpeg itself: https://git.ffmpeg.org/ffmpeg.git (the commit named in
+                  the build's name; https://ffmpeg.org/download.html). The build scripts
+                  and the list of libraries built in, each with its own licence:
+                  https://github.com/FFmpeg-Builds/FFmpeg-Builds
+                  We have not changed it. If you can't get the source there, write to
+                  admin@zemaris.com and we will help you get it.
+      You may replace this FFmpeg with another build: install FFmpeg on the PC (Velocity
+      uses one it finds on the PATH first), or empty that folder and put your own
+      ffmpeg.exe and ffprobe.exe (with the files they need) in it. Deleting the folder
+      removes it; Velocity fetches it again when it is next needed.
+
+   b) Installed by Setup. If you leave the FFmpeg box ticked during setup, Setup asks the
+      Windows package manager (winget) to install the separate "FFmpeg Essentials" build,
+      which comes from its own publisher.
+        Licence:  that build includes GPL parts, so it is under the GNU GPL version 3.
+        Source:   https://www.gyan.dev/ffmpeg/builds/ and https://ffmpeg.org/download.html
+
+   FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project. The FFmpeg
+   project is not involved with and does not endorse Velocity.
 
 ------------------------------------------------------------------------------------------
 7. Inno Setup (makes the Velocity installer and uninstaller)

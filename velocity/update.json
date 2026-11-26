@@ -1,12 +1,12 @@
 {
-  "version": "1.7.7",
-  "url": "https://zemaris.com/velocity/download/Velocity-Setup-1.7.7.exe",
-  "sha256": "f26d68ad5824c77a93bb8ccbe5b9f92fa4c5df62825ad57b3f6e40fe57c52e47",
-  "size": 22536150,
-  "notes": "YouTube videos now download on PCs where FFmpeg was installed after Velocity started, and Velocity says plainly when FFmpeg is needed. Faster video info for playlist and Mix links.",
+  "version": "1.7.8",
+  "url": "https://zemaris.com/velocity/download/Velocity-Setup-1.7.8.exe",
+  "sha256": "b39457d9c969c7ccb03a7f31022ae984ec920ba8f4e5d2eb078100e690e33b1a",
+  "size": 22545646,
+  "notes": "HD YouTube videos and MP3s now work on PCs without FFmpeg: Velocity downloads it by itself the first time it is needed (about 73 MB, one time only).",
   "engine": {
     "version": "2026.11.23",
     "sha256": "e8665ed64d6b9172773e812f891fb707a0cb1ee8d9ef4fc1acb00cabee4c5256"
   },
-  "signature": "vxl/GLqZH7nz2pDov9KbOQ1PAhpm3zYwgf7dVAkb/jaMTIQ+UYJSbBQvpVCq3W/0UvfP244AsuzVvyWHCFmC9Q=="
+  "signature": "Iq3ym7EDr5KxDmXPpMBRdmYHF9hyz6HzBh40aBO64EPwZMD1fw/ZFZM9t16Nyv1AYDE54biLlXz9TG2eyaI/tw=="
 }

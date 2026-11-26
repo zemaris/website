@@ -1,9 +1,9 @@
 {
-  "version": "0.8.1",
-  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.1.exe",
-  "sha256": "5d33b3ad860fe5cb54a653b65a34cd4b13914c43ed9d334e1c1d2989594970b7",
-  "size": 68509472,
-  "notes": "Velocity PDF 0.8.1: removing a key respects the monthly limit and keeps the key, and a changed plan's new key is picked up automatically.",
+  "version": "0.8.2",
+  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.2.exe",
+  "sha256": "76282b1cbe56e59144f64b165a6c8bd61da87decb7fc80b6837c204e2a98768e",
+  "size": 68525909,
+  "notes": "Velocity PDF 0.8.2: Save and Save As now work on files opened from your PC, a failed save says why and offers Try again or Save as, and Ctrl+S works while typing.",
   "product": "pdf",
-  "signature": "imCQC4tOYb1KNYAPT7j6O4d9zxbJ//lvhMOtwXu5+Frv4aWIXcwYUNBcdUf1qxl5aWgNHZziwvvD0yqwAcBrvw=="
+  "signature": "z2+JIvP4W6aVwe/Gxokr7JC4OAHrEvyqza+X/VG/lXjj8KjfG3kUqAHrT1phrWAEpAvimydU9yHd3vQFXkJ1IQ=="
 }
