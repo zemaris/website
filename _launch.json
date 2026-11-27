@@ -35,10 +35,10 @@
     "open": true,
     "base_url": "https://zemaris.com/velocity/download/",
     "windows": {
-      "version": "1.7.8",
-      "file": "Velocity-Setup-1.7.8.exe",
-      "size": 22545646,
-      "sha256": "b39457d9c969c7ccb03a7f31022ae984ec920ba8f4e5d2eb078100e690e33b1a",
+      "version": "1.7.9",
+      "file": "Velocity-Setup-1.7.9.exe",
+      "size": 22549133,
+      "sha256": "1388f8d62edcae5f8769dde213ce847277e8c12792ce1d229c34842abe1b8145",
       "signed": false,
       "publisher": "",
       "date": "November 2026"
