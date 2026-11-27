@@ -664,3 +664,142 @@ nav.links a { white-space: nowrap }
   .hero .orb, .pcard, .pcard::before, .pdfapp .caret, .pdfapp .redact i, .pdfapp .sig path { animation: none }
   .pcard:hover, .why-item:hover, .pd-card:hover { transform: none }
 }
+
+/* ---------- Products menu in the top bar (every app; opened by site.js) */
+.fcols { grid-template-columns: 1.4fr repeat(4, 1fr) }
+/* accent colour of each app: cards, menu items, glows */
+[data-acc="dm"], .sw[data-app="dm"] { --c1: #4f8cff; --c2: #7c5cff }
+[data-acc="pdf"], .sw[data-app="pdf"] { --c1: #c026d3; --c2: #7c3aed }
+[data-acc="player"], .sw[data-app="player"] { --c1: #6366f1; --c2: #a855f7 }
+[data-acc="scan"], .sw[data-app="scan"] { --c1: #5b8cff; --c2: #22d3ee }
+[data-acc="camera"], .sw[data-app="camera"] { --c1: #f59e0b; --c2: #ef4444 }
+.dd { position: relative }
+.dd-btn { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 15.5px; font-weight: 550; color: var(--text2); background: none;
+  border: 0; padding: 8px 13px; border-radius: 9px; cursor: pointer; white-space: nowrap }
+.dd-btn:hover { color: var(--text); background: var(--panel2) }
+.dd-btn.on { color: var(--accent); background: var(--soft) }
+.dd-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s }
+.dd.open .dd-btn svg { transform: rotate(180deg) }
+.dd-menu { display: none; position: absolute; top: calc(100% + 14px); left: -12px; width: 660px; padding: 8px; overflow: hidden;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 30px 80px rgba(10, 20, 50, .28); z-index: 60 }
+.dd-menu::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: linear-gradient(90deg, #4f8cff, #7c5cff, #c026d3, #14b8a6, #f59e0b) }
+.dd.open .dd-menu { display: block; animation: ddIn .16s ease-out }
+@keyframes ddIn { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: none } }
+.dd-head { margin: 8px 12px 8px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap }
+.dd-head b { font-size: 12.5px; letter-spacing: 1.1px; text-transform: uppercase; color: var(--mute) }
+.dd-head span { font-size: 13px; color: var(--mute) }
+.dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px }
+nav.links .dd-item { display: flex; align-items: center; gap: 13px; padding: 11px 12px; border-radius: 13px; white-space: normal; border: 1px solid transparent;
+  transition: background .15s, border-color .15s }
+nav.links .dd-item:hover { background: color-mix(in srgb, var(--c1) 9%, transparent); border-color: color-mix(in srgb, var(--c1) 28%, transparent) }
+nav.links .dd-item[aria-current] { background: color-mix(in srgb, var(--c1) 12%, transparent) }
+.dd-item img { width: 40px; height: 40px; border-radius: 11px; flex: none; box-shadow: 0 6px 16px color-mix(in srgb, var(--c1) 35%, transparent); transition: transform .2s }
+.dd-item:hover img { transform: scale(1.07) rotate(-3deg) }
+.dd-item b { display: block; color: var(--text); font-size: 15px; font-weight: 650; line-height: 1.3 }
+.dd-item small { display: block; color: var(--text2); font-size: 13px; font-weight: 500 }
+/* small status and kind labels: at least 4.5:1 on the panel in both themes (the light --warn / --ok are too pale for
+   12-13 px text). _tests/test_site.py Catalog.test_small_labels_contrast computes it from these values. */
+:root { --st-warn: #8a5300; --st-ok: #0a7444; --kind-base: #0f1724; --kind-pct: 45% }
+:root[data-theme="dark"] { --st-warn: #f2a93b; --st-ok: #34c77b; --kind-base: #c3ccd8; --kind-pct: 65% }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --st-warn: #f2a93b; --st-ok: #34c77b; --kind-base: #c3ccd8; --kind-pct: 65% } }
+.dd-item .st { display: block; font-style: normal; font-size: 12px; font-weight: 650; color: var(--st-warn); margin-top: 1px }
+.dd-item .st.ok { color: var(--st-ok) }
+.dd-foot { display: flex; justify-content: space-between; gap: 10px; margin: 6px 0 0; padding: 10px 12px 4px; border-top: 1px solid var(--line) }
+nav.links .dd-foot a { padding: 6px 4px; font-size: 14.5px; font-weight: 650; color: var(--accent) }
+nav.links .dd-foot a:hover { background: none; text-decoration: underline }
+@media (max-width: 1180px) {
+  nav.links { max-height: calc(100vh - 68px); overflow-y: auto }
+  .dd-btn { width: 100%; justify-content: space-between; padding: 12px 14px; font-size: 16.5px }
+  .dd-menu { position: static; width: auto; box-shadow: none; border: 0; border-radius: 0; padding: 0 0 6px 6px; background: none }
+  .dd-menu::before, .dd-head { display: none }
+  .dd-grid { grid-template-columns: 1fr }
+  nav.links .dd-item { padding: 9px 12px }
+}
+@media (max-width: 1080px) { .fcols { grid-template-columns: 1fr 1fr } }
+@media (max-width: 600px) { .fcols { grid-template-columns: 1fr } }
+
+/* ---------- dark showcase opening (download page) and trust strip */
+.dl-hero { position: relative; overflow: hidden; color: #fff; text-align: center; padding: 72px 0 64px;
+  background: radial-gradient(900px 420px at 50% -10%, #3b2a8a 0%, transparent 65%), linear-gradient(180deg, var(--hero2), var(--hero1)) }
+.dl-hero .crumbs, .dl-hero .crumbs a { color: #9aa8c4 }
+.dl-hero h1 { font-size: clamp(36px, 5vw, 58px); letter-spacing: -1.2px; line-height: 1.08; margin: 0 0 16px; font-weight: 800 }
+.dl-hero h1 .g { background-image: linear-gradient(90deg, #6ea2ff, #a78bff 35%, #e879f9 65%, #2dd4bf) }
+.dl-hero .sub { color: #c4cee0; margin: 0 auto 34px }
+.dl-hero .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .45; pointer-events: none }
+.dl-hero .o1 { width: 340px; height: 340px; left: -80px; top: 40px; background: #4f8cff }
+.dl-hero .o2 { width: 300px; height: 300px; right: -60px; bottom: -80px; background: #c026d3; opacity: .3 }
+.dl-hero .wrap { position: relative }
+.fleet { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; margin: 0 auto 34px; padding: 0; list-style: none }
+.fleet a { display: grid; justify-items: center; gap: 9px; width: 104px; color: #dbe4f5; font-size: 13.5px; font-weight: 600; line-height: 1.25 }
+.fleet a:hover { text-decoration: none; color: #fff }
+.fleet img { width: 72px; height: 72px; border-radius: 19px; box-shadow: 0 16px 40px color-mix(in srgb, var(--c1) 55%, transparent), 0 0 0 1px rgba(255, 255, 255, .08);
+  animation: bob 6s ease-in-out infinite; transition: transform .25s }
+.fleet li:nth-child(2) img { animation-delay: -1s } .fleet li:nth-child(3) img { animation-delay: -2s } .fleet li:nth-child(4) img { animation-delay: -3s }
+.fleet li:nth-child(5) img { animation-delay: -4s } .fleet li:nth-child(6) img { animation-delay: -5s }
+.fleet a:hover img { transform: translateY(-6px) scale(1.06) }
+.fleet .st { font-size: 11.5px; font-weight: 700; color: #f2a93b } .fleet .st.ok { color: #34c77b }
+@keyframes bob { 0%, 100% { translate: 0 0 } 50% { translate: 0 -8px } }
+.trust { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none }
+.trust li { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 99px; font-size: 14px; font-weight: 600;
+  color: #dbe4f5; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .14) }
+.trust svg { width: 16px; height: 16px; fill: none; stroke: #34c77b; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round }
+@media (max-width: 600px) { .fleet { gap: 12px 6px } .fleet a { width: 96px } .fleet img { width: 60px; height: 60px; border-radius: 16px } .dl-hero { padding: 48px 0 44px } }
+
+/* ---------- software catalogue (download.html) */
+.filters { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 0 0 28px }
+.filters[hidden] { display: none }
+.fchip { font: inherit; font-size: 14.5px; font-weight: 600; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--line); background: var(--panel);
+  color: var(--text2); cursor: pointer; display: inline-flex; align-items: center; gap: 7px }
+.fchip:hover { border-color: var(--accent); color: var(--text) }
+.fchip svg { width: 15px; height: 15px; fill: currentColor }
+.fchip[aria-pressed="true"] { background: var(--soft); color: var(--accent); border-color: var(--accent) }
+.catalog { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px }
+.sw { --c1: #4f8cff; --c2: #7c5cff; position: relative; overflow: hidden; background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 26px 24px 22px;
+  display: flex; flex-direction: column; gap: 14px; min-width: 0; transition: transform .25s, box-shadow .25s, border-color .25s }
+.sw::before { content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--c1), var(--c2)) }
+.sw::after { content: ""; position: absolute; width: 220px; height: 220px; right: -90px; top: -110px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--c1) 22%, transparent), transparent); transition: opacity .25s; opacity: .7 }
+.sw:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--c1) 45%, var(--line));
+  box-shadow: 0 26px 60px -18px color-mix(in srgb, var(--c1) 55%, transparent) }
+.sw:hover::after { opacity: 1 }
+.sw > * { position: relative; z-index: 1 }
+.sw[hidden] { display: none }
+.sw-head { display: flex; gap: 14px; align-items: center }
+.sw-head img { width: 60px; height: 60px; border-radius: 16px; flex: none; box-shadow: 0 10px 26px color-mix(in srgb, var(--c1) 40%, transparent); transition: transform .25s }
+.sw:hover .sw-head img { transform: rotate(-4deg) scale(1.05) }
+.sw h3 { margin: 0; font-size: 19px; line-height: 1.25 }
+.sw h3 a { color: var(--text) }
+.sw-kind { margin: 2px 0 0; color: color-mix(in srgb, var(--c1) var(--kind-pct), var(--kind-base)); font-size: 13px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase }
+.sw-pitch { margin: 0; color: var(--text2); font-size: 15.5px; flex: 1 }
+.sw-os { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none }
+.sw-os li { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text2); border: 1px solid var(--line); border-radius: 99px; padding: 3px 10px; background: var(--panel2) }
+.sw-os svg { width: 14px; height: 14px; fill: currentColor }
+.sw-meta { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; color: var(--mute) }
+.sw-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px }
+.sw-cta .btn { flex: 1 1 auto; padding: 11px 16px; font-size: 15.5px }
+.sw-cta .btn.primary { background: linear-gradient(135deg, var(--c1), var(--c2)); box-shadow: 0 10px 26px -6px color-mix(in srgb, var(--c1) 60%, transparent) }
+.sw .fine { margin: 0 }
+.btn.soon[disabled] { transform: none }
+.dl-sec { padding: 72px 0 }
+.dl-sec h2 { font-size: clamp(26px, 3vw, 34px); margin: 0 0 8px }
+.dl-sec .lead { color: var(--text2); margin: 0 0 28px }
+.dl-one { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start }
+.sec-head { text-align: center; margin: 0 auto 30px; max-width: 680px }
+.sec-head h2 { font-size: clamp(26px, 3vw, 36px); margin: 0 0 8px }
+.sec-head p { color: var(--text2); margin: 0 }
+@media (max-width: 1080px) { .catalog { grid-template-columns: repeat(2, 1fr) } }
+@media (max-width: 760px) { .catalog, .dl-one { grid-template-columns: 1fr } }
+
+/* ---------- home: the apps on the way, and the trust strip */
+.hero.home .trust { margin: 26px 0 0 }
+.family { margin: 44px auto 0; text-align: center; position: relative }
+.family h2 { font-size: 15px; letter-spacing: 1.2px; text-transform: uppercase; color: #9aa8c4; margin: 0 0 16px; font-weight: 750 }
+.family .fleet { margin: 0 } .family .fleet a { width: 136px }
+
+/* ---------- app pages: icon glow and accent */
+.phero .picon { filter: drop-shadow(0 18px 36px rgba(91, 140, 255, .35)) }
+.picon.round { border-radius: 22px }
+@media (prefers-reduced-motion: reduce) {
+  .sw:hover, .sw:hover .sw-head img, .fleet a:hover img, .dd-item:hover img { transform: none }
+  .fleet img, .dd.open .dd-menu { animation: none }
+}

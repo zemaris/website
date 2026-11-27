@@ -304,10 +304,20 @@ class Built(unittest.TestCase):
         self.assertIn('href="/zemaris-pdf.html"', self.pages["download.html"])
 
     def test_no_competitor_names(self):
-        allt = "\n".join(self.pages.values()).lower()
-        for name in ("internet download manager", "idm", "acrobat", "foxit", "free download manager", "jdownloader",
-                     "eagleget", "pdfelement", "nitro", "updf", "pdf-xchange"):
-            self.assertIsNone(re.search(r"\b" + re.escape(name) + r"\b", allt), name)
+        """Not on the pages, and not in the update notes either: the apps show those notes to people in their
+        "update available" message (velocity/update.json and velocity-pdf/update.json, served by this site)."""
+        texts = {n: t for n, t in self.pages.items()}
+        for uj in (os.path.join("velocity", "update.json"), os.path.join("velocity-pdf", "update.json")):
+            path = os.path.join(SITE, uj)
+            if os.path.isfile(path):
+                with open(path, encoding="utf-8-sig") as f:
+                    texts[uj] = f.read()
+        self.assertIn(os.path.join("velocity", "update.json"), texts)
+        for n, text in texts.items():
+            low = text.lower()
+            for name in ("internet download manager", "idm", "acrobat", "foxit", "free download manager", "jdownloader",
+                         "eagleget", "pdfelement", "nitro", "updf", "pdf-xchange"):
+                self.assertIsNone(re.search(r"\b" + re.escape(name) + r"\b", low), f"{n}: {name}")
 
     def test_eula_page_is_the_installer_text(self):
         src = open(os.path.join(SITE, "_legal", "EULA.txt"), encoding="utf-8").read().strip("\n")
@@ -644,7 +654,7 @@ class Downloads(unittest.TestCase):
                 self.assertNotIn(gone, end, n)
             self.assertNotIn("Please%20tell%20me%20when%20Velocity%20launches", pages[n], n)
         # the macOS, Linux and phone cards ask for an email, never the launch list that no longer exists
-        # (Zemaris PDF and Velocity Browser cards further down keep their own launch list: not released yet)
+        # (the cards of other apps further down have their own buttons)
         cards = dl[dl.index('data-os="mac"'):dl.index('data-os="ext"')]
         self.assertNotIn('href="#launch"', dl)
         self.assertNotIn("launch list", cards)
@@ -1026,7 +1036,7 @@ class VelocityPdf(unittest.TestCase):
         self.assertNotIn("Coming soon</span>", vp)
         self.assertIn('id="download"', vp)
         self.assertIn("System requirements", vp)
-        card = dl[dl.index('data-app="pdf"'):dl.index('data-app="browser"')]
+        card = dl[dl.index('data-app="pdf"'):dl.index('data-app="player"')]   # the card after Zemaris PDF
         self.assertNotIn(".exe", card)
         self.assertIn("Join the launch list", card)
         self.assertIn("Version " + base_cfg()["downloads"]["pdf_windows"]["version"], card)
@@ -1044,7 +1054,7 @@ class VelocityPdf(unittest.TestCase):
         self.assertNotIn("launch list", vp)
         self.assertIn("Seeing a warning when you download?", vp)
         self.assertIn("Version 0.8.0", vp)
-        card = dl[dl.index('data-app="pdf"'):dl.index('data-app="browser"')]
+        card = dl[dl.index('data-app="pdf"'):dl.index('data-app="player"')]   # the card after Zemaris PDF
         self.assertNotIn("launch list", card)
         self.assertIn("Download Zemaris PDF", card)
 
@@ -1163,6 +1173,235 @@ class VelocityPdf(unittest.TestCase):
         write(sha256="0" * 64)
         with self.assertRaises(SystemExit):
             run()
+
+
+class Catalog(unittest.TestCase):
+    """The download page as a catalogue of every Zemaris app, the Products menu on every page, and the pages of the
+    apps not released yet (Nov 2026: the owner wants all our software shown, not only the Download Manager)."""
+
+    NEW_PAGES = {"player": "zemaris-player.html", "scan": "zemaris-scan.html",
+                 "camera": "zemaris-camera.html"}
+    DOWNLOAD_LINK = re.compile(r'href="[^"]*(?:\.(?:exe|msi|msix|apk|aab|zip)|/download/)[^"]*"', re.I)
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.mkdtemp(prefix="zsite-cat-")
+        cls.built = _build.build(cls.tmp, base_cfg(), quiet=True)
+        closed = os.path.join(cls.tmp, "closed")
+        os.makedirs(closed)
+        cls.closed = _build.build(closed, closed_cfg(), quiet=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp, ignore_errors=True)
+
+    @staticmethod
+    def cards(dl):
+        """{app key: card html} of the catalogue, in page order."""
+        return {m.group(1): m.group(0) for m in
+                re.finditer(r'<article class="sw[^"]*" data-app="(\w+)".*?</article>', dl, re.S)}
+
+    def test_every_product_has_a_card_in_order_available_first(self):
+        keys = {"features": "dm"}
+        for pages in (self.built, self.closed):
+            cards = self.cards(pages["download.html"])
+            self.assertEqual(list(cards), [keys.get(p[0], p[0]) for p in _build.PRODUCTS])
+            for (key, href, name, plats, flag, icon), (app, card) in zip(_build.PRODUCTS, cards.items()):
+                self.assertIn(f'>{name}</a></h3>', card, app)
+                self.assertIn(f'src="{icon}"', card, app)
+                self.assertRegex(card, r'<a class="btn[^"]*" href="' + re.escape(href) + r'" title="[^"]+">View details</a>', app)
+                want = {"Windows": "windows", "Android": "android"}
+                self.assertEqual(card.split('data-platforms="')[1].split('"')[0].split(),
+                                 [want[p] for p in plats.split(" · ")], app)
+                self.assertTrue(os.path.isfile(os.path.join(SITE, *icon.strip("/").split("/"))), icon)
+            released = [p[4] is not None for p in _build.PRODUCTS]
+            self.assertEqual(released, sorted(released, reverse=True), "available apps come first")
+
+    def test_coming_soon_apps_never_link_to_a_download(self):
+        for pages in (self.built, self.closed):
+            cards = self.cards(pages["download.html"])
+            for key, href, name, plats, flag, icon in _build.PRODUCTS:
+                if flag is not None:
+                    continue
+                card = cards[key]
+                self.assertIn('<span class="chip warn">Coming soon</span>', card, key)
+                self.assertRegex(card, r'<button class="btn soon" type="button" disabled title="[^"]+">Coming soon</button>')
+                self.assertIsNone(self.DOWNLOAD_LINK.search(card), key)
+                page = pages[href.lstrip("/")]
+                self.assertIsNone(self.DOWNLOAD_LINK.search(page[page.index('<main id="main">'):]), href)
+                self.assertIn(">Coming soon</button>", page, href)
+                self.assertNotRegex(plain(page), r"\$\d", f"{href}: no price for an app not released yet")
+
+    def test_available_cards_follow_the_download_switches(self):
+        cfg = base_cfg()
+        d = cfg["downloads"]
+        cards = self.cards(self.built["download.html"])
+        for app, live, url, ver in (("dm", d["open"], d["base_url"] + d["windows"]["file"], d["windows"]["version"]),
+                                    ("pdf", d["pdf_open"], d["pdf_windows"]["base_url"] + d["pdf_windows"]["file"],
+                                     d["pdf_windows"]["version"])):
+            if live:
+                self.assertIn(f'href="{url}"', cards[app], app)
+                self.assertIn(f"Version {ver} · ", cards[app], app)
+                self.assertIn('<span class="chip ok">Available</span>', cards[app], app)
+        for app, card in self.cards(self.closed["download.html"]).items():   # switches off: no installer anywhere
+            self.assertIsNone(self.DOWNLOAD_LINK.search(card), app)
+            self.assertNotIn("Available", card, app)
+
+    def test_products_menu_on_every_page_lists_every_app(self):
+        for pages in (self.built, self.closed):
+            for n, text in pages.items():
+                if "<header" not in text:
+                    continue
+                head = text[text.index("<header"):text.index("</header>")]
+                self.assertRegex(head, r'<button class="dd-btn[^"]*" id="prodBtn" type="button" aria-expanded="false" '
+                                       r'aria-controls="prodMenu" title="[^"]+">Products', n)
+                menu = head[head.index('id="prodMenu"'):]
+                for key, href, name, plats, flag, icon in _build.PRODUCTS:
+                    self.assertIn(f'href="{href}"', menu, f"{n}: {name}")
+                    self.assertIn(f"<b>{name}</b>", menu, n)
+                self.assertIn('href="/download.html"', menu, n)
+                self.assertIsNone(self.DOWNLOAD_LINK.search(head), n)
+                foot = text[text.index("<footer"):]
+                for key, href, name, plats, flag, icon in _build.PRODUCTS:
+                    self.assertIn(f'href="{href}"', foot, f"{n} footer: {name}")
+        # the app's own page marks itself in the menu
+        for key, href, name, plats, flag, icon in _build.PRODUCTS:
+            page = self.built[href.lstrip("/")]
+            self.assertIn(f'href="{href}" aria-current="page"', page, href)
+            self.assertIn('class="dd-btn on"', page, href)
+        self.assertIn('Windows · Coming soon', self.closed["index.html"])
+
+    def test_new_app_pages_are_built_with_title_meta_and_schema(self):
+        products = {p[0]: p for p in _build.PRODUCTS}
+        for key, name in self.NEW_PAGES.items():
+            self.assertEqual(products[key][1], "/" + name)
+            text = self.built[name]
+            self.assertTrue(os.path.isfile(os.path.join(SITE, "_pages", name)), name)
+            title = html.unescape(re.search(r"<title>(.*?)</title>", text).group(1))
+            self.assertIn(products[key][2], title, name)
+            self.assertIn(f'<link rel="canonical" href="https://zemaris.com/{name}">', text)
+            schema = json.loads(parse(text).json_scripts[0])
+            self.assertEqual((schema["@type"], schema["name"]), ("SoftwareApplication", products[key][2]), name)
+            self.assertNotIn("offers", schema, name)                     # no price before release
+            self.assertIn('href="/download.html"', text[text.index('<main id="main">'):], name)
+        items = json.loads(parse(self.built["download.html"]).json_scripts[0])["itemListElement"]
+        self.assertEqual([i["item"]["name"] for i in items], [p[2] for p in _build.PRODUCTS])
+
+    def test_showcase_opening_trust_strip_and_motion(self):
+        """Download page opening: every app's icon links to its page with its status; home shows the apps on the way;
+        both have the trust strip; every new animation stops for people who ask for less motion."""
+        for pages in (self.built, self.closed):
+            dl = pages["download.html"]
+            fleet = re.search(r'<div class="dl-hero">.*?<ul class="fleet"[^>]*>(.*?)</ul>', dl, re.S).group(1)
+            items = re.findall(r'<li data-acc="(\w+)"><a href="([^"]+)"><img src="([^"]+)"', fleet)
+            self.assertEqual([(h, i) for _, h, i in items], [(p[1], p[5]) for p in _build.PRODUCTS])
+            self.assertIsNone(self.DOWNLOAD_LINK.search(fleet))
+            for n in ("download.html", "index.html"):
+                trust = re.search(r'<ul class="trust">(.*?)</ul>', pages[n], re.S)
+                self.assertIsNotNone(trust, n)
+                for words in ("No ads", "No tracking", "30 days free"):
+                    self.assertIn(words, trust.group(1), n)
+            home = pages["index.html"]
+            family = home[home.index('<div class="family">'):home.index("</section>", home.index('<div class="family">'))]
+            for key, href, name, plats, flag, icon in _build.PRODUCTS:
+                if flag is None:
+                    self.assertIn(f'href="{href}"', family, name)
+            self.assertIsNone(self.DOWNLOAD_LINK.search(family))
+        self.assertIn("Coming soon", plain(self.closed["download.html"][:self.closed["download.html"].index('id="catalog"')]))
+        with open(os.path.join(SITE, "assets", "style.css"), encoding="utf-8") as f:
+            css = f.read()
+        tail = css[css.index("/* ---------- Products menu in the top bar"):]
+        last = tail[tail.rindex("@media (prefers-reduced-motion: reduce)"):]
+        for anim in re.findall(r"\n(\.[^{\n]+)\{[^}]*\banimation:\s*(?!none)", tail):
+            self.assertIn(anim.split(",")[0].strip().split(" ")[0], last, anim)
+
+    def test_asset_links_carry_a_content_version(self):
+        """Every page links /assets/style.css and /assets/site.js with ?v=<hash of the file>, so a changed file is
+        fetched fresh instead of an old cached copy being used with new pages."""
+        for name in ("style.css", "site.js"):
+            with open(os.path.join(SITE, "assets", name), "rb") as f:
+                want = hashlib.sha256(f.read().replace(b"\r\n", b"\n")).hexdigest()[:10]
+            self.assertEqual(_build.asset_version(name), want)
+            for n, text in self.built.items():
+                self.assertIn(f"/assets/{name}?v={want}", text, n)
+                self.assertNotRegex(text, r'"/assets/' + re.escape(name) + '"', n)
+
+    def test_small_labels_contrast(self):
+        """The small "Coming soon" / "Available" menu labels and the card's kind label (accent mixed into text)
+        reach 4.5:1 on the panel colour in light and dark (WCAG AA for normal text). Values read from style.css."""
+        with open(os.path.join(SITE, "assets", "style.css"), encoding="utf-8") as f:
+            css = f.read()
+
+        def rgb(h):
+            h = h.lstrip("#")
+            return [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+
+        def lum(c):
+            v = [x / 255 for x in c]
+            v = [x / 12.92 if x <= .03928 else ((x + .055) / 1.055) ** 2.4 for x in v]
+            return .2126 * v[0] + .7152 * v[1] + .0722 * v[2]
+
+        def ratio(a, b):
+            hi, lo = sorted((lum(a), lum(b)), reverse=True)
+            return (hi + .05) / (lo + .05)
+
+        def var(block, name):
+            return re.search(r"--" + name + r":\s*([^;}\s]+)", block).group(1)
+
+        light = re.search(r"^:root \{[^}]*--st-warn[^}]*\}", css, re.M).group(0)
+        dark = re.search(r':root\[data-theme="dark"\] \{[^}]*--st-warn[^}]*\}', css).group(0)
+        panel_light = var(css[:css.index(":root[data-theme")], "panel")
+        panel_dark = var(css[css.index(':root[data-theme="dark"]'):], "panel")
+        accents = re.findall(r'\[data-acc="\w+"\], \.sw\[data-app="\w+"\] \{ --c1: (#[0-9a-f]{6})', css)
+        self.assertEqual(len(accents), len(_build.PRODUCTS))
+        self.assertIn("color-mix(in srgb, var(--c1) var(--kind-pct), var(--kind-base))", css)
+        for block, panel in ((light, panel_light), (dark, panel_dark)):
+            for k in ("st-warn", "st-ok"):
+                self.assertGreaterEqual(ratio(rgb(var(block, k)), rgb(panel)), 4.5, (k, block[:30]))
+            p, base = float(var(block, "kind-pct").rstrip("%")) / 100, rgb(var(block, "kind-base"))
+            for a in accents:
+                mixed = [round(x * p + y * (1 - p)) for x, y in zip(rgb(a), base)]
+                self.assertGreaterEqual(ratio(mixed, rgb(panel)), 4.5, (a, block[:30]))
+
+    def test_every_app_has_its_own_icon(self):
+        icon = {p[0]: p[5] for p in _build.PRODUCTS}
+        self.assertEqual(len(set(icon.values())), len(icon))
+
+    def test_hidden_apps_are_nowhere_on_the_site(self):
+        """Apps kept off the site (_build.HIDDEN): their name, page and icon are in no built page, no asset and no page
+        source, and the build itself stops when a hidden app's page or name is still there. Five apps are shown."""
+        self.assertEqual([p[2] for p in _build.PRODUCTS], ["Velocity Download Manager", "Zemaris PDF", "Zemaris Player",
+                                                            "Zemaris Scan", "Zemaris Camera"])
+        hidden = [p for p in _build.APPS if p[0] in _build.HIDDEN]
+        for key, href, name, plats, flag, icon in hidden:
+            for pages in (self.built, self.closed):
+                self.assertNotIn(href.lstrip("/"), pages)
+                for n, text in pages.items():
+                    for word in (name, href, icon, f'data-acc="{key}"', f'data-app="{key}"'):
+                        self.assertNotIn(word, text, n)
+            self.assertFalse(os.path.exists(os.path.join(SITE, href.lstrip("/"))), href)
+            self.assertFalse(os.path.exists(os.path.join(SITE, "_pages", href.lstrip("/"))), href)
+            self.assertFalse(os.path.exists(os.path.join(SITE, *icon.strip("/").split("/"))), icon)
+            for folder in ("_pages", "assets"):
+                for f in os.listdir(os.path.join(SITE, folder)):
+                    if f.endswith((".html", ".css", ".js", ".svg")):
+                        with open(os.path.join(SITE, folder, f), encoding="utf-8") as fh:
+                            self.assertNotIn(name, fh.read(), f"{folder}/{f}")
+        # the safety net: hiding an app whose page and name are still on the site stops the build
+        old = _build.HIDDEN
+        try:
+            _build.HIDDEN = {"camera"}
+            with self.assertRaises(_build.BuildError):
+                _build.build(os.path.join(self.tmp, "closed"), closed_cfg(), quiet=True)
+        finally:
+            _build.HIDDEN = old
+
+    def test_old_and_retired_names_stay_off_the_catalogue(self):
+        """Velocity Tube is dropped and Velocity Commander is not a public app; old "Velocity ..." app names are gone."""
+        for n, text in self.built.items():
+            for gone in ("Velocity Tube", "Velocity Commander", "Velocity Player",
+                         "Velocity Scan", "Velocity Camera"):
+                self.assertNotIn(gone, text, n)
 
 
 if __name__ == "__main__":

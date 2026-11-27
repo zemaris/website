@@ -29,10 +29,52 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-NAV = [("features", "/features.html", "Download Manager"), ("pdf", "/zemaris-pdf.html", "Zemaris PDF"),
-       ("compare", "/compare.html", "Compare"),
+# Every Zemaris app, in the order the Products menu and the download page show them (available ones first).
+# key = the nav key on the app's own page; flag = the launch flag that makes it "Available" (None = not released yet:
+# always "Coming soon", and no download link anywhere).
+APPS = (
+    ("features", "/features.html", "Velocity Download Manager", "Windows", "downloads_live", "/assets/velocity-icon.svg"),
+    ("pdf", "/zemaris-pdf.html", "Zemaris PDF", "Windows", "pdf_downloads_live", "/assets/velocity-pdf-icon.svg"),
+    ("player", "/zemaris-player.html", "Zemaris Player", "Windows · Android", None, "/assets/zemaris-player-icon.png"),
+    ("scan", "/zemaris-scan.html", "Zemaris Scan", "Android", None, "/assets/zemaris-scan-icon.svg"),
+    ("camera", "/zemaris-camera.html", "Zemaris Camera", "Android", None, "/assets/zemaris-camera-icon.png"),
+)
+# Apps kept off the site (internal only): put the key here. The Products menu and the footer follow by themselves; the
+# app's page in _pages, its catalogue card, icon rows and schema entry on download.html and index.html, its icon file
+# and accent colour in style.css must go too: the build stops if a hidden app's page exists or its name, address or icon
+# shows up in any page. To show an app again, take its key out and add those back.
+HIDDEN = set()
+PRODUCTS = tuple(p for p in APPS if p[0] not in HIDDEN)   # the apps the site shows
+NAV = [("compare", "/compare.html", "Compare"),
        ("pricing", "/pricing.html", "Pricing"), ("support", "/support.html", "Support"),
        ("whatsnew", "/whats-new.html", "What's new"), ("download", "/download.html", "Download")]
+# What each app is, in two words, and its accent colour name in style.css ([data-acc] / .sw[data-app])
+KIND = {"features": ("Download manager", "dm"), "pdf": ("PDF editor", "pdf"),
+        "player": ("Video and music player", "player"), "scan": ("Document scanner", "scan"),
+        "camera": ("Timestamp camera", "camera")}
+CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+
+
+def nav_html(active):
+    """The top menu: a Products menu with every app (opened by assets/site.js), then the other pages."""
+    items = []
+    for key, href, name, plats, flag, icon in PRODUCTS:
+        kind, acc = KIND[key]
+        status = (f'<!--IF {flag}--><em class="st ok">{plats} · Available</em><!--ELSE--><em class="st">{plats} · Coming soon'
+                  f'</em><!--ENDIF-->' if flag else f'<em class="st">{plats} · Coming soon</em>')
+        cur = ' aria-current="page"' if key == active else ""
+        items.append(f'<a class="dd-item" data-acc="{acc}" href="{href}"{cur}><img src="{icon}" alt="" width="40" height="40">'
+                     f'<span><b>{name}</b><small>{kind}</small>{status}</span></a>')
+    on = " on" if active in {p[0] for p in PRODUCTS} else ""
+    menu = (f'<div class="dd"><button class="dd-btn{on}" id="prodBtn" type="button" aria-expanded="false" '
+            f'aria-controls="prodMenu" title="Show all Zemaris software">Products{CHEVRON}</button>'
+            f'<div class="dd-menu" id="prodMenu">'
+            f'<p class="dd-head"><b>Zemaris software</b><span>Fast, private apps. No ads, no tracking.</span></p>'
+            f'<div class="dd-grid">{"".join(items)}</div>'
+            f'<p class="dd-foot"><a class="dd-all" href="/download.html">See all downloads</a>'
+            f'<a class="dd-more" href="/pricing.html">Plans and prices</a></p></div></div>')
+    return menu + "".join(f'<a href="{href}"{" class=\"on\"" if key == active else ""}>{label}</a>'
+                          for key, href, label in NAV)
 
 # Old page addresses that must keep working (emails, installed apps and other sites link to them): the build writes
 # the same page there too. Its canonical link and og:url name the new address, so search engines keep one page.
@@ -61,8 +103,8 @@ HEAD = """<!doctype html>
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
 <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t)}}catch(e){{}}</script>
-<link rel="stylesheet" href="/assets/style.css">
-<script src="/assets/site.js" defer></script>
+<link rel="stylesheet" href="/assets/style.css?v={css_v}">
+<script src="/assets/site.js?v={js_v}" defer></script>
 <script src="/assets/stats.js" defer></script>
 {extra}</head>
 <body>
@@ -76,7 +118,7 @@ HEAD = """<!doctype html>
         <svg class="theme-light-ic" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         <svg class="theme-dark-ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
       </button>
-      <a class="btn small primary" href="/download.html" title="Go to the download page">Get Velocity</a>
+      <a class="btn small primary" href="/download.html" title="See all Zemaris software and download it">Downloads</a>
       <button class="iconbtn" id="menuBtn" title="Show or hide the menu" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     </div>
   </div>
@@ -90,9 +132,10 @@ FOOT = """</main>
     <div class="fcols">
       <div>
         <a class="brand" href="/" title="Zemaris home page"><img src="/assets/zemaris-mark.svg" alt="" width="30" height="30">Zemaris</a>
-        <p>Fast, honest software: Velocity Download Manager and Zemaris PDF for Windows.</p>
+        <p>Fast, honest software: Velocity Download Manager and Zemaris PDF for Windows, with more apps for Windows and Android on the way.</p>
       </div>
-      <div><h5>Product</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/download.html">Download</a><a href="/zemaris-pdf.html">Zemaris PDF</a><a href="/languages.html">Languages</a></div>
+      <div><h5>Software</h5><!--SOFTWARE--><a href="/download.html">All downloads</a></div>
+      <div><h5>Explore</h5><a href="/features.html">Features</a><a href="/compare.html">Compare</a><a href="/pricing.html">Pricing</a><a href="/whats-new.html">What's new</a><a href="/languages.html">Languages</a></div>
       <div><h5>Help</h5><a href="/support.html">Help centre</a><a href="/support.html#troubleshoot">Troubleshooting</a><a href="/support.html#licence">Licence & activation</a><a href="/refunds.html">Refunds</a><a href="mailto:{{SUPPORT_EMAIL}}">Contact us</a></div>
       <div><h5>Company</h5><a href="/about.html">About Zemaris</a><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="/eula.html">Licence agreement</a><a href="/legal.html">Legal notice</a><a href="/third-party.html">Open-source notices</a><a href="mailto:{{SUPPORT_EMAIL}}">{{SUPPORT_EMAIL}}</a></div>
     </div>
@@ -102,6 +145,9 @@ FOOT = """</main>
 </body>
 </html>
 """
+
+
+FOOT = FOOT.replace("<!--SOFTWARE-->", "".join(f'<a href="{p[1]}">{p[2]}</a>' for p in PRODUCTS))
 
 
 class BuildError(SystemExit):
@@ -376,6 +422,14 @@ def check_page(name, page):
              "\", trading as Zemaris\") and seller.governing_law the country only (they add \"the laws of\")")
 
 
+def asset_version(name):
+    """A short hash of an asset's content for its link (/assets/style.css?v=...): a changed file gets a new address, so
+    browsers and the CDN never pair new pages with an old cached style sheet or script."""
+    import hashlib
+    with open(os.path.join(HERE, "assets", name), "rb") as f:
+        return hashlib.sha256(f.read().replace(b"\r\n", b"\n")).hexdigest()[:10]
+
+
 def build(out_dir=None, cfg=None, quiet=False, root=HERE):
     """Builds every page into out_dir (default: this folder). Returns {page name: html}.
     root is where a zemaris.com installer is looked for (tests use a temp folder)."""
@@ -390,6 +444,7 @@ def build(out_dir=None, cfg=None, quiet=False, root=HERE):
     vals, raw = values(cfg)
     raw = dict(raw)
     src = os.path.join(HERE, "_pages")
+    versions = {"css_v": asset_version("style.css"), "js_v": asset_version("site.js")}
     built, placeholders = {}, set()
     for name in sorted(os.listdir(src)):
         if not name.endswith(".html"):
@@ -409,9 +464,9 @@ def build(out_dir=None, cfg=None, quiet=False, root=HERE):
             raw["EULA_TEXT"] = legal_text("EULA.txt", vals)
         if "{{NOTICES_TEXT}}" in body:
             raw["NOTICES_TEXT"] = legal_text("THIRD-PARTY-NOTICES.txt", vals)
-        nav = "".join(f'<a href="{href}"{" class=\"on\"" if key == active else ""}>{label}</a>' for key, href, label in NAV)
+        nav = nav_html(active)
         path = "/" if name == "index.html" else "/" + name
-        page = HEAD.format(title=title, desc=desc, nav=nav, extra=extra, path=path) + body + FOOT
+        page = HEAD.format(title=title, desc=desc, nav=nav, extra=extra, path=path, **versions) + body + FOOT
         page = render(page, vals, raw, {**flags, **release_flags(page, cfg, flags["downloads_live"])}, name)
         check_page(name, page)
         placeholders.update(PLACEHOLDER.findall(page))
@@ -424,6 +479,15 @@ def build(out_dir=None, cfg=None, quiet=False, root=HERE):
             built[old] = page
         if not quiet:
             print("built", name)
+    for key, href, name, *_ in APPS:   # hidden apps: not a page, not a word anywhere on the site
+        if key in HIDDEN:
+            if os.path.isfile(os.path.join(src, href.lstrip("/"))):
+                fail(f"_pages{href} is a hidden app's page (HIDDEN in _build.py): remove it or show the app")
+            for n, page in built.items():
+                if name in page or href in page:
+                    fail(f"{n}: names {name}, which is hidden (HIDDEN in _build.py)")
+        elif href.lstrip("/") not in built:
+            fail(f"{href}: page of a shown app is missing in _pages")
     if not quiet:
         print("checkout:", "OPEN (" + cfg["checkout"]["environment"] + ")" if flags["checkout_live"] else "Coming soon")
         print("downloads:", "OPEN" if flags["downloads_live"] else "Coming soon")

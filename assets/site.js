@@ -23,10 +23,33 @@
     }
     var m = e.target.closest("#menuBtn");
     if (m) { var n = document.querySelector("nav.links"); n.classList.toggle("open"); m.setAttribute("aria-expanded", n.classList.contains("open")) }
+    // the Products menu in the top bar: its button opens and closes it, a click anywhere else closes it
+    var pb = e.target.closest("#prodBtn");
+    if (pb) products(pb.getAttribute("aria-expanded") !== "true");
+    else if (!e.target.closest("#prodMenu")) products(false);
     // a link to a collapsed answer on this page opens it, also when clicked again after it was closed: the address
     // already ends in that #, so no hashchange comes
     var h = e.target.closest('a[href^="#"]');
     if (h) openDetails(h.getAttribute("href").slice(1));
+  });
+
+  function products(open) {
+    var b = document.getElementById("prodBtn");
+    if (!b || (b.getAttribute("aria-expanded") === "true") === open) return;
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+    b.parentNode.classList.toggle("open", open);
+  }
+  // keyboard focus moving to something outside the Products menu (Tab past its last item) closes it. Only when focus
+  // goes somewhere: a mouse press on a blank part of the menu moves focus nowhere and must not close it under the
+  // pointer (the click handler above closes it for clicks outside)
+  document.addEventListener("focusout", function (e) {
+    var dd = e.target && e.target.closest ? e.target.closest(".dd") : null, to = e.relatedTarget;
+    if (dd && to && !dd.contains(to)) products(false);
+  });
+  // Escape closes the Products menu and puts the keyboard back on its button
+  document.addEventListener("keydown", function (e) {
+    var b = document.getElementById("prodBtn");
+    if (e.key === "Escape" && b && b.getAttribute("aria-expanded") === "true") { products(false); b.focus() }
   });
 
   document.addEventListener("DOMContentLoaded", function () {
