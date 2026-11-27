@@ -1,9 +1,9 @@
 {
-  "version": "0.8.2",
-  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.2.exe",
-  "sha256": "76282b1cbe56e59144f64b165a6c8bd61da87decb7fc80b6837c204e2a98768e",
-  "size": 68525909,
-  "notes": "Velocity PDF 0.8.2: Save and Save As now work on files opened from your PC, a failed save says why and offers Try again or Save as, and Ctrl+S works while typing.",
+  "version": "0.8.5",
+  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.5.exe",
+  "sha256": "594dcab750bfbe3f3a1aa37e6daa27907b82990407aee61b8d3c1d5bd7f57836",
+  "size": 68599175,
+  "notes": "Zemaris PDF 0.8.5: select and highlight exactly the words you drag over; reliable spell check with suggestions (also in comments and form fields); choose several pages with Ctrl and Shift; form fields with border, fill and tick styles that work when clicked, including date picker and signature box; better Word, Excel and PowerPoint export; page views change straight away; cleaner tabs with a + button to open files.",
   "product": "pdf",
-  "signature": "z2+JIvP4W6aVwe/Gxokr7JC4OAHrEvyqza+X/VG/lXjj8KjfG3kUqAHrT1phrWAEpAvimydU9yHd3vQFXkJ1IQ=="
+  "signature": "LvN7mr0vbh+YFwLyGkPS2u3WRvwamQ1b0Q8HyDUNYfw32j4f9CAW13dUXII+xtf1ABJ6/xk/RlGQbYDu/WzvYA=="
 }
