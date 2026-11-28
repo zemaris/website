@@ -46,11 +46,11 @@
     "pdf_open": true,
     "pdf_windows": {
       "_note": "Velocity PDF installer. version/file/base_url set; size, sha256 and date are filled by python _release.py --product pdf. pdf_open stays false until the owner publishes: the pages then say Download available soon.",
-      "version": "0.8.5",
-      "file": "VelocityPDF-Setup-0.8.5.exe",
+      "version": "0.8.6",
+      "file": "VelocityPDF-Setup-0.8.6.exe",
       "base_url": "https://zemaris.com/velocity-pdf/download/",
-      "size": 68599175,
-      "sha256": "594dcab750bfbe3f3a1aa37e6daa27907b82990407aee61b8d3c1d5bd7f57836",
+      "size": 68611175,
+      "sha256": "cfacda2ca9004bb8c9e551d1ba52af5552ade91dc110247a5419aaa8b4d600fc",
       "signed": false,
       "publisher": "",
       "date": "November 2026"

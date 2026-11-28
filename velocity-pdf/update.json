@@ -1,9 +1,9 @@
 {
-  "version": "0.8.5",
-  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.5.exe",
-  "sha256": "594dcab750bfbe3f3a1aa37e6daa27907b82990407aee61b8d3c1d5bd7f57836",
-  "size": 68599175,
-  "notes": "Zemaris PDF 0.8.5: select and highlight exactly the words you drag over; reliable spell check with suggestions (also in comments and form fields); choose several pages with Ctrl and Shift; form fields with border, fill and tick styles that work when clicked, including date picker and signature box; better Word, Excel and PowerPoint export; page views change straight away; cleaner tabs with a + button to open files.",
+  "version": "0.8.6",
+  "url": "https://zemaris.com/velocity-pdf/download/VelocityPDF-Setup-0.8.6.exe",
+  "sha256": "cfacda2ca9004bb8c9e551d1ba52af5552ade91dc110247a5419aaa8b4d600fc",
+  "size": 68611175,
+  "notes": "Zemaris PDF 0.8.6: side panels fold away with an arrow and remember it; zoom stays where your mouse is (Ctrl+wheel, pinch) or on the middle of the view (buttons); drag a box in the Pages panel to choose several pages; chosen pages are clearly highlighted; option to make Zemaris PDF your default PDF app.",
   "product": "pdf",
-  "signature": "LvN7mr0vbh+YFwLyGkPS2u3WRvwamQ1b0Q8HyDUNYfw32j4f9CAW13dUXII+xtf1ABJ6/xk/RlGQbYDu/WzvYA=="
+  "signature": "ZWLFnP4g5kuoASUHbGCGpR+FHgGK0ToCe0UAvZhBZCbMJgzOP0Ulkij7m7c9vEvTMTOZX9Stjxe+q5kObJIQiQ=="
 }
